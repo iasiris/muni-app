@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Muni</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="create_account">Crea tu cuenta</string>
+    <string name="forgot_password">Olvidaste tu contraseña?</string>
+    <string name="remember_me">Recuerdame</string>
+    <string name="email">Email</string>
+    <string name="password">Contraseña</string>
+    <string name="invalid_login">Email o contraseña incorrectos</string>
+    <string name="confirm_password">Confirmar Contraseña</string>
+    <string name="full_name">Nombre Completo</string>
+    <string name="do_not_have_account">No tienes una cuenta?</string>
+    <string name="sing_up_here">Registrate aqui</string>
+    <string name="sing_in">Registrate</string>
+    <string name="search">Buscar</string>
+    <string name="muni">Muni</string>
+    <string name="see_all">Ver todo</string>
+    <string name="categorias">Categorias</string>
+    <string name="specials_of_the_day">Ofertas del dia</string>
+    <string name="order_by">Ordenar</string>
+    <string name="add_to_cart">Agregar</string>
+    <string name="one_product">%1$s producto</string>
+    <string name="products">%1$s productos</string>
+
+
+    <!-- Descripcion de Imagenes y Contenido-->
+    <string name="shopping_bag">Bolsas de compra</string>
+    <string name="back_button">Back Button</string>
+    <string name="drink">Bebida</string>
+    <string name="locacion_icon">Icon Location</string>
+    <string name="search_icon">Icon Busqueda</string>
+    <string name="cart_icon">Icon Carrito</string>">
+    <string name="decrease_icon">Icon Agregar</string>
+    <string name="increase_icon">Icon Quitar</string>">
+    <string name="remove_icon">Icon Eliminar</string>">
+    <string name="product_image">Imagen de Producto</string>">
+    <string name="show_password">Mostrar contraseña</string>
+    <string name="hide_password">Ocultar contraseña</string>
+    <string name="delete_icon">Borrar Icon</string>
+    <string name="order_featured">Destacados</string>
+    <string name="price_low_to_high">Menor Precio</string>
+    <string name="price_high_to_low">Mayor Precio </string>
+    <string name="add">Icon Mas</string>">
+    <string name="remove">Icon Menos</string>">
+    <string name="dropwdown_menu">Menu desplegable</string>
+
+</resources>
