@@ -95,13 +95,14 @@ class ProfileViewModel @Inject constructor(
 
     private fun getUser() {
         viewModelScope.launch { //let para ejecutar el bloque solo si el usuario no es nulo
-            withContext(Dispatchers.IO) {
-                userDataSource.getCurrentUser()?.let { user ->
-                    _profileUiState.update { state ->
-                        state.copy(
-                            user = user
-                        )
-                    }
+            val user = withContext(Dispatchers.IO) {
+                userDataSource.getCurrentUser()
+            }
+            user?.let {
+                _profileUiState.update { state ->
+                    state.copy(
+                        user = user
+                    )
                 }
             }
         }

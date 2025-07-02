@@ -34,8 +34,12 @@
     <string name="delivery_fee">Envio</string>
     <string name="cart_total">Total</string>
     <string name="checkout">Pagar</string>
-
     <string name="empty_cart_message">"Tu carrito está vacío"</string>
+    <string name="order_history">Historial de pedidos</string>
+    <string name="order_history_title">"Mis pedidos"</string>
+    <string name="order_id">ID de Orden: %1$s</string>
+    <string name="order_total_price">Total: $%1$s</string>
+    <string name="order_date">Orden generada: %1$s</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

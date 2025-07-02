@@ -30,7 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.ui.navigation.Routes.REGISTER
+import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.utils.components.CaptionText
 import com.iasiris.muniapp.utils.components.CustomTextField
 import com.iasiris.muniapp.utils.components.CustomTextFieldPassword
@@ -41,8 +44,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    navigateToHome: () -> Unit,
-    navigateToRegister: () -> Unit,
+    navController: NavController,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
     val loginUiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
@@ -110,7 +112,7 @@ fun LoginScreen(
                         onClick = {
                             loginViewModel.onLogin { isValid ->
                                 if (isValid) {
-                                    navigateToHome()
+                                    navController.navigate(PRODUCT_CATALOG)
                                 } else {
                                     coroutineScope.launch {
                                         snackbarHostState.showSnackbar(invalidLogin)
@@ -135,7 +137,7 @@ fun LoginScreen(
                 )
 
                 TextButton(
-                    onClick = { navigateToRegister() },
+                    onClick = { navController.navigate(REGISTER) },
                     modifier = Modifier.wrapContentSize()
                 ) {
                     CaptionText(

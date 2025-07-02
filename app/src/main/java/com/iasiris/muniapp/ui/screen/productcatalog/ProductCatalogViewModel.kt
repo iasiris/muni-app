@@ -25,7 +25,7 @@ class ProductCatalogViewModel @Inject constructor(
         getProducts()
     }
 
-    fun onCategorySelected(category: String) {//TODO FIX THIS
+    fun onCategorySelected(category: String) {
         _prodCatUiState.update { state ->
             val newCategory = if (state.selectedCategory == category) "" else category
             state.copy(
@@ -61,18 +61,18 @@ class ProductCatalogViewModel @Inject constructor(
 
     private fun getProducts() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val allProducts = productDataSource.getProducts()
-                _prodCatUiState.update { state ->
-                    state.copy(
-                        allProducts = allProducts,
-                        products = filterProducts(
-                            state.searchText,
-                            state.selectedCategory,
-                            allProducts
-                        )
+            val allProducts = withContext(Dispatchers.IO) {
+                productDataSource.getProducts()
+            }
+            _prodCatUiState.update { state ->
+                state.copy(
+                    allProducts = allProducts,
+                    products = filterProducts(
+                        state.searchText,
+                        state.selectedCategory,
+                        allProducts
                     )
-                }
+                )
             }
         }
     }

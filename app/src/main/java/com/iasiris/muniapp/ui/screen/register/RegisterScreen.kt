@@ -25,7 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.utils.components.CustomTextField
 import com.iasiris.muniapp.utils.components.CustomTextFieldPassword
 import com.iasiris.muniapp.utils.components.PrimaryButton
@@ -37,7 +39,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
-    navigateToHome: () -> Unit,
+    navController: NavController,
     registerViewModel: RegisterViewModel = hiltViewModel()
 ) {
 
@@ -123,7 +125,7 @@ fun RegisterScreen(
                         onClick = {
                             registerViewModel.onRegister { isValid ->
                                 if (isValid) {
-                                    navigateToHome()
+                                    navController.navigate(PRODUCT_CATALOG)
                                 } else {
                                     coroutineScope.launch {
                                         snackbarHostState.showSnackbar(invalidRegister)

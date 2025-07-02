@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.utils.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,11 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocalBar
@@ -33,22 +36,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.data.model.CartItem
+import com.iasiris.muniapp.data.model.Order
+import com.iasiris.muniapp.data.model.Product
 import com.iasiris.muniapp.ui.screen.productcatalog.PriceOrder
 import com.iasiris.muniapp.ui.theme.MuniAppTheme
 import com.iasiris.muniapp.ui.theme.Shapes
-import com.iasiris.muniapp.utils.*
+import com.iasiris.muniapp.utils.paddingExtraSmall
+import com.iasiris.muniapp.utils.paddingMedium
+import com.iasiris.muniapp.utils.paddingSmall
+import com.iasiris.muniapp.utils.sizeMedium
 
 @Composable
 fun PillCard(
-    text: String,
-    isSelected: Boolean = false,
-    onClick: () -> Unit
+    text: String, isSelected: Boolean = false, onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -75,8 +84,7 @@ fun PillCard(
 
 @Composable
 fun PillCardWithDropDownMenu(
-    selectedOrder: PriceOrder,
-    onOrderSelected: (PriceOrder) -> Unit
+    selectedOrder: PriceOrder, onOrderSelected: (PriceOrder) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val isSelected = selectedOrder != PriceOrder.FEATURED
@@ -126,25 +134,19 @@ fun PillCardWithDropDownMenu(
                 DropdownMenuItem(
                     text = {
                         BodyText(
-                            text = label,
-                            color = if (selected)
-                                MaterialTheme.colorScheme.onPrimary
-                            else
-                                MaterialTheme.colorScheme.onSurface
+                            text = label, color = if (selected) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurface
                         )
                     },
                     colors = MenuDefaults.itemColors(
-                        textColor = if (selected)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSurface
+                        textColor = if (selected) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onSurface
                     ),
                     onClick = {
                         expanded = false
                         onOrderSelected(option)
                     },
-                    modifier = if (selected) Modifier
-                        .background(MaterialTheme.colorScheme.primary)
+                    modifier = if (selected) Modifier.background(MaterialTheme.colorScheme.primary)
                     else Modifier.background(Color.White)
                 )
             }
@@ -155,10 +157,7 @@ fun PillCardWithDropDownMenu(
 
 @Composable
 fun RowWithAddCartAndQuantity(
-    quantity: Int,
-    onAdd: () -> Unit = {},
-    onRemove: () -> Unit = {},
-    navigateTo: () -> Unit = {}
+    quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}, navigateTo: () -> Unit = {}
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -166,10 +165,7 @@ fun RowWithAddCartAndQuantity(
         modifier = Modifier.fillMaxWidth()
     ) {
         QuantityButtons(
-            quantity,
-            onAdd = onAdd,
-            onRemove = onRemove,
-            modifier = Modifier.weight(1f)
+            quantity, onAdd = onAdd, onRemove = onRemove, modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(paddingSmall))
         PrimaryButton(
@@ -184,9 +180,7 @@ fun RowWithAddCartAndQuantity(
 
 @Composable
 fun RowWithPriceAndHasDrink(
-    price: Double = 0.0,
-    hasDrink: Boolean,
-    fontWeight: FontWeight
+    price: Double = 0.0, hasDrink: Boolean, fontWeight: FontWeight
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -194,8 +188,7 @@ fun RowWithPriceAndHasDrink(
         modifier = Modifier.fillMaxWidth()
     ) {
         SubheadText(
-            text = "$$price",
-            fontWeight = fontWeight
+            text = "$$price", fontWeight = fontWeight
         )
         Icon(
             imageVector = if (hasDrink) Icons.Filled.LocalBar else Icons.Outlined.NoDrinks,
@@ -207,8 +200,7 @@ fun RowWithPriceAndHasDrink(
 
 @Composable
 fun RowWithQuantityAndAmount(
-    quantity: Int,
-    totalAmount: Double
+    quantity: Int, totalAmount: Double
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -217,22 +209,18 @@ fun RowWithQuantityAndAmount(
     ) {
         SubheadText(
             text = if (quantity == 1) stringResource(
-                R.string.one_product,
-                quantity
-            ) else stringResource(R.string.products, quantity),
-            fontWeight = FontWeight.Bold
+                R.string.one_product, quantity
+            ) else stringResource(R.string.products, quantity), fontWeight = FontWeight.Bold
         )
         SubheadText(
-            text = "$$totalAmount",
-            fontWeight = FontWeight.Bold
+            text = "$$totalAmount", fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
 fun RowWithSubheadTextAndAmount(
-    text: String,
-    totalAmount: Double
+    text: String, totalAmount: Double
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -240,20 +228,17 @@ fun RowWithSubheadTextAndAmount(
         modifier = Modifier.fillMaxWidth()
     ) {
         SubheadText(
-            text = text,
-            fontWeight = FontWeight.Bold
+            text = text, fontWeight = FontWeight.Bold
         )
         SubheadText(
-            text = "$$totalAmount",
-            fontWeight = FontWeight.Bold
+            text = "$$totalAmount", fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Composable
 fun RowWithBodyTextAndAmount(
-    text: String,
-    totalAmount: Double
+    text: String, totalAmount: Double
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -261,20 +246,17 @@ fun RowWithBodyTextAndAmount(
         modifier = Modifier.fillMaxWidth()
     ) {
         BodyText(
-            text = text,
-            fontWeight = FontWeight.Normal
+            text = text, fontWeight = FontWeight.Normal
         )
         BodyText(
-            text = "$$totalAmount",
-            fontWeight = FontWeight.Normal
+            text = "$$totalAmount", fontWeight = FontWeight.Normal
         )
     }
 }
 
 @Composable
 fun RowWithNameAndDeleteIcon(
-    text: String,
-    onDelete: () -> Unit
+    text: String, onDelete: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -297,10 +279,7 @@ fun RowWithNameAndDeleteIcon(
 
 @Composable
 fun RowWithPriceAndButtons(
-    price: Double = 0.0,
-    quantity: Int,
-    onAdd: () -> Unit = {},
-    onRemove: () -> Unit = {}
+    price: Double = 0.0, quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -327,6 +306,155 @@ fun RowWithPriceAndButtons(
     }
 }
 
+@Composable
+fun CardWithImageInTheLeft(
+    product: Product, navigateToProductDetail: (String) -> Unit = {}
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .padding(paddingExtraSmall)
+            .height(120.dp)
+            .fillMaxWidth()
+            .clickable {
+                navigateToProductDetail(product.id)
+            }) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            //TODO agregar imagen por default mientras cargan las imagenes reales
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = stringResource(id = R.string.product_image),
+                onError = {
+                    Log.i("AsyncImage", "Error loading image ${it.result.throwable.message}")
+                },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+            )
+
+            Spacer(modifier = Modifier.width(paddingSmall))
+
+            Column(
+                modifier = Modifier.padding(end = paddingMedium)
+            ) {
+                BodyText(text = product.name)
+
+                Spacer(modifier = Modifier.height(paddingExtraSmall))
+
+                CaptionText(
+                    text = product.description, color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(paddingSmall))
+
+                RowWithPriceAndHasDrink(
+                    price = product.price,
+                    hasDrink = product.hasDrink,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardWithImageInTheLeftWithButtons(
+    product: Product, onAdd: () -> Unit, onRemove: () -> Unit, onDelete: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceBright),
+        modifier = Modifier
+            .padding(paddingExtraSmall)
+            .height(120.dp)
+            .fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            //TODO agregar imagen por default mientras cargan las imagenes reales
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = stringResource(id = R.string.product_image),
+                onError = {
+                    Log.i("AsyncImage", "Error loading image ${it.result.throwable.message}")
+                },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+            )
+
+            Spacer(modifier = Modifier.width(paddingSmall))
+
+            Column(
+                modifier = Modifier.padding(end = paddingMedium)
+            ) {
+                RowWithNameAndDeleteIcon(
+                    text = product.name,
+                    onDelete = onDelete,
+                )
+
+                CaptionText(
+                    text = product.description, color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                RowWithPriceAndButtons(
+                    price = product.price,
+                    quantity = product.quantity,
+                    onAdd = onAdd,
+                    onRemove = onRemove
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardWithDateAndTotal(
+    order: Order
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceBright),
+        modifier = Modifier
+            .padding(paddingExtraSmall)
+            .height(100.dp)
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingMedium),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            BodyText(
+                text = stringResource(id = R.string.order_id, order.orderId),
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(paddingExtraSmall))
+
+            BodyText(
+                text = stringResource(id = R.string.order_total_price, order.totalPrice),
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(paddingExtraSmall))
+
+            CaptionText(
+                text = stringResource(id = R.string.order_date, order.orderDate),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun CardsPreview() {
@@ -335,50 +463,68 @@ fun CardsPreview() {
             modifier = Modifier.padding(paddingMedium)
         ) {
             PillCard(
-                text = "Mountain",
-                isSelected = false,
-                onClick = {}
-            )
+                text = "Mountain", isSelected = false, onClick = {})
             PillCard(
-                text = "Mountain",
-                isSelected = true,
-                onClick = {}
-            )
+                text = "Mountain", isSelected = true, onClick = {})
             Spacer(modifier = Modifier.height(paddingMedium))
             RowWithPriceAndHasDrink(
-                price = 10.0,
-                hasDrink = true,
-                fontWeight = FontWeight.Medium
+                price = 10.0, hasDrink = true, fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(paddingMedium))
             RowWithAddCartAndQuantity(
                 quantity = 1,
             )
             RowWithQuantityAndAmount(
-                quantity = 1,
-                totalAmount = 10.0
+                quantity = 1, totalAmount = 10.0
             )
             RowWithQuantityAndAmount(
-                quantity = 2,
-                totalAmount = 10.0
+                quantity = 2, totalAmount = 10.0
             )
             RowWithSubheadTextAndAmount(
-                text = "Total",
-                totalAmount = 10.0
+                text = "Total", totalAmount = 10.0
             )
             RowWithBodyTextAndAmount(
-                text = "Subtotal",
-                totalAmount = 10.0
+                text = "Subtotal", totalAmount = 10.0
             )
             RowWithNameAndDeleteIcon(
-                text = "Product Name",
-                onDelete = { }
-            )
-            RowWithPriceAndButtons(
-                price = 10.0,
-                quantity = 1,
-                onAdd = {},
-                onRemove = {}
+                text = "Product Name", onDelete = { })
+            RowWithPriceAndButtons(price = 10.0, quantity = 1, onAdd = {}, onRemove = {})
+            CardWithImageInTheLeft(
+                product = Product(
+                    id = "1",
+                    name = "Product Name",
+                    description = "Product Description",
+                    imageUrl = "",
+                    price = 10.0,
+                    hasDrink = true,
+                    category = "Category",
+                ), navigateToProductDetail = {})
+            CardWithImageInTheLeftWithButtons(
+                product = Product(
+                    id = "1",
+                    name = "Product Name",
+                    description = "Product Description",
+                    imageUrl = "",
+                    price = 10.0,
+                    hasDrink = true,
+                    category = "Category",
+                    quantity = 1
+                ), onAdd = {}, onRemove = {}, onDelete = {})
+            CardWithDateAndTotal(
+                order = Order(
+                    orderId = "1", productsId = listOf(
+                        CartItem(
+                            name = "Product Name",
+                            description = "Product Description",
+                            imageUrl = "",
+                            price = 10,
+                            hasDrink = true,
+                            quantity = 1
+                        )
+                    ),
+                    totalPrice = 10,
+                    orderDate = "05/06/2025"
+                )
             )
         }
     }

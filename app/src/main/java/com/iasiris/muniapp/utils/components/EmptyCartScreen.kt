@@ -2,10 +2,8 @@ package com.iasiris.muniapp.utils.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -24,13 +22,10 @@ import com.iasiris.muniapp.utils.paddingSmall
 
 @Composable
 fun EmptyCartScreen(
-    paddingValue: PaddingValues,
     navController: NavController
 ) {
     Column(
-        modifier = Modifier
-            .padding(paddingValue)
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
         BackButtonWithTitle(

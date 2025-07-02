@@ -58,7 +58,7 @@ fun CustomTextField(
         isError = errorMessage != null,
         supportingText = {
             errorMessage?.let {
-                BodyText(text = it, color = Color.Red) //TODO CHECK THIS
+                BodyText(text = it, color = Color.Red)
             }
         },
         colors = colors

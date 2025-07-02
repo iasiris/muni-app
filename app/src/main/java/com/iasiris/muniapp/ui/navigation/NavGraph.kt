@@ -6,12 +6,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.iasiris.muniapp.ui.navigation.Routes.CART
 import com.iasiris.muniapp.ui.navigation.Routes.LOGIN
+import com.iasiris.muniapp.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_CATALOG
+import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_DETAIL
 import com.iasiris.muniapp.ui.navigation.Routes.PROFILE
 import com.iasiris.muniapp.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.ui.screen.cart.CartScreen
 import com.iasiris.muniapp.ui.screen.login.LoginScreen
+import com.iasiris.muniapp.ui.screen.orderhistory.OrderHistoryScreen
 import com.iasiris.muniapp.ui.screen.productcatalog.ProductCatalogScreen
+import com.iasiris.muniapp.ui.screen.productdetail.ProductDetailScreen
 import com.iasiris.muniapp.ui.screen.profile.ProfileScreen
 import com.iasiris.muniapp.ui.screen.register.RegisterScreen
 
@@ -22,6 +26,7 @@ object Routes {
     const val PRODUCT_DETAIL = "product_detail/{id}"
     const val CART = "cart"
     const val PROFILE = "profile"
+    const val ORDER_HISTORY = "order_history"
 }
 
 @Composable
@@ -33,25 +38,19 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = PRODUCT_CATALOG
+        startDestination = LOGIN
     ) { //TODO agregar if para chequear si usuario esta loggeado, si esta loggeado llevar directamente a home
         composable(LOGIN) {
-            LoginScreen(
-                navigateToHome = { navController.navigate(PRODUCT_CATALOG) },
-                navigateToRegister = { navController.navigate(REGISTER) }
-            )
+            LoginScreen(navController)
         }
         composable(REGISTER) {
-            RegisterScreen(
-                navigateToHome = { navController.navigate(PRODUCT_CATALOG) }
-            )
+            RegisterScreen(navController)
         }
         composable(PRODUCT_CATALOG) {
-            ProductCatalogScreen(
-                navigateToProductDetail = { productId ->
-                    navController.navigate("product_detail/$productId")
-                }
-            )
+            ProductCatalogScreen(navController)
+        }
+        composable(PRODUCT_DETAIL) {
+            ProductDetailScreen(navController)
         }
         composable(PROFILE) {
             ProfileScreen(navController)
@@ -59,12 +58,9 @@ fun NavGraph(
         composable(CART) {
             CartScreen(navController)
         }
-        /*composable(PRODUCT_DETAIL) {
-            ProductDetail(
-                navController,
-                navigateToCart = { navController.navigate(CART) }
-            )
-        }*/
+        composable(ORDER_HISTORY) {
+            OrderHistoryScreen(navController)
+        }
     }
 }
 

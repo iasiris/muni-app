@@ -25,7 +25,7 @@ import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingSmall
 
 @Composable
-fun BottomNavBar( //TODO excluir BottomNavBar de Login y register
+fun BottomNavBar(
     modifier: Modifier = Modifier,
     navController: NavController? = null
 ) {

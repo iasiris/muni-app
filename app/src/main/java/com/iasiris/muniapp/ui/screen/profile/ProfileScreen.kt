@@ -36,13 +36,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.utils.components.BackButtonWithTitle
 import com.iasiris.muniapp.utils.components.CustomOutlinedTextField
 import com.iasiris.muniapp.utils.components.CustomOutlinedTextFieldPassword
 import com.iasiris.muniapp.utils.components.PrimaryButton
-import com.iasiris.muniapp.utils.paddingExtraSmall
+import com.iasiris.muniapp.utils.paddingExtraLarge
 import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
+import com.iasiris.muniapp.utils.paddingSmall
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,16 +68,17 @@ fun ProfileScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },//TODO como solucionar el uso de snackbar sin scaffold que no corte el boton
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            BackButtonWithTitle( //TODO no va para atras
+            horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+            BackButtonWithTitle(
                 title = stringResource(id = R.string.profile_title),
                 onBackButtonClick = { navController.popBackStack() }
             )
@@ -132,27 +135,40 @@ fun ProfileScreen(
                 leadingIcon = Icons.Default.Public
             )
 
-            Spacer(modifier = Modifier.height(paddingLarge))
+            Spacer(modifier = Modifier.height(paddingSmall))
 
-            PrimaryButton( //TODO no cambia a enabled
-                label = stringResource(id = R.string.save_changes),
-                onClick = {
-                    profileViewModel.onSaveChanges { isValid ->
-                        if (isValid) {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(userSaved)
-                            }
-                        } else {
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(userNotSaved)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = paddingExtraLarge, end = paddingExtraLarge),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PrimaryButton(
+                    label = stringResource(id = R.string.save_changes),
+                    onClick = {
+                        profileViewModel.onSaveChanges { isValid ->
+                            if (isValid) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(userSaved)
+                                }
+                            } else {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(userNotSaved)
+                                }
                             }
                         }
-                    }
-                },
-                modifier = Modifier
-                    .padding(horizontal = paddingExtraSmall),
-                enabled = profileUiState.isSaveEnabled
-            )
+                    },
+
+                    enabled = profileUiState.isSaveEnabled
+                )
+
+                PrimaryButton(
+                    label = stringResource(id = R.string.order_history),
+                    onClick = { navController.navigate(ORDER_HISTORY) },
+                )
+            }
+
         }
     }
 }
