@@ -31,7 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.ui.theme.MuniAppTheme
-import com.iasiris.muniapp.utils.*
+import com.iasiris.muniapp.utils.paddingSmall
+import com.iasiris.muniapp.utils.sizeMedium
 
 @Composable
 fun PrimaryButton(

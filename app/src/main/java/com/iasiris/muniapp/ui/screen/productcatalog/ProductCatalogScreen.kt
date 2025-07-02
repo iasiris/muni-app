@@ -26,14 +26,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.data.model.Product
-import com.iasiris.muniapp.ui.theme.MuniAppTheme
 import com.iasiris.muniapp.utils.components.BodyText
 import com.iasiris.muniapp.utils.components.CaptionText
 import com.iasiris.muniapp.utils.components.CustomSearchBar
@@ -46,26 +44,30 @@ import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.utils.paddingSmall
 
 @Composable
-fun ProductCatalog(
-    navigateToProductDetail: (String) -> Unit
+fun ProductCatalogScreen(
+    navigateToProductDetail: (String) -> Unit,
+    prodCatViewModel: ProductCatalogViewModel = hiltViewModel()
 ) {
-    val prodCatViewModel: ProductCatalogViewModel = hiltViewModel()
     val prodCatUiState by prodCatViewModel.prodCatUiState.collectAsStateWithLifecycle()
 
     Column(
-        modifier = Modifier
-            .padding()
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SubheadText(
-            text = stringResource(id = R.string.muni),
-            textAlign = TextAlign.Left,
-            fontWeight = FontWeight.Bold
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = paddingMedium, start = paddingMedium),
+            horizontalArrangement = Arrangement.SpaceBetween
         )
-
-        Spacer(modifier = Modifier.height(paddingMedium))
+        {
+            SubheadText(
+                text = stringResource(id = R.string.muni),
+                textAlign = TextAlign.Left,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         CustomSearchBar(
             searchText = prodCatUiState.searchText,
@@ -113,7 +115,7 @@ fun ProductCatalog(
 }
 
 @Composable
-fun CardWithImageInTheLeft(
+fun CardWithImageInTheLeft( //TODO no esta cargando la imagen!!!
     product: Product,
     navigateToProductDetail: (String) -> Unit = {}
 ) {
@@ -167,18 +169,5 @@ fun CardWithImageInTheLeft(
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ProductCatalogPreview() {
-    MuniAppTheme {
-        ProductCatalog(
-            navigateToProductDetail = { productName ->
-                Log.d("ProductCatalogPreview", "Navigating to product detail for: $productName")
-            }
-        )
     }
 }

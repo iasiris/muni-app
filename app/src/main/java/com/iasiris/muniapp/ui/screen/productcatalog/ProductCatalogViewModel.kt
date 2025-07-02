@@ -6,10 +6,12 @@ import com.iasiris.muniapp.data.local.ProductDataSource
 import com.iasiris.muniapp.data.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ProductCatalogViewModel @Inject constructor(
@@ -59,12 +61,18 @@ class ProductCatalogViewModel @Inject constructor(
 
     private fun getProducts() {
         viewModelScope.launch {
-            val allProducts = productDataSource.getProducts()
-            _prodCatUiState.update { state ->
-                state.copy(
-                    allProducts = allProducts,
-                    products = filterProducts(state.searchText, state.selectedCategory, allProducts)
-                )
+            withContext(Dispatchers.IO) {
+                val allProducts = productDataSource.getProducts()
+                _prodCatUiState.update { state ->
+                    state.copy(
+                        allProducts = allProducts,
+                        products = filterProducts(
+                            state.searchText,
+                            state.selectedCategory,
+                            allProducts
+                        )
+                    )
+                }
             }
         }
     }

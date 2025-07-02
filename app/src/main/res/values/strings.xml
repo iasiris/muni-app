@@ -21,7 +21,14 @@
     <string name="add_to_cart">Agregar</string>
     <string name="one_product">%1$s producto</string>
     <string name="products">%1$s productos</string>
-
+    <string name="invalid_register">No se pudo registar el usuario</string>
+    <string name="profile_title">Perfil</string>
+    <string name="email_label">Email</string>
+    <string name="fullname_label">Nombre Completo</string>
+    <string name="nationality_label">Nacionalidad</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="user_changes_saved">Los cambios fueron guardados</string>
+    <string name="user_changes_not_saved">Error al guardar datos</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>
@@ -43,5 +50,6 @@
     <string name="add">Icon Mas</string>">
     <string name="remove">Icon Menos</string>">
     <string name="dropwdown_menu">Menu desplegable</string>
-
+    <string name="user_icon">Icono usuario</string>
+    <string name="edit_image_icon">Icono editar imagen</string>
 </resources>

@@ -4,9 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.iasiris.muniapp.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.ui.navigation.Routes.PROFILE
-import com.iasiris.muniapp.ui.screen.productcatalog.ProductCatalog
+import com.iasiris.muniapp.ui.navigation.Routes.REGISTER
+import com.iasiris.muniapp.ui.screen.login.LoginScreen
+import com.iasiris.muniapp.ui.screen.productcatalog.ProductCatalogScreen
+import com.iasiris.muniapp.ui.screen.profile.ProfileScreen
+import com.iasiris.muniapp.ui.screen.register.RegisterScreen
 
 object Routes {
     const val LOGIN = "login"
@@ -28,24 +33,26 @@ fun NavGraph(
         navController = navController,
         startDestination = PRODUCT_CATALOG
     ) { //TODO agregar if para chequear si usuario esta loggeado, si esta loggeado llevar directamente a home
-        /*composable(LOGIN) {
-            Login(
-                navigateToHome = { navController.navigate(Routes.PRODUCT_CATALOG) },
-                navigateToRegister = { navController.navigate(Routes.REGISTER) }
+        composable(LOGIN) {
+            LoginScreen(
+                navigateToHome = { navController.navigate(PRODUCT_CATALOG) },
+                navigateToRegister = { navController.navigate(REGISTER) }
             )
         }
-        composable(Routes.REGISTER) {
-            RegisterBottomSheet(
-                navigateToHome = { navController.navigate(Routes.PRODUCT_CATALOG) },
-                onDismiss = { navController.popBackStack() }
+        composable(REGISTER) {
+            RegisterScreen(
+                navigateToHome = { navController.navigate(PRODUCT_CATALOG) }
             )
-        }*/
+        }
         composable(PRODUCT_CATALOG) {
-            ProductCatalog(
+            ProductCatalogScreen(
                 navigateToProductDetail = { productId ->
                     navController.navigate("product_detail/$productId")
                 }
             )
+        }
+        composable(PROFILE) {
+            ProfileScreen(navController)
         }
         /*composable(PRODUCT_DETAIL) {
             ProductDetail(
@@ -56,9 +63,7 @@ fun NavGraph(
         composable(CART) {
             Cart(navController)
         }
-        composable(PROFILE) {
-            Profile(navController)
-        }*/
+        */
     }
 }
 
