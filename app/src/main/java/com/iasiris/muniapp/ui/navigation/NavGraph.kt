@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.iasiris.muniapp.ui.navigation.Routes.CART
 import com.iasiris.muniapp.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.ui.navigation.Routes.PROFILE
 import com.iasiris.muniapp.ui.navigation.Routes.REGISTER
+import com.iasiris.muniapp.ui.screen.cart.CartScreen
 import com.iasiris.muniapp.ui.screen.login.LoginScreen
 import com.iasiris.muniapp.ui.screen.productcatalog.ProductCatalogScreen
 import com.iasiris.muniapp.ui.screen.profile.ProfileScreen
@@ -54,16 +56,15 @@ fun NavGraph(
         composable(PROFILE) {
             ProfileScreen(navController)
         }
+        composable(CART) {
+            CartScreen(navController)
+        }
         /*composable(PRODUCT_DETAIL) {
             ProductDetail(
                 navController,
                 navigateToCart = { navController.navigate(CART) }
             )
-        }
-        composable(CART) {
-            Cart(navController)
-        }
-        */
+        }*/
     }
 }
 

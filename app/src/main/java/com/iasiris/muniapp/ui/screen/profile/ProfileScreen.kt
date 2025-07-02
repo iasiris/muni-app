@@ -50,6 +50,8 @@ fun ProfileScreen(
     navController: NavController,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
+    //TODO agregar pre visualuzacion antes de guardar los cambios
+
     val profileUiState by profileViewModel.profileUiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
