@@ -41,26 +41,76 @@ Aplicación móvil para Android desarrollada en Kotlin, utilizando Jetpack Compo
 
 ## Screenshots
 
-Aquí puedes ver algunas capturas de pantalla de la app:
-![Login](screenshots/login.png)
-![Login](screenshots/login_-_verificacion_de_datos.png)
-![Login](screenshots/login_-_inicio_enabled_y_mensaje_de_error.png)
+Login:
 
-![Creación de nuevo usuario](screenshots/register.png)
-![Creación de nuevo usuario - verificación de datos](screenshots/register_-_verificacion_de_datos.png)
-![Creación de nuevo usuario - verificación de contraseñas](screenshots/register_-_check_pass.png)
+Pantalla de inicio de sesión
 
-![Pantalla principal](screenshots/product_catalog.png)
-![Pantalla principal - Búsqueda](screenshots/product_catalog_-_busqueda.png)
-![Pantalla principal - Filtrado por precio](screenshots/product_catalog_-_filtrado_por_precio.png)
-![Pantalla principal - Filtrado por categoria](screenshots/product_catalog_-_filtrado_por_categoria.png)
+<img src="screenshots/login.png" alt="Login" width="300"/>
 
-![Detalle de producto](screenshots/product_detail.png)
+Verificación de datos en login
 
-![Carrito de compras](screenshots/carrito.png)
-![Carrito de compras vacio](screenshots/carrito_vacio.png)
+<img src="screenshots/login_-_verificacion_de_datos.png" alt="Login - Verificación de datos" width="300"/>
 
-![Perfil](screenshots/perfil_con_historial_de_ordenes.png)
-![Perfil - Notificacion de guardado exitoso](screenshots/perfil_-_guardado_exitoso.png)
+Login con botón habilitado y mensaje de error
 
-![Historial de perdidos](screenshots/historial_de_pedidos.png)
+<img src="screenshots/login_-_inicio_enabled_y_mensaje_de_error.png" alt="Login - Error" width="300"/>
+
+Registro de Usuario:
+
+Pantalla de registro
+
+<img src="screenshots/register.png" alt="Registro" width="300"/>
+
+Verificación de datos en registro
+
+<img src="screenshots/register_-_verificacion_de_datos.png" alt="Registro - Verificación" width="300"/>
+
+Verificación de contraseñas
+
+<img src="screenshots/register_-_check_pass.png" alt="Registro - Verificación de contraseñas" width="300"/>
+
+Catálogo de Productos:
+
+Catálogo de productos
+
+<img src="screenshots/product_catalog.png" alt="Catálogo" width="300"/>
+
+Búsqueda en el catálogo
+
+<img src="screenshots/product_catalog_-_busqueda.png" alt="Catálogo - Búsqueda" width="300"/>
+
+Filtrado por precio
+
+<img src="screenshots/product_catalog_-_filtrado_por_precio.png" alt="Catálogo - Precio" width="300"/>
+
+Filtrado por categoría
+
+<img src="screenshots/product_catalog_-_filtrado_por_categoria.png" alt="Catálogo - Categoría" width="300"/>
+
+Detalle de Producto:
+
+<img src="screenshots/product_detail.png" alt="Detalle" width="300"/>
+
+Carrito:
+
+Carrito con productos
+
+<img src="screenshots/carrito.png" alt="Carrito lleno" width="300"/>
+
+Carrito vacío
+
+<img src="screenshots/carrito_vacio.png" alt="Carrito vacío" width="300"/>
+
+Perfil:
+
+Perfil con historial de órdenes
+
+<img src="screenshots/perfil_con_historial_de_ordenes.png" alt="Perfil" width="300"/>
+
+Guardado exitoso en perfil
+
+<img src="screenshots/perfil_-_guardado_exitoso.png" alt="Perfil - Guardado exitoso" width="300"/>
+
+Historial de Pedidos:
+
+<img src="screenshots/historial_de_pedidos.png" alt="Historial" width="300"/>
