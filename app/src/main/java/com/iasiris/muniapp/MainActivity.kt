@@ -14,10 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.iasiris.muniapp.ui.navigation.BottomNavBar
-import com.iasiris.muniapp.ui.navigation.NavGraph
-import com.iasiris.muniapp.ui.navigation.Routes
-import com.iasiris.muniapp.ui.theme.MuniAppTheme
+import com.iasiris.muniapp.view.ui.components.BottomNavBar
+import com.iasiris.muniapp.view.ui.navigation.NavGraph
+import com.iasiris.muniapp.view.ui.navigation.Routes
+import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
