@@ -27,7 +27,7 @@ class UserDataSourceImpl @Inject constructor() : UserDataSource {
         "a@a.com",
         "12345678",
         "John Doe",
-        "https://cdn-icons-png.flaticon.com/512/9385/9385289.png",
+        "", //https://res.cloudinary.com/dudjlugll/image/upload/v1751749310/m0hbkxkcawzgfydhs3jw.jpg <- TODO for testing, delete this
         "Argentina"
     )
 }

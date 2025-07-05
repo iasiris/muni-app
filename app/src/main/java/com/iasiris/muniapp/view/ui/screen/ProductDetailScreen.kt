@@ -38,10 +38,11 @@ fun ProductDetailScreen(
     navController: NavController,
     prodDetailViewModel: ProductDetailViewModel
 ) {
-    val prodDetailUiState by prodDetailViewModel.prodDetailUiState.collectAsStateWithLifecycle()
     LaunchedEffect (Unit){
         prodDetailViewModel.init()
     }
+
+    val prodDetailUiState by prodDetailViewModel.prodDetailUiState.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier

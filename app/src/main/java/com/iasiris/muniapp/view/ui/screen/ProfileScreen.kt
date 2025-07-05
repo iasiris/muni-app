@@ -1,9 +1,12 @@
 package com.iasiris.muniapp.view.ui.screen
 
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,32 +20,39 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.utils.paddingExtraLarge
+import com.iasiris.muniapp.utils.paddingMedium
+import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CustomOutlinedTextField
 import com.iasiris.muniapp.view.ui.components.CustomOutlinedTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
-import com.iasiris.muniapp.utils.paddingExtraLarge
-import com.iasiris.muniapp.utils.paddingMedium
-import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.view.viewmodel.ProfileField
 import com.iasiris.muniapp.view.viewmodel.ProfileViewModel
@@ -54,58 +64,93 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel
 ) {
     //TODO agregar pre visualuzacion antes de guardar los cambios
-
-    val profileUiState by profileViewModel.profileUiState.collectAsStateWithLifecycle()
-    LaunchedEffect (Unit){
+    LaunchedEffect(Unit) {
         profileViewModel.init()
     }
 
+    val profileUiState by profileViewModel.profileUiState.collectAsStateWithLifecycle()
+    var imageUri by remember { mutableStateOf<Uri?>(null) } //profileUiState.user.userImageUrl.toUri()
+
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    val userSaved = stringResource(id = R.string.user_changes_saved)
     val userNotSaved = stringResource(id = R.string.user_changes_not_saved)
 
+    val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        profileViewModel.onImageSelected(uri)
+        imageUri = uri
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackbarHostState) },//TODO como solucionar el uso de snackbar sin scaffold que no corte el boton
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
         Column(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-            ) {
             BackButtonWithTitle(
                 title = stringResource(id = R.string.profile_title),
-                onBackButtonClick = { navController.popBackStack() }
-            )
+                onBackButtonClick = { navController.popBackStack() })
 
+            //Profile Image
             IconButton(
-                onClick = { launcher.launch("image/*") },
+                onClick = {
+                    launcher.launch("image/*")
+                    profileViewModel.enableSave()
+                },
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape)
+                    .border(
+                        width = 4.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    )
             ) {
-                AsyncImage(
-                    model = profileUiState.user.userImageUrl,
-                    contentDescription = stringResource(id = R.string.user_icon),
-                    onError = {
-                        Log.i(
-                            "AsyncImage",
-                            "Error loading image ${it.result.throwable.message}"
+                if (profileUiState.user.userImageUrl.isNotEmpty()) {
+                    AsyncImage(
+                        model = profileUiState.user.userImageUrl,
+                        contentDescription = stringResource(id = R.string.product_image),
+                        onError = {
+                            Log.i(
+                                "AsyncImage",
+                                "Error loading image ${it.result.throwable.message}"
+                            )
+                        },
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    if (imageUri != null) {
+                        val bitmap = remember(imageUri) {
+                            val source =
+                                ImageDecoder.createSource(
+                                    context.contentResolver,
+                                    imageUri!!
+                                )
+                            ImageDecoder.decodeBitmap(source).asImageBitmap()
+                        }
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = stringResource(id = R.string.user_icon),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
                         )
-                    },
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
+                    } else {
+                        Image(
+                            painter = painterResource(id = R.drawable.muni_icon),//TODO Add default image
+                            contentDescription = stringResource(id = R.string.user_icon),
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(paddingMedium))
@@ -150,21 +195,15 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PrimaryButton(
-                    label = stringResource(id = R.string.save_changes),
-                    onClick = {
-                        profileViewModel.onSaveChanges { isValid ->
-                            if (isValid) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(userSaved)
-                                }
-                            } else {
+                    label = stringResource(id = R.string.save_changes), onClick = {
+                        profileViewModel.onSaveChanges(imageUri) { isValid ->
+                            if (!isValid) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(userNotSaved)
                                 }
                             }
                         }
                     },
-
                     enabled = profileUiState.isSaveEnabled
                 )
 
@@ -175,5 +214,9 @@ fun ProfileScreen(
             }
 
         }
+    }
+
+    if (profileUiState.isUserUploading) {
+        CircularProgressIndicator()
     }
 }

@@ -51,7 +51,7 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = LOGIN
+        startDestination = PRODUCT_CATALOG //LOGIN
     ) { //TODO agregar if para chequear si usuario esta loggeado, si esta loggeado llevar directamente a home
         composable(LOGIN) {
             LoginScreen(navController, loginViewModel)

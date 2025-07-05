@@ -1,11 +1,16 @@
 package com.iasiris.muniapp.view.viewmodel
 
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.cloudinary.Cloudinary
+import com.iasiris.muniapp.BuildConfig
 import com.iasiris.muniapp.data.local.UserDataSource
 import com.iasiris.muniapp.data.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
+import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -17,14 +22,24 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val myApplication: Application,
+    private val cloudinary: Cloudinary,
     private val userDataSource: UserDataSource
-) : ViewModel() {
+) : AndroidViewModel(myApplication) {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
     val profileUiState: StateFlow<ProfileUiState> = _profileUiState
 
     fun init() {
         getUser()
+    }
+
+    fun enableSave() {//TODO this can be improved
+        _profileUiState.update { state ->
+            state.copy(
+                isSaveEnabled = true
+            )
+        }
     }
 
     fun onFieldChange(field: ProfileField, value: String) {
@@ -71,23 +86,48 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun onImageSelected(uri: Uri?) {
-        _profileUiState.update { state ->
-            state.copy(
-                user = state.user.copy(userImageUrl = uri?.toString().orEmpty()),
-                isSaveEnabled = true
-            )
+    private suspend fun uploadImage(uri: Uri) {
+        withContext(Dispatchers.IO) {
+            try {
+                val inputSteam = getApplication<Application>().contentResolver.openInputStream(uri)
+                val uploadResult = cloudinary.uploader().upload(
+                    inputSteam,
+                    mapOf("upload_preset" to BuildConfig.CLOUDINARY_UPLOAD_PRESET)
+                )
+                val imageUrl = uploadResult["secure_url"] as String
+                _profileUiState.update { state ->
+                    state.copy(
+                        user = state.user.copy(userImageUrl = imageUrl),
+                        isSaveEnabled = true
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("Cloudinary", "Error uploading image: ${e.message}")
+            }
         }
     }
 
-    fun onSaveChanges(onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
+    fun onSaveChanges(imageUri: Uri?, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch() {
+            _profileUiState.update { state ->
+                state.copy(
+                    isUserUploading = true
+                )
+            }
+
+            imageUri?.let { uploadImage(imageUri) }
+
             val isValid = withContext(Dispatchers.IO) {
                 userDataSource.updateUser(_profileUiState.value.user)
             }
             onResult(isValid)
+            Log.d("Log", "${_profileUiState.value.user}")
             _profileUiState.update { state ->
-                state.copy(user = _profileUiState.value.user, newPassword = "")
+                state.copy(
+                    user = _profileUiState.value.user, newPassword = "",
+                    isSaveEnabled = false,
+                    isUserUploading = false
+                )
             }
         }
     }
@@ -120,7 +160,8 @@ class ProfileViewModel @Inject constructor(
 
         } else if (field == "newPassword") {
             val newPassword = _profileUiState.value.newPassword
-            val isNewPasswordValid = isNewPasswordValid(newPassword)
+            val isNewPasswordValid =
+                isNewPasswordValid(_profileUiState.value.user.password, newPassword)
             _profileUiState.update { state ->
                 if (isNewPasswordValid) {
                     state.copy(
@@ -137,9 +178,6 @@ class ProfileViewModel @Inject constructor(
 
         }
     }
-
-    private fun isNewPasswordValid(newPassword: String): Boolean =
-        newPassword.length >= 8 && _profileUiState.value.user.password != newPassword
 }
 
 data class ProfileUiState(
@@ -148,7 +186,8 @@ data class ProfileUiState(
     val isSaveEnabled: Boolean = false,
     val passwordHidden: Boolean = true,
     val emailError: String? = null,
-    val passwordError: String? = null
+    val passwordError: String? = null,
+    val isUserUploading: Boolean = false
 )
 
 enum class ProfileField {

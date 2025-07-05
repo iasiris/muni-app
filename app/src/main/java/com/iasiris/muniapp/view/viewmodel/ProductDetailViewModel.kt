@@ -16,12 +16,8 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ProductDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val productDataSource: ProductDataSource
 ) : ViewModel() {
-    private val productId: String =
-        checkNotNull(savedStateHandle["id"]) //TODO chequear si es el modo correcto
-
     private val _prodDetailUiState = MutableStateFlow(ProductDetailUiState())
     val prodDetailUiState: StateFlow<ProductDetailUiState> = _prodDetailUiState
 
@@ -67,7 +63,7 @@ class ProductDetailViewModel @Inject constructor(
     private fun getProduct() {
         viewModelScope.launch {
             val product = withContext(Dispatchers.IO) {
-                productDataSource.getProductById(productId)
+                productDataSource.getProductById(_prodDetailUiState.value.product.id)
             }
             product?.let {
                 _prodDetailUiState.update { state ->

@@ -27,7 +27,6 @@
     <string name="fullname_label">Nombre Completo</string>
     <string name="nationality_label">Nacionalidad</string>
     <string name="save_changes">Guardar cambios</string>
-    <string name="user_changes_saved">Los cambios fueron guardados</string>
     <string name="user_changes_not_saved">Error al guardar datos</string>
     <string name="cart_title">Carrito</string>
     <string name="cart_subtotal">Productos</string>
@@ -40,6 +39,7 @@
     <string name="order_id">ID de Orden: %1$s</string>
     <string name="order_total_price">Total: $%1$s</string>
     <string name="order_date">Orden generada: %1$s</string>
+    <string name="saving_profile_data">"Guardando datos..."</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

@@ -9,5 +9,8 @@ class CommonUtils {
         fun isPasswordValid(password: String) = password.length >= 8
 
         fun isFullNameValid(fullName: String) = fullName.length >= 8
+
+        fun isNewPasswordValid(password: String, newPassword: String): Boolean =
+            newPassword.length >= 8 && password != newPassword
     }
 }

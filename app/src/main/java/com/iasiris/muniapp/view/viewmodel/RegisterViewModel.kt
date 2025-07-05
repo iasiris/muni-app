@@ -90,8 +90,7 @@ class RegisterViewModel @Inject constructor(
             val newUser = User(
                 email = _registerUiState.value.email,
                 fullName = _registerUiState.value.fullName,
-                password = _registerUiState.value.password,
-                userImageUrl = ""
+                password = _registerUiState.value.password
             )
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {

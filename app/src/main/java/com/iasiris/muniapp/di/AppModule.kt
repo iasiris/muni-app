@@ -1,4 +1,4 @@
-package com.iasiris.muniapp
+package com.iasiris.muniapp.di
 
 import com.iasiris.muniapp.data.local.OrderDataSource
 import com.iasiris.muniapp.data.local.OrderDataSourceImpl

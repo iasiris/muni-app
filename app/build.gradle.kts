@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,12 @@ plugins {
     alias(libs.plugins.hilt.android)
     id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.kotlin.serialization)
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -19,6 +27,27 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "CLOUDINARY_CLOUD_NAME",
+            "\"${localProperties["CLOUDINARY_CLOUD_NAME"]}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_KEY",
+            "\"${localProperties["CLOUDINARY_API_KEY"]}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_API_SECRET",
+            "\"${localProperties["CLOUDINARY_API_SECRET"]}\""
+        )
+        buildConfigField(
+            "String",
+            "CLOUDINARY_UPLOAD_PRESET",
+            "\"${localProperties["CLOUDINARY_UPLOAD_PRESET"]}\""
+        )
     }
 
     buildTypes {
@@ -39,6 +68,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     tasks.withType<Test> {
         useJUnitPlatform()
@@ -46,7 +76,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -65,7 +94,6 @@ dependencies {
     //hilt
     implementation(libs.hilt.core)
     implementation(libs.androidx.navigation.testing.android)
-
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     //navigation component
@@ -78,6 +106,8 @@ dependencies {
     //coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    //cloudinary
+    implementation(libs.cloudinary)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
