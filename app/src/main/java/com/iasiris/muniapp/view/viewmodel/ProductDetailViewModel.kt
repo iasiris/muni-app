@@ -1,9 +1,8 @@
 package com.iasiris.muniapp.view.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.local.ProductDataSource
+import com.iasiris.muniapp.data.repository.ProductDataSource
 import com.iasiris.muniapp.data.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject

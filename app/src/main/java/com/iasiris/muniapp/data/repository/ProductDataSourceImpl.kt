@@ -1,11 +1,11 @@
-package com.iasiris.muniapp.data.local
+package com.iasiris.muniapp.data.repository
 
 import com.iasiris.muniapp.data.model.Product
 import jakarta.inject.Inject
 
 class ProductDataSourceImpl @Inject constructor() : ProductDataSource {
-
-    override fun getProducts(): List<Product> = products
+    //TODO implement this to interact with the API
+    override fun getAllProducts(): List<Product> = products
 
     override fun getProductById(productId: String): Product? {
         return products.find { it.id == productId }

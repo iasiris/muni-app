@@ -69,7 +69,7 @@ fun ProfileScreen(
     }
 
     val profileUiState by profileViewModel.profileUiState.collectAsStateWithLifecycle()
-    var imageUri by remember { mutableStateOf<Uri?>(null) } //profileUiState.user.userImageUrl.toUri()
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -144,7 +144,7 @@ fun ProfileScreen(
                         )
                     } else {
                         Image(
-                            painter = painterResource(id = R.drawable.muni_icon),//TODO Add default image
+                            painter = painterResource(id = R.drawable.muni_icon),
                             contentDescription = stringResource(id = R.string.user_icon),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -181,7 +181,12 @@ fun ProfileScreen(
             CustomOutlinedTextField(
                 label = stringResource(id = R.string.nationality_label),
                 text = profileUiState.user.nationality,
-                onValueChange = { profileViewModel.onFieldChange(ProfileField.Nationality, it) },
+                onValueChange = {
+                    profileViewModel.onFieldChange(
+                        ProfileField.Nationality,
+                        it
+                    )
+                },
                 leadingIcon = Icons.Default.Public
             )
 
@@ -212,7 +217,6 @@ fun ProfileScreen(
                     onClick = { navController.navigate(ORDER_HISTORY) },
                 )
             }
-
         }
     }
 

@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.data.local
 
+import com.iasiris.muniapp.data.repository.ProductDataSourceImpl
 import org.junit.jupiter.api.Test
 
 class ProductDataSourceImplTest {

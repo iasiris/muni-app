@@ -1,9 +1,8 @@
-package com.iasiris.muniapp.data.local
+package com.iasiris.muniapp.data.repository
 
 import com.iasiris.muniapp.data.model.Product
 
 interface ProductDataSource {
-
-    fun getProducts(): List<Product>
+    fun getAllProducts(): List<Product>
     fun getProductById(productId: String): Product?
 }

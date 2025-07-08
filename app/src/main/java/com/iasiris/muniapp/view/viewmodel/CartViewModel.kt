@@ -2,8 +2,8 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.local.ProductDataSource
-import com.iasiris.muniapp.data.model.Product
+import com.iasiris.muniapp.data.model.CartItem
+import com.iasiris.muniapp.data.repository.CartItemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -15,66 +15,65 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val productDataSource: ProductDataSource
+    private val cartItemRepository: CartItemRepository
 ) : ViewModel() {
-    //TODO agregar CartDataSource para manejar la logica de negocio
-    //TODO Usar datos que vengan de un repositorio o base de datos
     private val _cartUiState = MutableStateFlow(CartUiState())
     val cartUiState: StateFlow<CartUiState> = _cartUiState
 
     fun init() {
-        getProducts()
+        getCartItems()
     }
 
-    fun onAddProduct(productAdd: Product) {
+    fun onIncreaseCartItem(cartItem: CartItem) {
         _cartUiState.update { state ->
-            val updatedProducts = state.products.map {
-                if (it.name == productAdd.name && it.quantity < state.MAX_PRODUCT_QUANTITY) {
+            val updatedCartItems = state.cartItems.map {
+                if (it.product.id == cartItem.product.id && it.quantity < state.MAX_CART_ITEM_QUANTITY) {
                     it.copy(quantity = it.quantity + 1)
                 } else it
             }
-            state.copy(products = updatedProducts)
+            state.copy(cartItems = updatedCartItems)
         }
+
         updateTotal()
     }
 
-    fun onRemoveProduct(productRemoved: Product) {
+    fun onDecreaseCartItem(cartItem: CartItem) {
         _cartUiState.update { state ->
-            val updatedProducts = state.products.mapNotNull {
-                if (it.name == productRemoved.name && it.quantity > state.MIN_PRODUCT_QUANTITY) {
+            val updatedCartItems = state.cartItems.mapNotNull {
+                if (it.product.id == cartItem.product.id && it.quantity > state.MIN_CART_ITEM_QUANTITY) {
                     it.copy(quantity = it.quantity - 1)
                 } else it
             }
-            state.copy(products = updatedProducts)
+            state.copy(cartItems = updatedCartItems)
         }
         updateTotal()
     }
 
-    fun onDeleteProduct(productDeleted: Product) {
+    fun onRemoveCartItem(cartItem: CartItem) {
         _cartUiState.update { state ->
-            val updatedProducts = state.products.filterNot {
-                it.name == productDeleted.name
+            val updatedCartItems = state.cartItems.filterNot {
+                it.product.id == cartItem.product.id
             }
-            state.copy(products = updatedProducts)
+            state.copy(cartItems = updatedCartItems)
         }
         updateTotal()
     }
 
-    private fun getProducts() {
+    private fun getCartItems() {
         viewModelScope.launch {
-            val allProducts = withContext(Dispatchers.IO) {
-                productDataSource.getProducts()
+            val allCartItems = withContext(Dispatchers.IO) {
+                cartItemRepository.getAllCartItems()
             }
             _cartUiState.update { state ->
-                state.copy(products = allProducts)
+                state.copy(cartItems = allCartItems)
             }
             updateTotal()
         }
     }
 
-    private fun updateTotal() {
+    private fun updateTotal() {//TODO guardar cartItems en DB
         _cartUiState.update { state ->
-            val subTotal = state.products.sumOf { it.price * it.quantity }
+            val subTotal = state.cartItems.sumOf { it.product.price * it.quantity }
             val deliveryFee = Math.round(subTotal * state.FEE_PERCENTAGE * 100) / 100.0
             val totalAmount = subTotal + state.deliveryFee
             state.copy(
@@ -87,10 +86,10 @@ class CartViewModel @Inject constructor(
 }
 
 data class CartUiState(
-    val MAX_PRODUCT_QUANTITY: Int = 10,
-    val MIN_PRODUCT_QUANTITY: Int = 1,
+    val MAX_CART_ITEM_QUANTITY: Int = 10,
+    val MIN_CART_ITEM_QUANTITY: Int = 1,
     val FEE_PERCENTAGE: Double = 0.03,
-    val products: List<Product> = emptyList(),
+    val cartItems: List<CartItem> = emptyList(),
     val subTotal: Double = 0.0,
     val deliveryFee: Double = 0.0,
     val totalAmount: Double = 0.0

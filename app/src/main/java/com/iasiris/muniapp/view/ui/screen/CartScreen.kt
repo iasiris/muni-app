@@ -19,16 +19,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.utils.paddingExtraSmall
+import com.iasiris.muniapp.utils.paddingLarge
+import com.iasiris.muniapp.utils.paddingMedium
+import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CardWithImageInTheLeftWithButtons
 import com.iasiris.muniapp.view.ui.components.EmptyCartScreen
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.RowWithBodyTextAndAmount
 import com.iasiris.muniapp.view.ui.components.RowWithSubheadTextAndAmount
-import com.iasiris.muniapp.utils.paddingExtraSmall
-import com.iasiris.muniapp.utils.paddingLarge
-import com.iasiris.muniapp.utils.paddingMedium
-import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.view.viewmodel.CartViewModel
 
@@ -38,11 +38,11 @@ fun CartScreen(
     cartViewModel: CartViewModel
 ) {
     val cartUiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
-    LaunchedEffect (Unit){
+    LaunchedEffect(Unit) {
         cartViewModel.init()
     }
 
-    if (cartUiState.products.isEmpty()) {
+    if (cartUiState.cartItems.isEmpty()) {
         EmptyCartScreen(navController)
     } else {
         Column(
@@ -62,14 +62,14 @@ fun CartScreen(
                     .padding(horizontal = paddingMedium)
                     .weight(1f)
             ) {
-                itemsIndexed(cartUiState.products) { index, product ->
+                itemsIndexed(cartUiState.cartItems) { index, cartItem ->
                     CardWithImageInTheLeftWithButtons(
-                        product = product,
-                        onAdd = { cartViewModel.onAddProduct(product) },
-                        onRemove = { cartViewModel.onRemoveProduct(product) },
-                        onDelete = { cartViewModel.onDeleteProduct(product) }
+                        product = cartItem.product,
+                        onAdd = { cartViewModel.onIncreaseCartItem(cartItem) },
+                        onRemove = { cartViewModel.onDecreaseCartItem(cartItem) },
+                        onDelete = { cartViewModel.onRemoveCartItem(cartItem) }
                     )
-                    if (index < cartUiState.products.lastIndex) {
+                    if (index < cartUiState.cartItems.lastIndex) {
                         HorizontalDivider(
                             modifier = Modifier
                                 .fillMaxWidth()

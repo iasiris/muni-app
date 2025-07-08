@@ -1,6 +1,6 @@
 package com.iasiris.muniapp.view.viewmodel
 
-import com.iasiris.muniapp.data.local.ProductDataSource
+import com.iasiris.muniapp.data.repository.ProductDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain

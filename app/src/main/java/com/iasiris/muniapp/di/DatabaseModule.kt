@@ -1,4 +1,37 @@
 package com.iasiris.muniapp.di
 
-class DatabaseModule {
+import android.content.Context
+import androidx.room.Room
+import com.iasiris.muniapp.data.database.AppDatabase
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DatabaseModule {
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase {
+        return Room.databaseBuilder(
+            appContext,
+            AppDatabase::class.java,
+            "muniapp_database"
+        ).build()
+    }
+
+    @Provides
+    fun provideProductDao(database: AppDatabase) = database.productDao()
+
+    @Provides
+    fun provideCartItemDao(database: AppDatabase) = database.cartItemDao()
+
+    @Provides
+    fun provideOrderHistoryDao(database: AppDatabase) = database.orderHistoryDao()
+
+    @Provides
+    fun provideOrderItemDao(database: AppDatabase) = database.orderItemDao()
 }

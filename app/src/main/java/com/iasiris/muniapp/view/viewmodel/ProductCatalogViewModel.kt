@@ -1,28 +1,31 @@
 package com.iasiris.muniapp.view.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.local.ProductDataSource
 import com.iasiris.muniapp.data.model.Product
+import com.iasiris.muniapp.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ProductCatalogViewModel @Inject constructor(
-    private val productDataSource: ProductDataSource
+    private val productRepository: ProductRepository
 ) : ViewModel() {
 
     private val _prodCatUiState = MutableStateFlow(ProductCatalogUiState())
     val prodCatUiState: StateFlow<ProductCatalogUiState> = _prodCatUiState
 
-    fun init(){ //TODO llamar desde el composable al principio de todo hacer esto en otros viewModels
-        getProducts()
+    fun init(){
+        // productRepository.refreshProducts() <-- Es necesario?
+        getAllProducts()
     }
 
     fun onCategorySelected(category: String) {
@@ -59,11 +62,12 @@ class ProductCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun getProducts() {
+    private fun getAllProducts() {
         viewModelScope.launch {
             val allProducts = withContext(Dispatchers.IO) {
-                productDataSource.getProducts()
+                productRepository.getAllProducts()  //TODO check this
             }
+            Log.d("TESTING", "Products fetched: $allProducts")
             _prodCatUiState.update { state ->
                 state.copy(
                     allProducts = allProducts,
@@ -74,6 +78,7 @@ class ProductCatalogViewModel @Inject constructor(
                     )
                 )
             }
+            Log.d("TESTING", "Filtered products: ${_prodCatUiState.value.products}")
         }
     }
 

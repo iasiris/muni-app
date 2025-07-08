@@ -101,7 +101,7 @@ fun BackButtonWithTitle(
 }
 
 @Composable
-fun QuantityButtons(
+fun QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
     quantity: Int,
     onAdd: () -> Unit,
     onRemove: () -> Unit,

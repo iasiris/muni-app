@@ -1,15 +1,12 @@
 package com.iasiris.muniapp.data.model
 
 data class CartItem(
-    val name: String,
-    val description: String,
-    val imageUrl: String,
-    val price: Int,
-    val hasDrink: Boolean,
-    val quantity: Int
+    val id: Int = 0,
+    val product: Product,
+    val quantity: Int = 1
 )
 
-data class Order(
+data class Order(//TODO check val productsId: List<CartItem>
     val orderId: String,
     val productsId: List<CartItem>,
     val totalPrice: Int,

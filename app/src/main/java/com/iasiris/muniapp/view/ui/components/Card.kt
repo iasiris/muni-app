@@ -156,7 +156,7 @@ fun PillCardWithDropDownMenu(
 
 
 @Composable
-fun RowWithAddCartAndQuantity(
+fun RowWithAddCartAndQuantity(//TODO change names of variables onAdd, onRemove, onDelete
     quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}, navigateTo: () -> Unit = {}
 ) {
     Row(
@@ -164,7 +164,7 @@ fun RowWithAddCartAndQuantity(
         horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
-        QuantityButtons(
+        QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
             quantity, onAdd = onAdd, onRemove = onRemove, modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(paddingSmall))
@@ -278,7 +278,7 @@ fun RowWithNameAndDeleteIcon(
 }
 
 @Composable
-fun RowWithPriceAndButtons(
+fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onDelete
     price: Double = 0.0, quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}
 ) {
     Row(
@@ -295,7 +295,7 @@ fun RowWithPriceAndButtons(
             textAlign = TextAlign.Start
         )
 
-        QuantityButtons(
+        QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
             quantity = quantity,
             onAdd = onAdd,
             onRemove = onRemove,
@@ -362,7 +362,7 @@ fun CardWithImageInTheLeft(
 }
 
 @Composable
-fun CardWithImageInTheLeftWithButtons(
+fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, onRemove, onDelete
     product: Product, onAdd: () -> Unit, onRemove: () -> Unit, onDelete: () -> Unit
 ) {
     Card(

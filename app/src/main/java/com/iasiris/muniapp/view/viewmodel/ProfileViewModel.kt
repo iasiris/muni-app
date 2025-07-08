@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
-import com.iasiris.muniapp.data.local.UserDataSource
+import com.iasiris.muniapp.data.repository.UserDataSource
 import com.iasiris.muniapp.data.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
@@ -124,7 +124,8 @@ class ProfileViewModel @Inject constructor(
             Log.d("Log", "${_profileUiState.value.user}")
             _profileUiState.update { state ->
                 state.copy(
-                    user = _profileUiState.value.user, newPassword = "",
+                    user = _profileUiState.value.user,
+                    newPassword = "",
                     isSaveEnabled = false,
                     isUserUploading = false
                 )

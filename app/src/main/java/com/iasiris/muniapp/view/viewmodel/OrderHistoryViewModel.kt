@@ -2,7 +2,7 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.local.OrderDataSource
+import com.iasiris.muniapp.data.repository.OrderDataSource
 import com.iasiris.muniapp.data.model.Order
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
