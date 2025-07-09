@@ -2,7 +2,7 @@ package com.iasiris.muniapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.iasiris.muniapp.data.database.AppDatabase
+import com.iasiris.muniapp.data.local.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

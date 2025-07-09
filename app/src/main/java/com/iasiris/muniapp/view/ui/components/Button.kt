@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -101,6 +102,28 @@ fun BackButtonWithTitle(
 }
 
 @Composable
+fun AddToButton(
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50),
+        modifier = Modifier.size(48.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = stringResource(id = R.string.add_to_cart_icon),
+            tint = Color.White,
+            modifier = Modifier.size(sizeMedium)
+        )
+    }
+}
+
+@Composable
 fun QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
     quantity: Int,
     onAdd: () -> Unit,
@@ -168,6 +191,7 @@ fun PreviewButtons() {
                 title = "Titulo",
                 onBackButtonClick = {}
             )
+            AddToButton(onClick = {})
 
             QuantityButtons(
                 quantity = 1,

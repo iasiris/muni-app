@@ -30,6 +30,11 @@ android {
 
         buildConfigField(
             "String",
+            "BASE_URL",
+            "\"${localProperties["BASE_URL"]}\""
+        )
+        buildConfigField(
+            "String",
             "CLOUDINARY_CLOUD_NAME",
             "\"${localProperties["CLOUDINARY_CLOUD_NAME"]}\""
         )

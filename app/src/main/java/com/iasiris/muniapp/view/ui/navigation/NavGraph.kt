@@ -9,21 +9,18 @@ import com.iasiris.muniapp.view.ui.navigation.Routes.CART
 import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_DETAIL
 import com.iasiris.muniapp.view.ui.navigation.Routes.PROFILE
 import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.ui.screen.CartScreen
 import com.iasiris.muniapp.view.ui.screen.LoginScreen
 import com.iasiris.muniapp.view.ui.screen.OrderHistoryScreen
 import com.iasiris.muniapp.view.ui.screen.ProductCatalogScreen
-import com.iasiris.muniapp.view.ui.screen.ProductDetailScreen
 import com.iasiris.muniapp.view.ui.screen.ProfileScreen
 import com.iasiris.muniapp.view.ui.screen.RegisterScreen
 import com.iasiris.muniapp.view.viewmodel.CartViewModel
 import com.iasiris.muniapp.view.viewmodel.LoginViewModel
 import com.iasiris.muniapp.view.viewmodel.OrderHistoryViewModel
 import com.iasiris.muniapp.view.viewmodel.ProductCatalogViewModel
-import com.iasiris.muniapp.view.viewmodel.ProductDetailViewModel
 import com.iasiris.muniapp.view.viewmodel.ProfileViewModel
 import com.iasiris.muniapp.view.viewmodel.RegisterViewModel
 
@@ -45,7 +42,6 @@ fun NavGraph(
     val loginViewModel: LoginViewModel = hiltViewModel()
     val orderViewModel: OrderHistoryViewModel = hiltViewModel()
     val prodCatViewModel: ProductCatalogViewModel = hiltViewModel()
-    val productDetailViewModel: ProductDetailViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
 
@@ -61,9 +57,6 @@ fun NavGraph(
         }
         composable(PRODUCT_CATALOG) {
             ProductCatalogScreen(navController, prodCatViewModel)
-        }
-        composable(PRODUCT_DETAIL) {
-            ProductDetailScreen(navController, productDetailViewModel)
         }
         composable(PROFILE) {
             ProfileScreen(navController, profileViewModel)

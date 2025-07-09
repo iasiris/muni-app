@@ -2,8 +2,8 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.repository.OrderDataSource
-import com.iasiris.muniapp.data.model.Order
+import com.iasiris.muniapp.data.local.datasource.OrderDataSource
+import com.iasiris.muniapp.domain.model.Order
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers

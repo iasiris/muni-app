@@ -7,8 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
-import com.iasiris.muniapp.data.repository.UserDataSource
-import com.iasiris.muniapp.data.model.User
+import com.iasiris.muniapp.data.local.datasource.UserDataSource
+import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
 import dagger.hilt.android.lifecycle.HiltViewModel

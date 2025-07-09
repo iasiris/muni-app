@@ -64,7 +64,7 @@ fun CartScreen(
             ) {
                 itemsIndexed(cartUiState.cartItems) { index, cartItem ->
                     CardWithImageInTheLeftWithButtons(
-                        product = cartItem.product,
+                        cartItem = cartItem,
                         onAdd = { cartViewModel.onIncreaseCartItem(cartItem) },
                         onRemove = { cartViewModel.onDecreaseCartItem(cartItem) },
                         onDelete = { cartViewModel.onRemoveCartItem(cartItem) }

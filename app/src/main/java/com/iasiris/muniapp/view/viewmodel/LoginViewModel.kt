@@ -2,7 +2,7 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.repository.UserDataSource
+import com.iasiris.muniapp.data.local.datasource.UserDataSource
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
 import dagger.hilt.android.lifecycle.HiltViewModel

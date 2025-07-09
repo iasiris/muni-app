@@ -15,16 +15,15 @@
     <string name="search">Buscar</string>
     <string name="muni">Muni</string>
     <string name="see_all">Ver todo</string>
-    <string name="categorias">Categorias</string>
+    <string name="categories">Categorias</string>
     <string name="specials_of_the_day">Ofertas del dia</string>
     <string name="order_by">Ordenar</string>
-    <string name="add_to_cart">Agregar</string>
     <string name="one_product">%1$s producto</string>
     <string name="products">%1$s productos</string>
     <string name="invalid_register">No se pudo registar el usuario</string>
     <string name="profile_title">Perfil</string>
     <string name="email_label">Email</string>
-    <string name="fullname_label">Nombre Completo</string>
+    <string name="full_name_label">Nombre Completo</string>
     <string name="nationality_label">Nacionalidad</string>
     <string name="save_changes">Guardar cambios</string>
     <string name="user_changes_not_saved">Error al guardar datos</string>
@@ -40,12 +39,13 @@
     <string name="order_total_price">Total: $%1$s</string>
     <string name="order_date">Orden generada: %1$s</string>
     <string name="saving_profile_data">"Guardando datos..."</string>
+    <string name="retry">Reintentar</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>
     <string name="back_button">Back Button</string>
     <string name="drink">Bebida</string>
-    <string name="locacion_icon">Icon Location</string>
+    <string name="location_icon">Icon Location</string>
     <string name="search_icon">Icon Busqueda</string>
     <string name="cart_icon">Icon Carrito</string>">
     <string name="decrease_icon">Icon Agregar</string>
@@ -58,11 +58,12 @@
     <string name="order_featured">Destacados</string>
     <string name="price_low_to_high">Menor Precio</string>
     <string name="price_high_to_low">Mayor Precio </string>
-    <string name="add">Icon Mas</string>">
-    <string name="remove">Icon Menos</string>">
-    <string name="dropwdown_menu">Menu desplegable</string>
+    <string name="add">Icon Mas</string>"> <!-- TODO chequear esto -->
+    <string name="remove">Icon Menos</string>"> <!-- TODO chequear esto -->
+    <string name="dropdown_menu">Menu desplegable</string>
     <string name="user_icon">Icono usuario</string>
     <string name="edit_image_icon">Icono editar imagen</string>
+    <string name="add_to_cart_icon">Agregar</string>
 
 
 

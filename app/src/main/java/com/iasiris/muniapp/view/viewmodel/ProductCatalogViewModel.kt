@@ -1,32 +1,26 @@
 package com.iasiris.muniapp.view.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.model.Product
-import com.iasiris.muniapp.data.repository.ProductRepository
+import coil3.network.HttpException
+import com.iasiris.muniapp.domain.model.Product
+import com.iasiris.muniapp.domain.usecase.GetProductsUseCase
+import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.io.IOException
 
 @HiltViewModel
 class ProductCatalogViewModel @Inject constructor(
-    private val productRepository: ProductRepository
+    private val getProductsUseCase: GetProductsUseCase
 ) : ViewModel() {
 
     private val _prodCatUiState = MutableStateFlow(ProductCatalogUiState())
     val prodCatUiState: StateFlow<ProductCatalogUiState> = _prodCatUiState
-
-    fun init(){
-        // productRepository.refreshProducts() <-- Es necesario?
-        getAllProducts()
-    }
 
     fun onCategorySelected(category: String) {
         _prodCatUiState.update { state ->
@@ -62,23 +56,29 @@ class ProductCatalogViewModel @Inject constructor(
         }
     }
 
-    private fun getAllProducts() {
+    fun loadProducts(refreshData: Boolean = false) {
         viewModelScope.launch {
-            val allProducts = withContext(Dispatchers.IO) {
-                productRepository.getAllProducts()  //TODO check this
-            }
-            Log.d("TESTING", "Products fetched: $allProducts")
-            _prodCatUiState.update { state ->
-                state.copy(
-                    allProducts = allProducts,
-                    products = filterProducts(
-                        state.searchText,
-                        state.selectedCategory,
-                        allProducts
+            _prodCatUiState.update { it.copy(screenState = ScreenState.Loading) }
+            try {
+                val products = getProductsUseCase.invoke(refreshData)
+                _prodCatUiState.update { state ->
+                    state.copy(
+                        screenState = ScreenState.Success(products),
+                        allProducts = products,
+                        products = filterProducts(
+                            state.searchText,
+                            state.selectedCategory,
+                            products
+                        )
                     )
-                )
+                }
+            } catch (e: IOException) {
+                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Sin conexion a internet")) }
+            } catch (e: HttpException) {
+                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor: ${e.message}")) }
+            } catch (e: Exception) {
+                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
             }
-            Log.d("TESTING", "Filtered products: ${_prodCatUiState.value.products}")
         }
     }
 
@@ -99,6 +99,7 @@ class ProductCatalogViewModel @Inject constructor(
 }
 
 data class ProductCatalogUiState(
+    val screenState: ScreenState<List<Product>> = ScreenState.Loading,
     val allProducts: List<Product> = emptyList(),
     val products: List<Product> = emptyList(),
     val searchText: String = "",
@@ -109,7 +110,7 @@ data class ProductCatalogUiState(
         "Empanadas"
     ), //TODO TAKE THIS FROM API
     val selectedCategory: String = "",
-    val selectedOrder: PriceOrder = PriceOrder.FEATURED
+    val selectedOrder: PriceOrder = PriceOrder.FEATURED,
 )
 
 enum class PriceOrder {

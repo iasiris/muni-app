@@ -44,9 +44,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
-import com.iasiris.muniapp.data.model.CartItem
-import com.iasiris.muniapp.data.model.Order
-import com.iasiris.muniapp.data.model.Product
+import com.iasiris.muniapp.domain.model.CartItem
+import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.utils.paddingExtraSmall
 import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.utils.paddingSmall
@@ -118,7 +118,7 @@ fun PillCardWithDropDownMenu(
 
             Icon(
                 imageVector = Icons.Default.Reorder,
-                contentDescription = stringResource(id = R.string.dropwdown_menu),
+                contentDescription = stringResource(id = R.string.dropdown_menu),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(sizeMedium)
             )
@@ -151,30 +151,6 @@ fun PillCardWithDropDownMenu(
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun RowWithAddCartAndQuantity(//TODO change names of variables onAdd, onRemove, onDelete
-    quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}, navigateTo: () -> Unit = {}
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
-            quantity, onAdd = onAdd, onRemove = onRemove, modifier = Modifier.weight(1f)
-        )
-        Spacer(modifier = Modifier.width(paddingSmall))
-        PrimaryButton(
-            label = stringResource(id = R.string.add_to_cart),
-            onClick = navigateTo,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(2f)
-        )
     }
 }
 
@@ -308,7 +284,8 @@ fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onD
 
 @Composable
 fun CardWithImageInTheLeft(
-    product: Product, navigateToProductDetail: (String) -> Unit = {}
+    product: Product,
+    onClick: (String) -> Unit = {}
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -316,9 +293,7 @@ fun CardWithImageInTheLeft(
             .padding(paddingExtraSmall)
             .height(120.dp)
             .fillMaxWidth()
-            .clickable {
-                navigateToProductDetail(product.id)
-            }) {
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -362,8 +337,79 @@ fun CardWithImageInTheLeft(
 }
 
 @Composable
+fun CartWithImageOnTheTop(
+    product: Product,
+    onClick: (String) -> Unit = {}
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .padding(paddingSmall)
+            .height(250.dp)
+            .width(200.dp)
+    ) {
+        Column(
+
+        ) {
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = stringResource(id = R.string.product_image),
+                onError = {
+                    Log.i("AsyncImage", "Error loading image ${it.result.throwable.message}")
+                },
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth()
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .padding(horizontal = paddingMedium)
+                    .fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.height(paddingSmall))
+
+                BodyText(text = product.name)
+
+                Spacer(modifier = Modifier.height(paddingExtraSmall))
+
+                CaptionText(
+                    text = product.description,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(paddingSmall))
+
+                RowWithPriceAndHasDrink(
+                    price = product.price,
+                    hasDrink = product.hasDrink,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(paddingSmall))
+
+
+            }
+            Column( //TODO hacer que el button este abajo de todo a la derecha
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier
+                    .padding(horizontal = paddingMedium)
+                    .fillMaxWidth()
+            ) {
+                AddToButton(
+                    onClick = { onClick(product.id) } //TODO change this to add to cart
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, onRemove, onDelete
-    product: Product, onAdd: () -> Unit, onRemove: () -> Unit, onDelete: () -> Unit
+    cartItem: CartItem, onAdd: () -> Unit, onRemove: () -> Unit, onDelete: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -379,7 +425,7 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
         ) {
             //TODO agregar imagen por default mientras cargan las imagenes reales
             AsyncImage(
-                model = product.imageUrl,
+                model = cartItem.product.imageUrl,
                 contentDescription = stringResource(id = R.string.product_image),
                 onError = {
                     Log.i("AsyncImage", "Error loading image ${it.result.throwable.message}")
@@ -396,17 +442,18 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
                 modifier = Modifier.padding(end = paddingMedium)
             ) {
                 RowWithNameAndDeleteIcon(
-                    text = product.name,
+                    text = cartItem.product.name,
                     onDelete = onDelete,
                 )
 
                 CaptionText(
-                    text = product.description, color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = cartItem.product.description,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 RowWithPriceAndButtons(
-                    price = product.price,
-                    quantity = product.quantity,
+                    price = cartItem.product.price,
+                    quantity = cartItem.quantity,
                     onAdd = onAdd,
                     onRemove = onRemove
                 )
@@ -462,33 +509,41 @@ fun CardsPreview() {
         Column(
             modifier = Modifier.padding(paddingMedium)
         ) {
-            PillCard(
+            /*PillCard(
                 text = "Mountain", isSelected = false, onClick = {})
+
             PillCard(
                 text = "Mountain", isSelected = true, onClick = {})
+
             Spacer(modifier = Modifier.height(paddingMedium))
+
             RowWithPriceAndHasDrink(
                 price = 10.0, hasDrink = true, fontWeight = FontWeight.Medium
             )
+
             Spacer(modifier = Modifier.height(paddingMedium))
-            RowWithAddCartAndQuantity(
-                quantity = 1,
-            )
+
             RowWithQuantityAndAmount(
                 quantity = 1, totalAmount = 10.0
             )
+
             RowWithQuantityAndAmount(
                 quantity = 2, totalAmount = 10.0
             )
+
             RowWithSubheadTextAndAmount(
                 text = "Total", totalAmount = 10.0
             )
+
             RowWithBodyTextAndAmount(
                 text = "Subtotal", totalAmount = 10.0
             )
+
             RowWithNameAndDeleteIcon(
                 text = "Product Name", onDelete = { })
+
             RowWithPriceAndButtons(price = 10.0, quantity = 1, onAdd = {}, onRemove = {})
+
             CardWithImageInTheLeft(
                 product = Product(
                     id = "1",
@@ -498,8 +553,10 @@ fun CardsPreview() {
                     price = 10.0,
                     hasDrink = true,
                     category = "Category",
-                ), navigateToProductDetail = {})
-            CardWithImageInTheLeftWithButtons(
+                ), onClick = {}
+            )*/
+
+            CartWithImageOnTheTop(
                 product = Product(
                     id = "1",
                     name = "Product Name",
@@ -507,25 +564,52 @@ fun CardsPreview() {
                     imageUrl = "",
                     price = 10.0,
                     hasDrink = true,
-                    category = "Category",
+                    category = "Category"
+                ),
+                onClick = {}
+            )
+
+            /*CardWithImageInTheLeftWithButtons(
+                cartItem = CartItem(
+                    id = 1,
+                    product = Product(
+                        id = "1",
+                        name = "Product Name",
+                        description = "Product Description",
+                        imageUrl = "",
+                        price = 10.0,
+                        hasDrink = true,
+                        category = "Category"
+                    ),
                     quantity = 1
-                ), onAdd = {}, onRemove = {}, onDelete = {})
+                ),
+                onAdd = {},
+                onRemove = {},
+                onDelete = {}
+            )
+
             CardWithDateAndTotal(
                 order = Order(
-                    orderId = "1", productsId = listOf(
+                    orderId = "1",
+                    productsId = listOf(
                         CartItem(
-                            name = "Product Name",
-                            description = "Product Description",
-                            imageUrl = "",
-                            price = 10,
-                            hasDrink = true,
+                            id = 1,
+                            product = Product(
+                                id = "1",
+                                name = "Product Name",
+                                description = "Product Description",
+                                imageUrl = "",
+                                price = 10.0,
+                                hasDrink = true,
+                                category = "Category"
+                            ),
                             quantity = 1
                         )
                     ),
                     totalPrice = 10,
                     orderDate = "05/06/2025"
                 )
-            )
+            )*/
         }
     }
 }

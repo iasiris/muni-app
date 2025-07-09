@@ -1,7 +1,7 @@
 package com.iasiris.muniapp.ui.screen.orderhistory
 
-import com.iasiris.muniapp.data.repository.OrderDataSource
-import com.iasiris.muniapp.data.model.Order
+import com.iasiris.muniapp.data.local.datasource.OrderDataSource
+import com.iasiris.muniapp.domain.model.Order
 import com.iasiris.muniapp.view.viewmodel.OrderHistoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher

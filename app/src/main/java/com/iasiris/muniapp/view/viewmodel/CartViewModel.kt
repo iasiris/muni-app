@@ -2,8 +2,8 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.model.CartItem
-import com.iasiris.muniapp.data.repository.CartItemRepository
+import com.iasiris.muniapp.domain.model.CartItem
+import com.iasiris.muniapp.domain.usecase.GetCartItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartItemRepository: CartItemRepository
+    private val getCartItemsUseCase: GetCartItemsUseCase
 ) : ViewModel() {
     private val _cartUiState = MutableStateFlow(CartUiState())
     val cartUiState: StateFlow<CartUiState> = _cartUiState
@@ -61,9 +61,7 @@ class CartViewModel @Inject constructor(
 
     private fun getCartItems() {
         viewModelScope.launch {
-            val allCartItems = withContext(Dispatchers.IO) {
-                cartItemRepository.getAllCartItems()
-            }
+            val allCartItems = getCartItemsUseCase.invoke()
             _cartUiState.update { state ->
                 state.copy(cartItems = allCartItems)
             }

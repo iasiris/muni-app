@@ -172,7 +172,7 @@ fun ProfileScreen(
             )
 
             CustomOutlinedTextField(
-                label = stringResource(id = R.string.fullname_label),
+                label = stringResource(id = R.string.full_name_label),
                 text = profileUiState.user.fullName,
                 onValueChange = { profileViewModel.onFieldChange(ProfileField.FullName, it) },
                 leadingIcon = Icons.Default.PersonOutline,
