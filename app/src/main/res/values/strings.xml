@@ -48,8 +48,8 @@
     <string name="location_icon">Icon Location</string>
     <string name="search_icon">Icon Busqueda</string>
     <string name="cart_icon">Icon Carrito</string>">
-    <string name="decrease_icon">Icon Agregar</string>
-    <string name="increase_icon">Icon Quitar</string>">
+    <string name="decrease_icon">Icon Restar</string>
+    <string name="increase_icon">Icon Sumar</string>">
     <string name="remove_icon">Icon Eliminar</string>">
     <string name="product_image">Imagen de Producto</string>">
     <string name="show_password">Mostrar contraseña</string>

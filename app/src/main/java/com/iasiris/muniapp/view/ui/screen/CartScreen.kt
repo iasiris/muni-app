@@ -65,9 +65,9 @@ fun CartScreen(
                 itemsIndexed(cartUiState.cartItems) { index, cartItem ->
                     CardWithImageInTheLeftWithButtons(
                         cartItem = cartItem,
-                        onAdd = { cartViewModel.onIncreaseCartItem(cartItem) },
-                        onRemove = { cartViewModel.onDecreaseCartItem(cartItem) },
-                        onDelete = { cartViewModel.onRemoveCartItem(cartItem) }
+                        onIncrease = { cartViewModel.onIncreaseCartItem(cartItem) },
+                        onDecrease = { cartViewModel.onDecreaseCartItem(cartItem) },
+                        onRemove = { cartViewModel.onRemoveCartItem(cartItem) }
                     )
                     if (index < cartUiState.cartItems.lastIndex) {
                         HorizontalDivider(

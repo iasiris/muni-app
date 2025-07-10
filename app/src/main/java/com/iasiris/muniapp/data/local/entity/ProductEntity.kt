@@ -14,9 +14,7 @@ data class ProductEntity(
     val price: Double,
     val hasDrink: Boolean,
     val category: String
-) {
-    companion object
-}
+)
 
 fun ProductEntity.productEntityToDomain() = Product(id, name, description, imageUrl, price, hasDrink, category)
 fun ProductEntity.productEntityToDto() = ProductDto(id, name, description, imageUrl, price, hasDrink, category)

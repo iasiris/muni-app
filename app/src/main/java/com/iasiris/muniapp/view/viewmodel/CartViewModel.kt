@@ -1,8 +1,10 @@
 package com.iasiris.muniapp.view.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iasiris.muniapp.domain.model.CartItem
+import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.domain.usecase.GetCartItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -22,6 +24,11 @@ class CartViewModel @Inject constructor(
 
     fun init() {
         getCartItems()
+    }
+
+    fun addToCart(product: Product) {
+        //TODO add product to cart
+        Log.d("com.iasiris.muniapp", "Adding product to cart: ${product.name}")
     }
 
     fun onIncreaseCartItem(cartItem: CartItem) {
@@ -61,7 +68,7 @@ class CartViewModel @Inject constructor(
 
     private fun getCartItems() {
         viewModelScope.launch {
-            val allCartItems = getCartItemsUseCase.invoke()
+            val allCartItems = withContext(Dispatchers.IO) { getCartItemsUseCase.invoke() }
             _cartUiState.update { state ->
                 state.copy(cartItems = allCartItems)
             }

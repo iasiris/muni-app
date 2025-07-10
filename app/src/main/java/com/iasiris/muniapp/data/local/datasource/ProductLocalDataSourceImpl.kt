@@ -20,7 +20,7 @@ class ProductLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun clearProducts() {
-        TODO("Not yet implemented")
+        productDao.deleteProducts()
     }
 
     override fun getProducts(): List<ProductEntity> {

@@ -4,6 +4,7 @@ import com.iasiris.muniapp.data.remote.dto.ProductDto
 import retrofit2.http.GET
 
 interface ProductApiService {
+    //para endpoints https://muni-peya-delivery-api.onrender.com/api-docs/
     @GET("foods")
     suspend fun getProducts(): List<ProductDto>
 

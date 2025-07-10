@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Public
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -53,6 +52,7 @@ import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CustomOutlinedTextField
 import com.iasiris.muniapp.view.ui.components.CustomOutlinedTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
+import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.view.viewmodel.ProfileField
 import com.iasiris.muniapp.view.viewmodel.ProfileViewModel
@@ -221,6 +221,6 @@ fun ProfileScreen(
     }
 
     if (profileUiState.isUserUploading) {
-        CircularProgressIndicator()
+        SimpleCircularProgressIndicator()
     }
 }

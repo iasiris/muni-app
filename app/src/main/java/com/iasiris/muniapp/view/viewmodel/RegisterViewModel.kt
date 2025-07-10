@@ -3,7 +3,7 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.local.datasource.UserDataSource
+import com.iasiris.muniapp.data.remote.datasource.UserDataSource
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isFullNameValid

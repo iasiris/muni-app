@@ -1,5 +1,7 @@
 package com.iasiris.muniapp.view.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,18 +24,25 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iasiris.muniapp.R
-import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
 import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.utils.sizeMedium
+import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun PrimaryButton(
@@ -105,10 +114,26 @@ fun BackButtonWithTitle(
 fun AddToButton(
     onClick: () -> Unit
 ) {
+    var clicked by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (clicked) 1.2f else 1f,
+        animationSpec = tween(durationMillis = 150),
+        label = "scale"
+    )
     Button(
-        onClick = onClick,
+        onClick = {
+            clicked = true
+            onClick()
+        },
         shape = RoundedCornerShape(50),
-        modifier = Modifier.size(48.dp),
+        modifier = Modifier
+            .size(40.dp)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale)
+            .then(
+                if (clicked) Modifier else Modifier
+            ),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),
@@ -121,13 +146,19 @@ fun AddToButton(
             modifier = Modifier.size(sizeMedium)
         )
     }
+    if (clicked) {
+        LaunchedEffect(Unit) {
+            delay(150)
+            clicked = false
+        }
+    }
 }
 
 @Composable
-fun QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
+fun QuantityButtons(//TODO change names of variables onAdd, onRemove
     quantity: Int,
-    onAdd: () -> Unit,
-    onRemove: () -> Unit,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
     modifier: Modifier
 ) {
     Row(
@@ -139,7 +170,7 @@ fun QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
             .background(MaterialTheme.colorScheme.outlineVariant)
     ) {
         IconButton(
-            onClick = onRemove,
+            onClick = onDecrease,
             enabled = quantity > 1,
             modifier = Modifier.weight(1f)
         ) {
@@ -159,7 +190,7 @@ fun QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
         )
 
         IconButton(
-            onClick = onAdd,
+            onClick = onIncrease,
             modifier = Modifier.weight(1f)
         ) {
             Icon(
@@ -195,8 +226,8 @@ fun PreviewButtons() {
 
             QuantityButtons(
                 quantity = 1,
-                onAdd = {},
-                onRemove = {},
+                onIncrease = {},
+                onDecrease = {},
                 modifier = Modifier
             )
         }

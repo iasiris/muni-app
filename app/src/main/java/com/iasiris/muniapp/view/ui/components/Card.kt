@@ -232,7 +232,7 @@ fun RowWithBodyTextAndAmount(
 
 @Composable
 fun RowWithNameAndDeleteIcon(
-    text: String, onDelete: () -> Unit
+    text: String, onRemove: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -242,7 +242,7 @@ fun RowWithNameAndDeleteIcon(
         SubheadText(text = text, fontWeight = FontWeight.Bold)
 
         IconButton(
-            onClick = onDelete
+            onClick = onRemove
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
@@ -255,7 +255,10 @@ fun RowWithNameAndDeleteIcon(
 
 @Composable
 fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onDelete
-    price: Double = 0.0, quantity: Int, onAdd: () -> Unit = {}, onRemove: () -> Unit = {}
+    price: Double = 0.0,
+    quantity: Int,
+    onIncrease: () -> Unit = {},
+    onDecrease: () -> Unit = {}
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -273,66 +276,12 @@ fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onD
 
         QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
             quantity = quantity,
-            onAdd = onAdd,
-            onRemove = onRemove,
+            onIncrease = onIncrease,
+            onDecrease = onDecrease,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
         )
-    }
-}
-
-@Composable
-fun CardWithImageInTheLeft(
-    product: Product,
-    onClick: (String) -> Unit = {}
-) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier
-            .padding(paddingExtraSmall)
-            .height(120.dp)
-            .fillMaxWidth()
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            //TODO agregar imagen por default mientras cargan las imagenes reales
-            AsyncImage(
-                model = product.imageUrl,
-                contentDescription = stringResource(id = R.string.product_image),
-                onError = {
-                    Log.i("AsyncImage", "Error loading image ${it.result.throwable.message}")
-                },
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .width(120.dp)
-                    .fillMaxHeight()
-            )
-
-            Spacer(modifier = Modifier.width(paddingSmall))
-
-            Column(
-                modifier = Modifier.padding(end = paddingMedium)
-            ) {
-                BodyText(text = product.name)
-
-                Spacer(modifier = Modifier.height(paddingExtraSmall))
-
-                CaptionText(
-                    text = product.description, color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(paddingSmall))
-
-                RowWithPriceAndHasDrink(
-                    price = product.price,
-                    hasDrink = product.hasDrink,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
     }
 }
 
@@ -345,12 +294,10 @@ fun CartWithImageOnTheTop(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .padding(paddingSmall)
-            .height(250.dp)
-            .width(200.dp)
+            .height(300.dp)
+            .fillMaxWidth()
     ) {
-        Column(
-
-        ) {
+        Column() {
             AsyncImage(
                 model = product.imageUrl,
                 contentDescription = stringResource(id = R.string.product_image),
@@ -359,7 +306,7 @@ fun CartWithImageOnTheTop(
                 },
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .height(80.dp)
+                    .height(100.dp)
                     .fillMaxWidth()
             )
             Column(
@@ -392,12 +339,12 @@ fun CartWithImageOnTheTop(
 
 
             }
-            Column( //TODO hacer que el button este abajo de todo a la derecha
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End,
+            Spacer(modifier = Modifier.weight(1f))
+            Row(
                 modifier = Modifier
-                    .padding(horizontal = paddingMedium)
-                    .fillMaxWidth()
+                    .padding(bottom = paddingMedium, end = paddingMedium)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
             ) {
                 AddToButton(
                     onClick = { onClick(product.id) } //TODO change this to add to cart
@@ -409,7 +356,10 @@ fun CartWithImageOnTheTop(
 
 @Composable
 fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, onRemove, onDelete
-    cartItem: CartItem, onAdd: () -> Unit, onRemove: () -> Unit, onDelete: () -> Unit
+    cartItem: CartItem,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    onRemove: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -443,7 +393,7 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
             ) {
                 RowWithNameAndDeleteIcon(
                     text = cartItem.product.name,
-                    onDelete = onDelete,
+                    onRemove = onRemove,
                 )
 
                 CaptionText(
@@ -454,8 +404,8 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
                 RowWithPriceAndButtons(
                     price = cartItem.product.price,
                     quantity = cartItem.quantity,
-                    onAdd = onAdd,
-                    onRemove = onRemove
+                    onIncrease = onIncrease,
+                    onDecrease = onDecrease
                 )
             }
         }
@@ -509,7 +459,7 @@ fun CardsPreview() {
         Column(
             modifier = Modifier.padding(paddingMedium)
         ) {
-            /*PillCard(
+            PillCard(
                 text = "Mountain", isSelected = false, onClick = {})
 
             PillCard(
@@ -540,21 +490,9 @@ fun CardsPreview() {
             )
 
             RowWithNameAndDeleteIcon(
-                text = "Product Name", onDelete = { })
+                text = "Product Name", onRemove = { })
 
-            RowWithPriceAndButtons(price = 10.0, quantity = 1, onAdd = {}, onRemove = {})
-
-            CardWithImageInTheLeft(
-                product = Product(
-                    id = "1",
-                    name = "Product Name",
-                    description = "Product Description",
-                    imageUrl = "",
-                    price = 10.0,
-                    hasDrink = true,
-                    category = "Category",
-                ), onClick = {}
-            )*/
+            RowWithPriceAndButtons(price = 10.0, quantity = 1, onIncrease = {}, onDecrease = {})
 
             CartWithImageOnTheTop(
                 product = Product(
@@ -569,7 +507,7 @@ fun CardsPreview() {
                 onClick = {}
             )
 
-            /*CardWithImageInTheLeftWithButtons(
+            CardWithImageInTheLeftWithButtons(
                 cartItem = CartItem(
                     id = 1,
                     product = Product(
@@ -583,9 +521,9 @@ fun CardsPreview() {
                     ),
                     quantity = 1
                 ),
-                onAdd = {},
-                onRemove = {},
-                onDelete = {}
+                onIncrease = {},
+                onDecrease = {},
+                onRemove = {}
             )
 
             CardWithDateAndTotal(
@@ -609,7 +547,7 @@ fun CardsPreview() {
                     totalPrice = 10,
                     orderDate = "05/06/2025"
                 )
-            )*/
+            )
         }
     }
 }

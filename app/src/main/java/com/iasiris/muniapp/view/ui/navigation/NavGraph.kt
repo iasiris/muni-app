@@ -56,7 +56,7 @@ fun NavGraph(
             RegisterScreen(navController, registerViewModel)
         }
         composable(PRODUCT_CATALOG) {
-            ProductCatalogScreen(navController, prodCatViewModel)
+            ProductCatalogScreen(prodCatViewModel, cartViewModel)
         }
         composable(PROFILE) {
             ProfileScreen(navController, profileViewModel)
