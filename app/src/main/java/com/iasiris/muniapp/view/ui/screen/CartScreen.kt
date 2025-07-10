@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,25 +28,30 @@ import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
+import com.iasiris.muniapp.view.ui.components.BodyText
+import com.iasiris.muniapp.view.ui.components.CaptionText
 import com.iasiris.muniapp.view.ui.components.CardWithImageInTheLeftWithButtons
 import com.iasiris.muniapp.view.ui.components.EmptyCartScreen
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.RowWithBodyTextAndAmount
 import com.iasiris.muniapp.view.ui.components.RowWithSubheadTextAndAmount
-import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
 import com.iasiris.muniapp.view.viewmodel.CartViewModel
+import com.iasiris.muniapp.view.viewmodel.OrderHistoryViewModel
 
 @Composable
 fun CartScreen(
     navController: NavController,
-    cartViewModel: CartViewModel
+    cartViewModel: CartViewModel,
+    orderHistoryViewModel: OrderHistoryViewModel
 ) {
     val cartUiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
+    var showDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         cartViewModel.init()
     }
 
-    if (cartUiState.cartItems.isEmpty()) {
+    if (cartUiState.cartItems.isEmpty() && !showDialog) {
         EmptyCartScreen(navController)
     } else {
         Column(
@@ -107,16 +116,34 @@ fun CartScreen(
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                PrimaryButton( //TODO agregar proceso de guardado del pedido
-                    label = stringResource(
-                        id = R.string.checkout
-                    ),
-                    onClick = { navController.navigate(ORDER_HISTORY) }//TODO navegar a order history screen cuando el pedido este guardado
+                PrimaryButton(
+                    label = stringResource(id = R.string.checkout),
+                    onClick = {
+                        showDialog = orderHistoryViewModel.addOrderHistory(cartUiState.cartItems)
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        confirmButton = {
+                            PrimaryButton(
+                                label = stringResource(id = R.string.confirm),
+                                onClick = {
+                                    showDialog = false
+                                    cartViewModel.clearCart()
+                                }
+                            )
+                        },
+                        title = { BodyText(stringResource(id = R.string.order_success_title)) },
+                        text = { CaptionText(stringResource(id = R.string.order_success_message)) },
+                    )
+                }
             }
         }
     }
 }
+
 

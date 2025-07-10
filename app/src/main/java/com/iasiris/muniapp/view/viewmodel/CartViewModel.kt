@@ -1,11 +1,14 @@
 package com.iasiris.muniapp.view.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Product
-import com.iasiris.muniapp.domain.usecase.GetCartItemsUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.AddCartItemUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemsUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemByProductIdUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemsUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.UpdateCartItemUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +20,11 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val getCartItemsUseCase: GetCartItemsUseCase
+    private val getCartItemsUseCase: GetCartItemsUseCase,
+    private val getCartItemByProductIdUseCase: GetCartItemByProductIdUseCase,
+    private val addCartItemUseCase: AddCartItemUseCase,
+    private val updateCartItemUseCase: UpdateCartItemUseCase,
+    private val deleteCartItemsUseCase: DeleteCartItemsUseCase
 ) : ViewModel() {
     private val _cartUiState = MutableStateFlow(CartUiState())
     val cartUiState: StateFlow<CartUiState> = _cartUiState
@@ -27,33 +34,48 @@ class CartViewModel @Inject constructor(
     }
 
     fun addToCart(product: Product) {
-        //TODO add product to cart
-        Log.d("com.iasiris.muniapp", "Adding product to cart: ${product.name}")
+        viewModelScope.launch {
+            val existingCartItem = withContext(Dispatchers.IO) {
+                getCartItemByProductIdUseCase.invoke(product.id)
+            }
+            if (existingCartItem == null) {
+                val newCartItem = CartItem(product = product, quantity = 1)
+                withContext(Dispatchers.IO) {
+                    addCartItemUseCase.invoke(newCartItem)
+                }
+                _cartUiState.update { state ->
+                    val updatedCartItems = state.cartItems + newCartItem
+                    state.copy(cartItems = updatedCartItems)
+                }
+                updateTotal()//todo check this
+            } else {
+                onIncreaseCartItem(existingCartItem)
+            }
+        }
     }
 
     fun onIncreaseCartItem(cartItem: CartItem) {
-        _cartUiState.update { state ->
-            val updatedCartItems = state.cartItems.map {
-                if (it.product.id == cartItem.product.id && it.quantity < state.MAX_CART_ITEM_QUANTITY) {
-                    it.copy(quantity = it.quantity + 1)
-                } else it
-            }
-            state.copy(cartItems = updatedCartItems)
-        }
+        //todo update the quantity of the cart item in DB
+        viewModelScope.launch() {
+            val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity + 1)
+            if (cartItem.quantity < _cartUiState.value.MAX_CART_ITEM_QUANTITY) {
 
-        updateTotal()
+            }
+            withContext(Dispatchers.IO) { //update en DB
+                updateCartItemUseCase.invoke(cartItemUpdated)
+            }
+            getCartItems()
+        }
     }
 
     fun onDecreaseCartItem(cartItem: CartItem) {
-        _cartUiState.update { state ->
-            val updatedCartItems = state.cartItems.mapNotNull {
-                if (it.product.id == cartItem.product.id && it.quantity > state.MIN_CART_ITEM_QUANTITY) {
-                    it.copy(quantity = it.quantity - 1)
-                } else it
+        viewModelScope.launch() {
+            val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity - 1)
+            withContext(Dispatchers.IO) { //update en DB
+                updateCartItemUseCase.invoke(cartItemUpdated)
             }
-            state.copy(cartItems = updatedCartItems)
+            getCartItems()
         }
-        updateTotal()
     }
 
     fun onRemoveCartItem(cartItem: CartItem) {
@@ -76,7 +98,21 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun updateTotal() {//TODO guardar cartItems en DB
+    fun clearCart() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) { deleteCartItemsUseCase.invoke() }
+            _cartUiState.update { state ->
+                state.copy(
+                    cartItems = emptyList(),
+                    subTotal = 0.0,
+                    deliveryFee = 0.0,
+                    totalAmount = 0.0
+                )
+            }
+        }
+    }
+
+    private fun updateTotal() {
         _cartUiState.update { state ->
             val subTotal = state.cartItems.sumOf { it.product.price * it.quantity }
             val deliveryFee = Math.round(subTotal * state.FEE_PERCENTAGE * 100) / 100.0

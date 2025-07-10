@@ -40,7 +40,7 @@ fun NavGraph(
 ) {
     val cartViewModel: CartViewModel = hiltViewModel()
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val orderViewModel: OrderHistoryViewModel = hiltViewModel()
+    val orderHistoryViewModel: OrderHistoryViewModel = hiltViewModel()
     val prodCatViewModel: ProductCatalogViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
@@ -62,10 +62,10 @@ fun NavGraph(
             ProfileScreen(navController, profileViewModel)
         }
         composable(CART) {
-            CartScreen(navController, cartViewModel)
+            CartScreen(navController, cartViewModel, orderHistoryViewModel)
         }
         composable(ORDER_HISTORY) {
-            OrderHistoryScreen(navController, orderViewModel)
+            OrderHistoryScreen(navController, orderHistoryViewModel)
         }
     }
 }

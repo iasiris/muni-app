@@ -5,6 +5,7 @@ import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSource
 import com.iasiris.muniapp.data.repository.CartItemRepositoryImpl
 import com.iasiris.muniapp.data.repository.ProductRepositoryImpl
+import com.iasiris.muniapp.domain.repository.CartItemRepository
 import com.iasiris.muniapp.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
@@ -25,7 +26,7 @@ object RepositoryModule {
     @Provides
     fun provideCartItemRepository(
         cartItemLocalDataSource: CartItemLocalDataSource
-    ): CartItemRepositoryImpl {
+    ): CartItemRepository {
         return CartItemRepositoryImpl(cartItemLocalDataSource)
     }
 }

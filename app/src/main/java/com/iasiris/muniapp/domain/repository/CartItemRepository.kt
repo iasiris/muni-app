@@ -6,6 +6,7 @@ interface CartItemRepository {
     fun getCartItems(): List<CartItem>
     fun getCartItemsWithProducts(): List<CartItem>
     suspend fun getCartItemByProductId(productId: String): CartItem?
+    suspend fun updateCartItem(cartItem: CartItem)
     suspend fun insertCartItem(cartItem: CartItem)
     suspend fun deleteCartItem(cartItemId: Int)
     suspend fun deleteCartItems()

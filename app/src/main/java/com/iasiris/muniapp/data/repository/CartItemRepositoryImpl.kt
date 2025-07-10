@@ -34,6 +34,11 @@ class CartItemRepositoryImpl @Inject constructor(
         cartItemLocalDataSource.insertCartItem(cartItemEntity)
     }
 
+    override suspend fun updateCartItem(cartItem: CartItem) {
+        val cartItemEntity = cartItem.cartItemToEntity()
+        cartItemLocalDataSource.updateCartItem(cartItemEntity)
+    }
+
     override suspend fun deleteCartItem(cartItemId: Int) {
         cartItemLocalDataSource.deleteCartItem(cartItemId)
     }

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.network.HttpException
 import com.iasiris.muniapp.domain.model.Product
-import com.iasiris.muniapp.domain.usecase.GetProductsUseCase
+import com.iasiris.muniapp.domain.usecase.product.GetProductsUseCase
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -60,13 +60,15 @@ class ProductCatalogViewModel @Inject constructor(
     }
 
     fun loadProducts(refreshData: Boolean = false) {
+        //TODO SOLUCIONAR Error de red: timeout cuando se carga por primera vez la app
+        //TODO!!!!! se borra cartItems cuando: catalog(agrega prod) -> cart(esta el prod) -> catalog -> cart(desaparece el prod)
         viewModelScope.launch {
             _prodCatUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
                 val products = withContext(Dispatchers.IO) { getProductsUseCase.invoke(refreshData) }
                 val categories = products.map { it.category }
                     .distinct()
-                    .sorted() //lista de categorias unicas y ordenadas
+                    .sorted()
                 _prodCatUiState.update { state ->
                     state.copy(
                         allProducts = products,

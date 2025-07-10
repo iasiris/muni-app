@@ -27,6 +27,10 @@ class CartItemLocalDataSourceImpl @Inject constructor(
         cartItemDao.insertCartItem(cartItem)
     }
 
+    override suspend fun updateCartItem(cartItem: CartItemEntity) {
+        cartItemDao.updateCartItem(cartItem)
+    }
+
     override suspend fun deleteCartItem(cartItemId: Int) {
         cartItemDao.deleteCartItem(cartItemId)
     }

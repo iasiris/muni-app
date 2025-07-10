@@ -1,4 +1,4 @@
-package com.iasiris.muniapp.domain.usecase
+package com.iasiris.muniapp.domain.usecase.product
 
 import com.iasiris.muniapp.domain.repository.ProductRepository
 import javax.inject.Inject

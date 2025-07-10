@@ -40,6 +40,9 @@
     <string name="order_date">Orden generada: %1$s</string>
     <string name="saving_profile_data">"Guardando datos..."</string>
     <string name="retry">Reintentar</string>
+    <string name="confirm">Aceptar</string>
+    <string name="order_success_title">¡Felicidades!</string>
+    <string name="order_success_message">Tu compra se ha realizado con éxito</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

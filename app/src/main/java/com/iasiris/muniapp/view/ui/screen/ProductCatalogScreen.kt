@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.view.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
