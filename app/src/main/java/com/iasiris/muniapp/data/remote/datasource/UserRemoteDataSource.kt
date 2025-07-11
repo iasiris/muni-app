@@ -2,7 +2,7 @@ package com.iasiris.muniapp.data.remote.datasource
 
 import com.iasiris.muniapp.domain.model.User
 
-interface UserDataSource {
+interface UserRemoteDataSource {
     fun getCurrentUser(): User?
     fun getUserByEmail(email:String): User?
     suspend fun saveUser(user: User): Boolean

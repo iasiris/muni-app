@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
-import com.iasiris.muniapp.data.remote.datasource.UserDataSource
+import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 class ProfileViewModel @Inject constructor(
     private val myApplication: Application,
     private val cloudinary: Cloudinary,
-    private val userDataSource: UserDataSource
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : AndroidViewModel(myApplication) {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -118,7 +118,7 @@ class ProfileViewModel @Inject constructor(
             imageUri?.let { uploadImage(imageUri) }
 
             val isValid = withContext(Dispatchers.IO) {
-                userDataSource.updateUser(_profileUiState.value.user)
+                userRemoteDataSource.updateUser(_profileUiState.value.user)
             }
             onResult(isValid)
             Log.d("Log", "${_profileUiState.value.user}")
@@ -136,7 +136,7 @@ class ProfileViewModel @Inject constructor(
     private fun getUser() {
         viewModelScope.launch { //let para ejecutar el bloque solo si el usuario no es nulo
             val user = withContext(Dispatchers.IO) {
-                userDataSource.getCurrentUser()
+                userRemoteDataSource.getCurrentUser()
             }
             user?.let {
                 _profileUiState.update { state ->

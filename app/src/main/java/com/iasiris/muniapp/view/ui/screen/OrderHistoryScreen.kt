@@ -51,9 +51,9 @@ fun OrderHistoryScreen(
                 .padding(horizontal = paddingMedium)
                 .weight(1f)
         ) {
-            itemsIndexed(orderHistoryUiState.orders) { index, order ->
+            itemsIndexed(orderHistoryUiState.orderHistories) { index, order ->
                 CardWithDateAndTotal(order)
-                if (index < orderHistoryUiState.orders.lastIndex) {
+                if (index < orderHistoryUiState.orderHistories.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()

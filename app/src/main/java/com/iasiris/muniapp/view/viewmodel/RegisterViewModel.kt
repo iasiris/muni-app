@@ -3,7 +3,7 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.remote.datasource.UserDataSource
+import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isFullNameValid
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val userDataSource: UserDataSource
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : ViewModel() {
 
     private val _registerUiState = MutableStateFlow(RegisterUiState())
@@ -94,7 +94,7 @@ class RegisterViewModel @Inject constructor(
             )
             viewModelScope.launch {
                 withContext(Dispatchers.IO) {
-                    userDataSource.saveUser(newUser)
+                    userRemoteDataSource.saveUser(newUser)
                 }
                 clearRegistrationForm()
                 onResult(true)

@@ -1,6 +1,7 @@
 package com.iasiris.muniapp.di
 
 import com.iasiris.muniapp.BuildConfig
+import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.ProductApiService
 import dagger.Module
 import dagger.Provides
@@ -39,6 +40,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ProductApiService =
+    fun provideProductApiService(retrofit: Retrofit): ProductApiService =
         retrofit.create(ProductApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideOrderApiService(retrofit: Retrofit): OrderHistoryApiService =
+        retrofit.create(OrderHistoryApiService::class.java)
 }

@@ -2,7 +2,7 @@ package com.iasiris.muniapp.view.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.remote.datasource.UserDataSource
+import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userDataSource: UserDataSource
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : ViewModel() {
 
     private val _loginUiState = MutableStateFlow(LoginUiState())
@@ -55,7 +55,7 @@ class LoginViewModel @Inject constructor(
     fun onLogin(onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             val user = withContext(Dispatchers.IO) {
-                userDataSource.getUserByEmail(_loginUiState.value.email)
+                userRemoteDataSource.getUserByEmail(_loginUiState.value.email)
             }
             val isValid = user != null &&
                     _loginUiState.value.email == user.email &&

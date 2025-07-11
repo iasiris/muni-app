@@ -1,7 +1,7 @@
 package com.iasiris.muniapp.ui.screen.orderhistory
 
 import com.iasiris.muniapp.data.local.datasource.OrderDataSource
-import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.domain.model.OrderHistory
 import com.iasiris.muniapp.view.viewmodel.OrderHistoryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,17 +30,17 @@ class OrderHistoryViewModelTest {//TODO terminar este test
 
     @Test
     fun testGetOrderHistory() = runTest {
-        val orderHistoryMock = emptyList<Order>()
+        val orderHistoryHistoryMock = emptyList<OrderHistory>()
 
         val orderDataSourceMock = mock<OrderDataSource>()
-        whenever(orderDataSourceMock.getOrdersByUserId("1")).thenReturn(orderHistoryMock)
+        whenever(orderDataSourceMock.getOrdersByUserId("1")).thenReturn(orderHistoryHistoryMock)
 
         val viewModel = OrderHistoryViewModel(orderDataSourceMock)
 
         viewModel.getOrderHistory()
         testDispatcher.scheduler.advanceUntilIdle()
 
-        val result = viewModel.orderHistoryUiState.value.orders
-        Assertions.assertEquals(orderHistoryMock, result)
+        val result = viewModel.orderHistoryUiState.value.orderHistories
+        Assertions.assertEquals(orderHistoryHistoryMock, result)
     }
 }

@@ -5,7 +5,7 @@ import jakarta.inject.Inject
 
 //TODO SOLO HACER LLAMADO A API, NO GUARDAR NADA EN BASE DE DATOS,
 //TODO guardar usuario en shared preferences o similar
-class UserDataSourceImpl @Inject constructor() : UserDataSource {
+class UserRemoteDataSourceImpl @Inject constructor() : UserRemoteDataSource {
     override fun getCurrentUser(): User? {
         return user
     }

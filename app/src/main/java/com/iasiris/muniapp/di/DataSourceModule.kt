@@ -1,15 +1,14 @@
 package com.iasiris.muniapp.di
 
 import com.iasiris.muniapp.data.local.dao.CartItemDao
+import com.iasiris.muniapp.data.local.dao.OrderHistoryDao
 import com.iasiris.muniapp.data.local.dao.ProductDao
 import com.iasiris.muniapp.data.local.datasource.CartItemLocalDataSource
 import com.iasiris.muniapp.data.local.datasource.CartItemLocalDataSourceImpl
-import com.iasiris.muniapp.data.local.datasource.OrderDataSource
-import com.iasiris.muniapp.data.local.datasource.OrderDataSourceImpl
+import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSource
+import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSourceImpl
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSourceImpl
-import com.iasiris.muniapp.data.remote.datasource.UserDataSource
-import com.iasiris.muniapp.data.remote.datasource.UserDataSourceImpl
 import com.iasiris.muniapp.data.remote.ProductApiService
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSource
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSourceImpl
@@ -37,12 +36,7 @@ object DataSourceModule {
     }
 
     @Provides
-    fun provideOrderDataSource(): OrderDataSource {
-        return OrderDataSourceImpl()
-    }
-
-    @Provides //TODO delete this
-    fun provideUserDataSource(): UserDataSource {
-        return UserDataSourceImpl()
+    fun provideOrderHistoryDataSource(orderHistoryDao: OrderHistoryDao): OrderHistoryLocalDataSource {
+        return OrderHistoryLocalDataSourceImpl(orderHistoryDao)
     }
 }

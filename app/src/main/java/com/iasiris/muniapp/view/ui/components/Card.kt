@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.domain.model.CartItem
-import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.domain.model.OrderHistory
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.utils.paddingExtraSmall
 import com.iasiris.muniapp.utils.paddingMedium
@@ -414,7 +414,7 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
 
 @Composable
 fun CardWithDateAndTotal(
-    order: Order
+    orderHistory: OrderHistory
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -432,20 +432,20 @@ fun CardWithDateAndTotal(
             horizontalAlignment = Alignment.Start
         ) {
             BodyText(
-                text = stringResource(id = R.string.order_id, order.orderId),
+                text = stringResource(id = R.string.order_id, orderHistory.orderId),
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(paddingExtraSmall))
 
             BodyText(
-                text = stringResource(id = R.string.order_total_price, order.totalPrice),
+                text = stringResource(id = R.string.order_total_price, orderHistory.totalPrice),
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(paddingExtraSmall))
 
             CaptionText(
-                text = stringResource(id = R.string.order_date, order.orderDate),
+                text = stringResource(id = R.string.order_date, orderHistory.orderDate),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -527,7 +527,7 @@ fun CardsPreview() {
             )
 
             CardWithDateAndTotal(
-                order = Order(
+                orderHistory = OrderHistory(
                     orderId = "1",
                     productsId = listOf(
                         CartItem(

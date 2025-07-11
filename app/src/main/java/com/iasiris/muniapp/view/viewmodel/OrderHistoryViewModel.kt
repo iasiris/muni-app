@@ -3,7 +3,10 @@ package com.iasiris.muniapp.view.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.iasiris.muniapp.data.local.datasource.OrderDataSource
-import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.domain.model.CartItem
+import com.iasiris.muniapp.domain.model.OrderHistory
+import com.iasiris.muniapp.domain.usecase.orderhistory.AddOrderUserCase
+import com.iasiris.muniapp.domain.usecase.orderhistory.GetOrdersByUserIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +18,8 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class OrderHistoryViewModel @Inject constructor(
-    private val orderDataSource: OrderDataSource
+    private val getOrdersByUserIdUseCase: GetOrdersByUserIdUseCase,
+    private val addOrderUseCase: AddOrderUserCase
 ) : ViewModel() {
 
     private val _orderHistoryUiState = MutableStateFlow(OrderHistoryUiState())
@@ -27,17 +31,29 @@ class OrderHistoryViewModel @Inject constructor(
     //TODO actualizar listado cuando se guarde un nuevo pedido
 
     fun getOrderHistory() {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             val orders = withContext(Dispatchers.IO) {
                 orderDataSource.getOrdersByUserId("1")
             }
             _orderHistoryUiState.update { state ->
-                state.copy(orders = orders)
+                state.copy(orderHistories = orders)
             }
+        }*/
+    }
+
+    fun addOrderHistory(cartItems: List<CartItem>): Boolean {
+        /*var isAdded = false
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                orderDataSource.addOrder(order)
+            }
+            getOrderHistory()
         }
+
+        return isAdded*/
     }
 }
 
 data class OrderHistoryUiState(
-    val orders: List<Order> = emptyList()
+    val orderHistory: List<OrderHistory> = emptyList()
 )
