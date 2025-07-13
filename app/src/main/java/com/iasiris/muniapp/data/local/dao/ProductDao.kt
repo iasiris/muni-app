@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.iasiris.muniapp.data.local.entity.ProductEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {

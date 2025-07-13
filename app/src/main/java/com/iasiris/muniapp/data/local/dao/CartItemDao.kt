@@ -8,7 +8,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.iasiris.muniapp.data.local.entity.CartItemEntity
 import com.iasiris.muniapp.data.local.entity.CartItemWithProductEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CartItemDao {

@@ -82,7 +82,7 @@ class ProductCatalogViewModel @Inject constructor(
                     )
                 }
             } catch (e: IOException) {
-                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Sin conexion a internet")) }
+                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
                 Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
             } catch (e: HttpException) {
                 _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }

@@ -1,7 +1,5 @@
 package com.iasiris.muniapp.domain.model
 
-import com.iasiris.muniapp.data.local.entity.ProductEntity
-
 data class Product(
     val id: String,
     val name: String,

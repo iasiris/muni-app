@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.domain.model.CartItem
-import com.iasiris.muniapp.domain.model.OrderHistory
+import com.iasiris.muniapp.domain.model.Order
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.utils.paddingExtraSmall
 import com.iasiris.muniapp.utils.paddingMedium
@@ -414,7 +414,7 @@ fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, o
 
 @Composable
 fun CardWithDateAndTotal(
-    orderHistory: OrderHistory
+    order: Order
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -432,20 +432,20 @@ fun CardWithDateAndTotal(
             horizontalAlignment = Alignment.Start
         ) {
             BodyText(
-                text = stringResource(id = R.string.order_id, orderHistory.orderId),
+                text = stringResource(id = R.string.order_id, order.orderId),
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(paddingExtraSmall))
 
             BodyText(
-                text = stringResource(id = R.string.order_total_price, orderHistory.totalPrice),
+                text = stringResource(id = R.string.order_total_price, order.totalPrice),
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(paddingExtraSmall))
 
             CaptionText(
-                text = stringResource(id = R.string.order_date, orderHistory.orderDate),
+                text = stringResource(id = R.string.order_date, order.orderDate),
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -527,7 +527,7 @@ fun CardsPreview() {
             )
 
             CardWithDateAndTotal(
-                orderHistory = OrderHistory(
+                order = Order(
                     orderId = "1",
                     productsId = listOf(
                         CartItem(
@@ -544,6 +544,7 @@ fun CardsPreview() {
                             quantity = 1
                         )
                     ),
+                    userId = "user1",
                     totalPrice = 10,
                     orderDate = "05/06/2025"
                 )

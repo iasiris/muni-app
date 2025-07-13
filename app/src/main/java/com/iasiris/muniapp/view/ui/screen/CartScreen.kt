@@ -119,7 +119,7 @@ fun CartScreen(
                 PrimaryButton(
                     label = stringResource(id = R.string.checkout),
                     onClick = {
-                        showDialog = orderHistoryViewModel.addOrderHistory(cartUiState.cartItems)
+                        showDialog = orderHistoryViewModel.addOrder(cartUiState.cartItems)
                     }
                 )
 

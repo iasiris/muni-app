@@ -6,6 +6,6 @@ import jakarta.inject.Inject
 class GetOrdersByUserIdUseCase @Inject constructor(
     private val orderHistoryRepository: OrderHistoryRepository
 ) {
-    suspend operator fun invoke(userId: String) =
-        orderHistoryRepository.getOrdersByUserId(userId)
+    operator fun invoke(userId: String, refreshData: Boolean) =
+        orderHistoryRepository.getOrderHistoryByUserId(userId, refreshData)
 }

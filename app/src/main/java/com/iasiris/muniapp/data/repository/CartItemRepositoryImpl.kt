@@ -1,7 +1,6 @@
 package com.iasiris.muniapp.data.repository
 
 import com.iasiris.muniapp.data.local.datasource.CartItemLocalDataSource
-import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
 import com.iasiris.muniapp.data.local.entity.cartItemEntityToDomain
 import com.iasiris.muniapp.data.local.entity.cartItemToEntity
 import com.iasiris.muniapp.data.local.entity.cartItemWithProductEntityToDomain
@@ -16,12 +15,12 @@ class CartItemRepositoryImpl @Inject constructor(
 
     override fun getCartItems(): List<CartItem> {//TODO chequear real uso de esto
         val localCarItems = cartItemLocalDataSource.getCartItems()
-        return localCarItems.map {it.cartItemEntityToDomain()}
+        return localCarItems.map { it.cartItemEntityToDomain() }
     }
 
     override fun getCartItemsWithProducts(): List<CartItem> {
         val localCartItems = cartItemLocalDataSource.getCartItemsWithProducts()
-        return localCartItems.map {it.cartItemWithProductEntityToDomain()}
+        return localCartItems.map { it.cartItemWithProductEntityToDomain() }
     }
 
     override suspend fun getCartItemByProductId(productId: String): CartItem? { //siempre va a retonar un CartItemWithProductEntity
