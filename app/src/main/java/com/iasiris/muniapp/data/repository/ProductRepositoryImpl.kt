@@ -1,10 +1,10 @@
 package com.iasiris.muniapp.data.repository
 
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
-import com.iasiris.muniapp.data.local.entity.productEntityToDomain
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSource
-import com.iasiris.muniapp.data.remote.dto.productDtoToDomain
-import com.iasiris.muniapp.data.remote.dto.productDtoToEntity
+import com.iasiris.muniapp.domain.mapper.productDtoToDomain
+import com.iasiris.muniapp.domain.mapper.productDtoToEntity
+import com.iasiris.muniapp.domain.mapper.productEntityToDomain
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.domain.repository.ProductRepository
 import jakarta.inject.Inject

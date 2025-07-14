@@ -1,8 +1,11 @@
 package com.iasiris.muniapp.data.local.entity
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 
 @Entity(
     tableName = "order_items",
@@ -19,12 +22,23 @@ import androidx.room.PrimaryKey
             childColumns = ["productId"],
             onDelete = ForeignKey.NO_ACTION
         )
-    ]
+    ],
+    indices = [Index(value = ["orderId"]), Index(value = ["productId"])]
 )
+
 data class OrderItemEntity(
-    @PrimaryKey(autoGenerate = true) val orderItemId: Int = 0,
-    var orderId: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    var orderId: String,
     val productId: String,
-    val quantity: Int,
-    val price: Double
+    val quantity: Int
+)
+
+
+data class OrderItemWithProductEntity(
+    @Embedded val orderItem: OrderItemEntity,
+    @Relation(
+        parentColumn = "productId",
+        entityColumn = "id"
+    )
+    val product: ProductEntity
 )

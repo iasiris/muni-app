@@ -23,8 +23,9 @@ class CartItemLocalDataSourceImpl @Inject constructor(
         return cartItemDao.getCartItemByProductId(productId)
     }
 
-    override suspend fun insertCartItem(cartItem: CartItemEntity) {
+    override suspend fun insertCartItem(cartItem: CartItemEntity) : CartItemWithProductEntity {
         cartItemDao.insertCartItem(cartItem)
+        return cartItemDao.getCartItemByProductId(cartItem.productId) ?: throw Exception("Cart item not found after insertion")
     }
 
     override suspend fun updateCartItem(cartItem: CartItemEntity) {

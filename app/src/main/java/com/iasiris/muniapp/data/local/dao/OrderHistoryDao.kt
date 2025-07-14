@@ -5,18 +5,23 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.iasiris.muniapp.data.local.entity.OrderEntity
+import com.iasiris.muniapp.data.local.entity.OrderItemEntity
+import com.iasiris.muniapp.data.local.entity.OrderItemWithProductEntity
 
 @Dao
 interface OrderHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrder(order: OrderEntity): Boolean
+    suspend fun insertOrder(order: OrderEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrderHistory(products: List<OrderEntity>)
+    suspend fun insertOrderItems(products: List<OrderItemEntity>)
 
     @Query("DELETE FROM orders")
     suspend fun deleteOrderHistory()
 
     @Query("SELECT * FROM orders ORDER BY orderDate DESC")
     fun getOrderHistory(): List<OrderEntity>
+
+    @Query("SELECT * FROM order_items WHERE orderId = :orderId")
+    fun getOrderItemsWithProductsByOrderId(orderId: Int): List<OrderItemWithProductEntity>
 }

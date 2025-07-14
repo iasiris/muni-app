@@ -2,8 +2,6 @@ package com.iasiris.muniapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.iasiris.muniapp.data.remote.dto.ProductDto
-import com.iasiris.muniapp.domain.model.Product
 
 @Entity(tableName = "products")
 data class ProductEntity(
@@ -16,8 +14,3 @@ data class ProductEntity(
     val category: String
 )
 
-fun ProductEntity.productEntityToDomain() =
-    Product(id, name, description, imageUrl, price, hasDrink, category)
-
-fun ProductEntity.productEntityToDto() =
-    ProductDto(id, name, description, imageUrl, price, hasDrink, category)

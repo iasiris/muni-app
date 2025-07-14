@@ -2,7 +2,6 @@ package com.iasiris.muniapp.data.local.entity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.iasiris.muniapp.domain.model.CartItem
 
 data class CartItemWithProductEntity(
     @Embedded val cartItem: CartItemEntity,
@@ -12,11 +11,3 @@ data class CartItemWithProductEntity(
     )
     val product: ProductEntity
 )
-
-fun CartItemWithProductEntity.cartItemWithProductEntityToDomain(): CartItem {
-    return CartItem(
-        id = cartItem.id.toString(),
-        product = product.productEntityToDomain(),
-        quantity = cartItem.quantity
-    )
-}

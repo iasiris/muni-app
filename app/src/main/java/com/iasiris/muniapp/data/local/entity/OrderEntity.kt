@@ -5,9 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "orders")
 data class OrderEntity(
-    @PrimaryKey val id: String,
-    val userId: String,
-    val cartItems: List<CartItemEntity>, //TODO handle list of cart items
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val totalAmount: Double,
     val orderDate: String
 )

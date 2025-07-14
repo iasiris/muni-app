@@ -39,9 +39,8 @@ class CartViewModel @Inject constructor(
                 getCartItemByProductIdUseCase.invoke(product.id)
             }
             if (existingCartItem == null) {
-                val newCartItem = CartItem(product = product, quantity = 1)
-                withContext(Dispatchers.IO) {
-                    addCartItemUseCase.invoke(newCartItem)
+                val newCartItem = withContext(Dispatchers.IO) {
+                    addCartItemUseCase.invoke(product)
                 }
                 _cartUiState.update { state ->
                     val updatedCartItems = state.cartItems + newCartItem

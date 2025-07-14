@@ -46,6 +46,7 @@ import coil3.compose.AsyncImage
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.domain.model.OrderItem
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.utils.paddingExtraSmall
 import com.iasiris.muniapp.utils.paddingMedium
@@ -509,7 +510,7 @@ fun CardsPreview() {
 
             CardWithImageInTheLeftWithButtons(
                 cartItem = CartItem(
-                    id = 1,
+                    id = "1",
                     product = Product(
                         id = "1",
                         name = "Product Name",
@@ -528,10 +529,10 @@ fun CardsPreview() {
 
             CardWithDateAndTotal(
                 order = Order(
-                    orderId = "1",
-                    productsId = listOf(
-                        CartItem(
-                            id = 1,
+                    id = "1",
+                    userId = "user1",
+                    products = listOf(
+                        OrderItem(
                             product = Product(
                                 id = "1",
                                 name = "Product Name",
@@ -544,8 +545,7 @@ fun CardsPreview() {
                             quantity = 1
                         )
                     ),
-                    userId = "user1",
-                    totalAmount = 10,
+                    totalAmount = 10.00,
                     orderDate = "05/06/2025"
                 )
             )

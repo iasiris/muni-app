@@ -11,10 +11,13 @@ import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSourceImpl
 import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.ProductApiService
+import com.iasiris.muniapp.data.remote.UserApiService
 import com.iasiris.muniapp.data.remote.datasource.OrderHistoryRemoteDataSource
 import com.iasiris.muniapp.data.remote.datasource.OrderHistoryRemoteDataSourceImpl
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSource
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSourceImpl
+import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
+import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,6 +26,11 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object DataSourceModule {
+    @Provides
+    fun provideUserRemoteDataSource(userApiService: UserApiService): UserRemoteDataSource {
+        return UserRemoteDataSourceImpl(userApiService)
+    }
+
     @Provides
     fun provideProductLocalDataSource(productDao: ProductDao): ProductLocalDataSource {
         return ProductLocalDataSourceImpl(productDao)

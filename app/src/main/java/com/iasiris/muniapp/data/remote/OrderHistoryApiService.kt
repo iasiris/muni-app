@@ -9,5 +9,5 @@ interface OrderHistoryApiService { //TODO
     suspend fun getOrderHistory(userId: String): List<OrderDto>
 
     @POST("orders")
-    suspend fun postOrder(): OrderDto
+    suspend fun postOrder(orderDto: OrderDto)
 }

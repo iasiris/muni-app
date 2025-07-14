@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val myApplication: Application,
+    myApplication: Application,
     private val cloudinary: Cloudinary,
     private val userRemoteDataSource: UserRemoteDataSource
 ) : AndroidViewModel(myApplication) {

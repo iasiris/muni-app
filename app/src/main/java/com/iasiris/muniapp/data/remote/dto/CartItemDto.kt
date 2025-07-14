@@ -11,14 +11,3 @@ data class CartItemDto(
     val quantity: Int = 1
 )
 
-fun CartItemDto.cartItemDtoToDomain() = CartItem(
-    id = id,
-    product = product.productDtoToDomain(),
-    quantity = quantity
-)
-
-fun CartItemDto.cartItemDtoToEntity() = CartItemEntity(
-    id = id.toInt(),
-    productId = product.id,
-    quantity = quantity
-)

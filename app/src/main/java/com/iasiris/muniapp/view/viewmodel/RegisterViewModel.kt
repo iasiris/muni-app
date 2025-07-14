@@ -88,6 +88,7 @@ class RegisterViewModel @Inject constructor(
         val canRegister = _registerUiState.value.isRegisterEnabled
         if (canRegister) {
             val newUser = User(
+                id = "",
                 email = _registerUiState.value.email,
                 fullName = _registerUiState.value.fullName,
                 password = _registerUiState.value.password

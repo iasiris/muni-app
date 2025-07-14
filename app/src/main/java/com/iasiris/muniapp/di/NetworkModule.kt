@@ -3,6 +3,7 @@ package com.iasiris.muniapp.di
 import com.iasiris.muniapp.BuildConfig
 import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.ProductApiService
+import com.iasiris.muniapp.data.remote.UserApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +38,11 @@ object NetworkModule {
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
+    @Provides
+    @Singleton
+    fun provideUserApiService(retrofit: Retrofit): UserApiService =
+        retrofit.create(UserApiService::class.java)
 
     @Provides
     @Singleton

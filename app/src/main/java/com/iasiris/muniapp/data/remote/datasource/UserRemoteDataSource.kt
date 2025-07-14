@@ -1,7 +1,7 @@
 package com.iasiris.muniapp.data.remote.datasource
 
 import com.iasiris.muniapp.domain.model.User
-
+//TODO Usar UserDto PARA LLAMADAS A API
 interface UserRemoteDataSource {
     fun getCurrentUser(): User?
     fun getUserByEmail(email:String): User?

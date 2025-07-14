@@ -1,10 +1,12 @@
 package com.iasiris.muniapp.data.repository
 
 import com.iasiris.muniapp.data.local.datasource.CartItemLocalDataSource
-import com.iasiris.muniapp.data.local.entity.cartItemEntityToDomain
-import com.iasiris.muniapp.data.local.entity.cartItemToEntity
-import com.iasiris.muniapp.data.local.entity.cartItemWithProductEntityToDomain
+import com.iasiris.muniapp.data.local.entity.CartItemEntity
+import com.iasiris.muniapp.domain.mapper.cartItemEntityToDomain
+import com.iasiris.muniapp.domain.mapper.cartItemToEntity
+import com.iasiris.muniapp.domain.mapper.cartItemWithProductEntityToDomain
 import com.iasiris.muniapp.domain.model.CartItem
+import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.domain.repository.CartItemRepository
 import jakarta.inject.Inject
 
@@ -28,9 +30,9 @@ class CartItemRepositoryImpl @Inject constructor(
         return cartItemEntity?.cartItemWithProductEntityToDomain()
     }
 
-    override suspend fun insertCartItem(cartItem: CartItem) {
-        val cartItemEntity = cartItem.cartItemToEntity()
-        cartItemLocalDataSource.insertCartItem(cartItemEntity)
+    override suspend fun insertCartItem(product: Product): CartItem {
+        val cartItemWithProductEntity = cartItemLocalDataSource.insertCartItem(CartItemEntity(productId = product.id))
+        return cartItemWithProductEntity.cartItemWithProductEntityToDomain()
     }
 
     override suspend fun updateCartItem(cartItem: CartItem) {

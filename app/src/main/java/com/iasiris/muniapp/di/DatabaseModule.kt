@@ -17,8 +17,8 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext appContext: Context): AppDatabase {
         return Room.databaseBuilder(
-            appContext, AppDatabase::class.java, "muniapp_database"
-        ).build()
+                appContext, AppDatabase::class.java, "muniapp_database"
+            ).fallbackToDestructiveMigration(true).build()
     }
 
     @Provides
@@ -29,7 +29,4 @@ object DatabaseModule {
 
     @Provides
     fun provideOrderHistoryDao(database: AppDatabase) = database.orderHistoryDao()
-
-    @Provides
-    fun provideOrderItemDao(database: AppDatabase) = database.orderItemDao()
 }

@@ -1,11 +1,15 @@
 package com.iasiris.muniapp.data.remote.datasource
 
+import com.iasiris.muniapp.data.remote.UserApiService
 import com.iasiris.muniapp.domain.model.User
 import jakarta.inject.Inject
 
 //TODO SOLO HACER LLAMADO A API, NO GUARDAR NADA EN BASE DE DATOS,
 //TODO guardar usuario en shared preferences o similar
-class UserRemoteDataSourceImpl @Inject constructor() : UserRemoteDataSource {
+//TODO Usar UserDto PARA LLAMADAS A API
+class UserRemoteDataSourceImpl @Inject constructor(
+    private val userApiService: UserApiService
+) : UserRemoteDataSource {
     override fun getCurrentUser(): User? {
         return user
     }
