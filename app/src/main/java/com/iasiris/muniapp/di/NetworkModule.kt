@@ -45,6 +45,6 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOrderApiService(retrofit: Retrofit): OrderHistoryApiService =
+    fun provideOrderHistoryApiService(retrofit: Retrofit): OrderHistoryApiService =
         retrofit.create(OrderHistoryApiService::class.java)
 }

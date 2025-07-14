@@ -1,14 +1,14 @@
 package com.iasiris.muniapp.data.local.entity
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "orders")
 data class OrderEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0, //TODO no deberia ser int?
-    val orderDate: Long = System.currentTimeMillis(),
+    @PrimaryKey val id: String,
+    val userId: String,
+    val cartItems: List<CartItemEntity>, //TODO handle list of cart items
     val totalAmount: Double,
-    val totalItems: Int
+    val orderDate: String
 )
 

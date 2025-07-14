@@ -17,4 +17,3 @@ data class ProductDto(
 
 fun ProductDto.productDtoToDomain() = Product(id, name, description, imageUrl, price, hasDrink, category)
 fun ProductDto.productDtoToEntity() = ProductEntity(id, name, description, imageUrl, price, hasDrink, category)
-fun Product.productToDto() = ProductDto(id, name, description, imageUrl, price, hasDrink, category)

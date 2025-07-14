@@ -36,9 +36,9 @@ object RepositoryModule {
 
     @Provides
     fun provideOrderRepository(
-        orderHistoryLocalDataSource: OrderHistoryLocalDataSource,
-        orderHistoryRemoteDataSource: OrderHistoryRemoteDataSource
+        orderHistoryRemoteDataSource: OrderHistoryRemoteDataSource,
+        orderHistoryLocalDataSource: OrderHistoryLocalDataSource
     ): OrderHistoryRepository {
-        return OrderHistoryRepositoryImpl(orderHistoryLocalDataSource, orderHistoryRemoteDataSource)
+        return OrderHistoryRepositoryImpl(orderHistoryRemoteDataSource,orderHistoryLocalDataSource)
     }
 }

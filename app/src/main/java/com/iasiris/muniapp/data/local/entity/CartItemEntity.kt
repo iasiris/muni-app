@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Product
 
+//TODO ver clase 30/06 para ver como armar order y orderItem
+
 @Entity(
     tableName = "cart_items",
     foreignKeys = [ForeignKey(
@@ -21,18 +23,10 @@ data class CartItemEntity(
     var quantity: Int = 1
 )
 
-fun CartItem.cartItemToEntity(): CartItemEntity {
-    return CartItemEntity(
-        id = id,
-        productId = product.id,
-        quantity = quantity
-    )
-}
+fun CartItem.cartItemToEntity() = CartItemEntity(id.toInt(), product.id, quantity)
 
-fun CartItemEntity.cartItemEntityToDomain(): CartItem {
-    return CartItem(
-        id = id,
-        product = Product(id = productId,"","","",0.0,false, ""),
-        quantity = quantity
-    )
-}
+fun CartItemEntity.cartItemEntityToDomain() = CartItem(
+    id = id.toString(),
+    product = Product(id = productId, "", "", "", 0.0, false, ""),
+    quantity = quantity
+)

@@ -64,6 +64,7 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel
 ) {
     //TODO agregar pre visualuzacion antes de guardar los cambios
+    //TODO agregar Logout button
     LaunchedEffect(Unit) {
         profileViewModel.init()
     }

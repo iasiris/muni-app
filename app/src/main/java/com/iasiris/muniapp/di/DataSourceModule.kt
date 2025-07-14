@@ -9,7 +9,10 @@ import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSource
 import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSourceImpl
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSource
 import com.iasiris.muniapp.data.local.datasource.ProductLocalDataSourceImpl
+import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.ProductApiService
+import com.iasiris.muniapp.data.remote.datasource.OrderHistoryRemoteDataSource
+import com.iasiris.muniapp.data.remote.datasource.OrderHistoryRemoteDataSourceImpl
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSource
 import com.iasiris.muniapp.data.remote.datasource.ProductRemoteDataSourceImpl
 import dagger.Module
@@ -36,7 +39,12 @@ object DataSourceModule {
     }
 
     @Provides
-    fun provideOrderHistoryDataSource(orderHistoryDao: OrderHistoryDao): OrderHistoryLocalDataSource {
+    fun provideOrderHistoryLocalDataSource(orderHistoryDao: OrderHistoryDao): OrderHistoryLocalDataSource {
         return OrderHistoryLocalDataSourceImpl(orderHistoryDao)
+    }
+
+    @Provides
+    fun provideOrderHistoryRemoteDataSource(orderHistoryApiService: OrderHistoryApiService): OrderHistoryRemoteDataSource {
+        return OrderHistoryRemoteDataSourceImpl(orderHistoryApiService)
     }
 }

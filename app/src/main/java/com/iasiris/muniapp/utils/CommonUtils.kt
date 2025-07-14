@@ -1,6 +1,9 @@
 package com.iasiris.muniapp.utils
 
 import android.util.Patterns
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class CommonUtils {
     companion object {
@@ -12,5 +15,11 @@ class CommonUtils {
 
         fun isNewPasswordValid(password: String, newPassword: String): Boolean =
             newPassword.length >= 8 && password != newPassword
+
+        fun returnDate(): String = SimpleDateFormat(
+            "yyyy-MM-dd HH:mm:ss",
+            Locale.getDefault()
+        ).format(Date(System.currentTimeMillis()))
+
     }
 }

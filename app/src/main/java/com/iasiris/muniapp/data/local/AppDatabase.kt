@@ -8,7 +8,6 @@ import com.iasiris.muniapp.data.local.dao.OrderItemDao
 import com.iasiris.muniapp.data.local.dao.ProductDao
 import com.iasiris.muniapp.data.local.entity.CartItemEntity
 import com.iasiris.muniapp.data.local.entity.OrderEntity
-import com.iasiris.muniapp.data.local.entity.OrderItemEntity
 import com.iasiris.muniapp.data.local.entity.ProductEntity
 
 @Database(

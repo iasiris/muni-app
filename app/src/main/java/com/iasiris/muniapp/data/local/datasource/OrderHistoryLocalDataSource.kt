@@ -1,8 +1,10 @@
 package com.iasiris.muniapp.data.local.datasource
 
-import com.iasiris.muniapp.domain.model.Order
+import com.iasiris.muniapp.data.local.entity.OrderEntity
 
 interface OrderHistoryLocalDataSource {
-    fun getOrderHistoryByUserId(userId: String): List<Order>
-    fun updateOrder(order: Order): Boolean
+    suspend fun insertOrder(order: OrderEntity): Boolean
+    suspend fun insertOrderHistory(products: List<OrderEntity>)
+    suspend fun clearOrderHistory()
+    fun getOrderHistory(): List<OrderEntityWithCartItemEntity>
 }

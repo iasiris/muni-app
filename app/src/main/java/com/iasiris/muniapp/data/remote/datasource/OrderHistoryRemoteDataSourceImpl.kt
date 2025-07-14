@@ -10,7 +10,7 @@ class OrderHistoryRemoteDataSourceImpl @Inject constructor(
 ) : OrderHistoryRemoteDataSource {
     override suspend fun getOrderHistoryByUserId(
         userId: String
-    ): List<OrderDto> = orderHistoryApiService.getOrderHistories(userId)
+    ): List<OrderDto> = orderHistoryApiService.getOrderHistory(userId)
 
     override suspend fun insertOrder(order: Order): Order { //TODO CHECH THIS DATAFLOW
         TODO("Not yet implemented")

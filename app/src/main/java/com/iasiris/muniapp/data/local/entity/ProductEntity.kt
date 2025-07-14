@@ -16,6 +16,8 @@ data class ProductEntity(
     val category: String
 )
 
-fun ProductEntity.productEntityToDomain() = Product(id, name, description, imageUrl, price, hasDrink, category)
-fun ProductEntity.productEntityToDto() = ProductDto(id, name, description, imageUrl, price, hasDrink, category)
-fun Product.productToEntity() = ProductEntity(id, name, description, imageUrl, price, hasDrink, category)
+fun ProductEntity.productEntityToDomain() =
+    Product(id, name, description, imageUrl, price, hasDrink, category)
+
+fun ProductEntity.productEntityToDto() =
+    ProductDto(id, name, description, imageUrl, price, hasDrink, category)

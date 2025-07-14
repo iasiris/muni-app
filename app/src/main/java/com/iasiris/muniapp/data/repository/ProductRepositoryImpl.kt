@@ -46,21 +46,6 @@ class ProductRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertProduct(product: Product) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun updateProduct(product: Product) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteProduct(productId: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun refreshProducts() {
-        TODO("Not yet implemented")
-    }
 }
 
 

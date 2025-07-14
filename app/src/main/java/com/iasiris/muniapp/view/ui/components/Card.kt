@@ -432,13 +432,13 @@ fun CardWithDateAndTotal(
             horizontalAlignment = Alignment.Start
         ) {
             BodyText(
-                text = stringResource(id = R.string.order_id, order.orderId),
+                text = stringResource(id = R.string.order_id, order.id),
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(paddingExtraSmall))
 
             BodyText(
-                text = stringResource(id = R.string.order_total_price, order.totalPrice),
+                text = stringResource(id = R.string.order_total_price, order.totalAmount),
                 fontWeight = FontWeight.Bold
             )
 
@@ -545,7 +545,7 @@ fun CardsPreview() {
                         )
                     ),
                     userId = "user1",
-                    totalPrice = 10,
+                    totalAmount = 10,
                     orderDate = "05/06/2025"
                 )
             )

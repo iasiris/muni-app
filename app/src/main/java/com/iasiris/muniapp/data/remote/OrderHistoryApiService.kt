@@ -6,8 +6,8 @@ import retrofit2.http.POST
 
 interface OrderHistoryApiService { //TODO
     @GET("orders/{userId}")
-    suspend fun getOrderHistories(userId: String): List<OrderDto>
+    suspend fun getOrderHistory(userId: String): List<OrderDto>
 
     @POST("orders")
-    suspend fun postOrderHistory(): OrderDto
+    suspend fun postOrder(): OrderDto
 }
