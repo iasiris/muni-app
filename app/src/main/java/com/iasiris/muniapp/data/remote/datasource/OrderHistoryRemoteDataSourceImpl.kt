@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.data.remote.datasource
 
+import android.util.Log
 import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.dto.OrderDto
 import jakarta.inject.Inject
@@ -12,6 +13,9 @@ class OrderHistoryRemoteDataSourceImpl @Inject constructor(
     ): List<OrderDto> = orderHistoryApiService.getOrderHistory(userId)
 
     override suspend fun insertOrder(orderDto: OrderDto) {
-        orderHistoryApiService.postOrder(orderDto)
+        Log.d("OrderHistoryRemoteDataSourceImpl", "insertOrder: $orderDto")
+        val test = orderHistoryApiService.postOrder(orderDto)
+        Log.d("OrderHistoryRemoteDataSourceImpl", "insertOrder: $test")
+        return test
     }
 }

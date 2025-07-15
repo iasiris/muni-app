@@ -11,7 +11,7 @@ import com.iasiris.muniapp.data.local.entity.OrderItemWithProductEntity
 @Dao
 interface OrderHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrder(order: OrderEntity)
+    suspend fun insertOrder(order: OrderEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrderItems(products: List<OrderItemEntity>)
@@ -19,7 +19,10 @@ interface OrderHistoryDao {
     @Query("DELETE FROM orders")
     suspend fun deleteOrderHistory()
 
-    @Query("SELECT * FROM orders ORDER BY orderDate DESC")
+    @Query("DELETE FROM order_items")
+    suspend fun deleteOrderItems()
+
+    @Query("SELECT * FROM orders ORDER BY orderDate ASC")
     fun getOrderHistory(): List<OrderEntity>
 
     @Query("SELECT * FROM order_items WHERE orderId = :orderId")

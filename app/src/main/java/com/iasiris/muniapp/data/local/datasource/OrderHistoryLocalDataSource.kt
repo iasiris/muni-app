@@ -8,4 +8,5 @@ interface OrderHistoryLocalDataSource {
     suspend fun insertOrder(order: OrderEntity, products: List<OrderItemEntity>) : List<OrderItemWithProductEntity>
     suspend fun clearOrderHistory()
     fun getOrderHistory(): List<OrderEntity>
+    fun getOrderItemsWithProductsByOrderId(orderId: Int): List<OrderItemWithProductEntity>
 }

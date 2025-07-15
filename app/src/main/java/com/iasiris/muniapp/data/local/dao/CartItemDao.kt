@@ -17,6 +17,7 @@ interface CartItemDao {
     @Update
     suspend fun updateCartItem(cartItem: CartItemEntity)
 
+    //TODO check if this is needed since the user will be de same all the time
     @Query("DELETE FROM cart_items WHERE id = :cartItemId")
     suspend fun deleteCartItem(cartItemId: Int)
 

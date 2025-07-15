@@ -10,21 +10,27 @@ class OrderHistoryLocalDataSourceImpl @Inject constructor(
     private val orderHistoryDao: OrderHistoryDao
 ) : OrderHistoryLocalDataSource {
 
-    override suspend fun insertOrder(
+    override suspend fun insertOrder( //TODO fix Error inesperado: FOREIGN KEY constraint failed (code 787 SQLITE_CONSTRAINT_FOREIGNKEY)
         order: OrderEntity,
         products: List<OrderItemEntity>
     ): List<OrderItemWithProductEntity> {
-        orderHistoryDao.insertOrder(order)
-        orderHistoryDao.insertOrderItems(products)
-        return orderHistoryDao.getOrderItemsWithProductsByOrderId(order.id)
+        val orderId = orderHistoryDao.insertOrder(order)
+        val orderItemsWithOrderId = products.map { it.copy(orderId = orderId.toString()) }
+        orderHistoryDao.insertOrderItems(orderItemsWithOrderId)
+        return orderHistoryDao.getOrderItemsWithProductsByOrderId(orderId.toInt())
     }
 
     override suspend fun clearOrderHistory() {
         orderHistoryDao.deleteOrderHistory()
+        orderHistoryDao.deleteOrderItems()
     }
 
     override fun getOrderHistory(): List<OrderEntity> {
         return orderHistoryDao.getOrderHistory()
+    }
+
+    override fun getOrderItemsWithProductsByOrderId(orderId: Int): List<OrderItemWithProductEntity> {
+        return orderHistoryDao.getOrderItemsWithProductsByOrderId(orderId)
     }
 }
 
