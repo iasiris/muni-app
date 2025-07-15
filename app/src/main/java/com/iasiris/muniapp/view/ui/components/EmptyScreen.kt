@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iasiris.muniapp.R
@@ -55,3 +56,44 @@ fun EmptyCartScreen(
 }
 
 //TODO hacer emptyOrderHistoryScreen similar to EmptyCartScreen
+
+@Composable
+fun EmptyOrderHistoryScreen(
+    navController: NavController
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top
+    ) {
+        BackButtonWithTitle(
+            title = stringResource(id = R.string.order_history_title),
+            onBackButtonClick = { navController.popBackStack() }
+        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = stringResource(id = R.string.empty_order_history_icon),
+                modifier = Modifier
+                    .size(64.dp)
+                    .align(Alignment.CenterHorizontally),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(paddingSmall))
+            SubheadText(
+                text = stringResource(id = R.string.empty_order_history_message),
+                fontWeight = FontWeight.Normal
+            )
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun EmptyOrderHistoryScreenPreview() {
+    EmptyOrderHistoryScreen(navController = NavController(context = androidx.compose.ui.platform.LocalContext.current))
+}

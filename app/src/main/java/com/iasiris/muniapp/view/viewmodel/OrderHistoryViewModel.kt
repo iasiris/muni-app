@@ -6,10 +6,8 @@ import androidx.lifecycle.viewModelScope
 import coil3.network.HttpException
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Order
-import com.iasiris.muniapp.domain.model.OrderItem
 import com.iasiris.muniapp.domain.usecase.orderhistory.AddOrderUserCase
 import com.iasiris.muniapp.domain.usecase.orderhistory.GetOrdersByUserIdUseCase
-import com.iasiris.muniapp.utils.CommonUtils.Companion.returnDate
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -35,7 +33,10 @@ class OrderHistoryViewModel @Inject constructor(
             _orderHistoryUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
                 val orders = withContext(Dispatchers.IO) {
-                    getOrdersByUserIdUseCase.invoke("123", refreshData) //TODO Replace with actual user ID
+                    getOrdersByUserIdUseCase.invoke(
+                        "123",
+                        refreshData
+                    ) //TODO Replace with actual user ID
                 }
                 _orderHistoryUiState.update { state ->
                     state.copy(
@@ -56,24 +57,31 @@ class OrderHistoryViewModel @Inject constructor(
         }
     }
 
-    fun addOrder(cartItems: List<CartItem>): Boolean {
-        var isOrderAdded = false
+    fun addOrder(cartItems: List<CartItem>) {
         viewModelScope.launch {
+            _orderHistoryUiState.update { it.copy(screenState = ScreenState.Loading) }
             val order = withContext(Dispatchers.IO) {
                 addOrderUseCase.invoke(cartItems)
             }
             if (order != null) {
                 _orderHistoryUiState.update { state ->
-                    state.copy(orderHistory = state.orderHistory + order)
+                    state.copy(
+                        orderHistory = state.orderHistory + order,
+                        isOrderAdded = true
+                    )
                 }
-                isOrderAdded = true
+                loadOrderHistory()
             }
         }
-        return isOrderAdded
+    }
+
+    fun resetOrderAdded() {
+        _orderHistoryUiState.update { it.copy(isOrderAdded = false) }
     }
 }
 
 data class OrderHistoryUiState(
     val screenState: ScreenState<List<Order>> = ScreenState.Loading,
-    val orderHistory: List<Order> = emptyList()
+    val orderHistory: List<Order> = emptyList(),
+    val isOrderAdded: Boolean = false
 )

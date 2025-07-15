@@ -5,11 +5,12 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Body
 import retrofit2.http.Path
+import retrofit2.Response
 
 interface OrderHistoryApiService { //TODO
     @GET("orders/{userId}")
     suspend fun getOrderHistory(@Path("userId")userId: String): List<OrderDto>
 
     @POST("orders")
-    suspend fun postOrder(@Body orderDto: OrderDto)
+    suspend fun postOrder(@Body orderDto: OrderDto): Response<Unit>
 }

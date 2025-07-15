@@ -60,7 +60,6 @@ class ProductCatalogViewModel @Inject constructor(
     }
 
     fun loadProducts(refreshData: Boolean = false) {
-        //TODO SOLUCIONAR Error de red: timeout cuando se carga por primera vez la app
         //TODO!!!!! se borra cartItems cuando: catalog(agrega prod) -> cart(esta el prod) -> catalog -> cart(desaparece el prod)
         viewModelScope.launch {
             _prodCatUiState.update { it.copy(screenState = ScreenState.Loading) }

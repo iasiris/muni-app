@@ -16,11 +16,20 @@ interface OrderHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrderItems(products: List<OrderItemEntity>)
 
+    @Query("DELETE FROM orders WHERE id = :id")
+    suspend fun deleteOrderById(id: Int)
+
     @Query("DELETE FROM orders")
     suspend fun deleteOrderHistory()
 
+    @Query("DELETE FROM order_items WHERE orderId = :orderId")
+    suspend fun deleteOrderItemsByOrderId(orderId: String)
+
     @Query("DELETE FROM order_items")
     suspend fun deleteOrderItems()
+
+    @Query("SELECT * FROM orders WHERE id = :id")
+    fun getOrderById(id:  Long): OrderEntity
 
     @Query("SELECT * FROM orders ORDER BY orderDate ASC")
     fun getOrderHistory(): List<OrderEntity>

@@ -1,10 +1,7 @@
 package com.iasiris.muniapp.data.remote.dto
 
-import com.google.gson.annotations.SerializedName
-
 data class OrderDto(
-    //@SerializedName("orderId")
-    val id: String,
+    val id: String, //TODO porque se guarda en MONGO CON id=0
     val userId: String,
     val products: List<OrderItemDto>,
     val totalAmount: Double,

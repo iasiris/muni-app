@@ -45,7 +45,7 @@ fun ProductCatalogScreen(
     val state = prodCatUiState.screenState
 
     LaunchedEffect(Unit) {
-        prodCatViewModel.loadProducts(true)
+        prodCatViewModel.loadProducts()
     }
     when (state) {
         is ScreenState.Loading -> {
@@ -137,7 +137,7 @@ fun ProductCatalogScreen(
                         fontWeight = FontWeight.Bold
                     )
                     PrimaryButton(
-                        onClick = { prodCatViewModel.loadProducts() },
+                        onClick = { prodCatViewModel.loadProducts(true) },
                         label = "${stringResource(id = R.string.retry)}",
                     )
                 }

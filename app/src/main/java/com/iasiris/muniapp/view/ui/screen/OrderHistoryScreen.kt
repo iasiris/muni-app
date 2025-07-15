@@ -26,6 +26,8 @@ import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CardWithDateAndTotal
+import com.iasiris.muniapp.view.ui.components.EmptyCartScreen
+import com.iasiris.muniapp.view.ui.components.EmptyOrderHistoryScreen
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.components.SubheadText
@@ -43,66 +45,71 @@ fun OrderHistoryScreen(
     LaunchedEffect(Unit) {
         orderHistoryViewModel.loadOrderHistory(true)
     }
+    //TODO mostrar pantalla de no hay historial cuando no haya ordenes, agregar un mensaje de "No hay historial de ordenes" en la pantalla
+    if (orderHistoryUiState.orderHistory.isEmpty() && state !is ScreenState.Loading) {
+        EmptyOrderHistoryScreen(navController)
+    } else {
+        when (state) {
+            is ScreenState.Loading -> {
+                SimpleCircularProgressIndicator()
+            }
 
-    when (state) {
-        is ScreenState.Loading -> {
-            SimpleCircularProgressIndicator()
-        }
-
-        is ScreenState.Success -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top
-            ) {
-                BackButtonWithTitle(
-                    title = stringResource(id = R.string.order_history_title),
-                    onBackButtonClick = { navController.navigate(PRODUCT_CATALOG) }
-                )
-
-                LazyColumn(
+            is ScreenState.Success -> {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = paddingMedium)
-                        .weight(1f)
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Top
                 ) {
-                    itemsIndexed(orderHistoryUiState.orderHistory) { index, order ->
-                        CardWithDateAndTotal(order)
-                        if (index < orderHistoryUiState.orderHistory.lastIndex) {
-                            HorizontalDivider(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        horizontal = paddingLarge,
-                                        vertical = paddingExtraSmall
-                                    ),
-                                color = MaterialTheme.colorScheme.outline,
-                            )
+                    BackButtonWithTitle(
+                        title = stringResource(id = R.string.order_history_title),
+                        onBackButtonClick = { navController.navigate(PRODUCT_CATALOG) }
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = paddingMedium)
+                            .weight(1f)
+                    ) {
+                        itemsIndexed(orderHistoryUiState.orderHistory) { index, order ->
+                            CardWithDateAndTotal(order)
+                            if (index < orderHistoryUiState.orderHistory.lastIndex) {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(
+                                            horizontal = paddingLarge,
+                                            vertical = paddingExtraSmall
+                                        ),
+                                    color = MaterialTheme.colorScheme.outline,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        is ScreenState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+            is ScreenState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    SubheadText(
-                        text = state.message,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold
-                    )
-                    PrimaryButton(
-                        onClick = { orderHistoryViewModel.loadOrderHistory() },
-                        label = "${stringResource(id = R.string.retry)}",
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        SubheadText(
+                            text = state.message,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                        PrimaryButton(
+                            onClick = { orderHistoryViewModel.loadOrderHistory() },
+                            label = "${stringResource(id = R.string.retry)}",
+                        )
+                    }
                 }
             }
         }
     }
+
 }

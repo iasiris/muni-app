@@ -9,6 +9,7 @@ import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemsUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemByProductIdUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemsUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.UpdateCartItemUseCase
+import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -46,34 +47,42 @@ class CartViewModel @Inject constructor(
                     val updatedCartItems = state.cartItems + newCartItem
                     state.copy(cartItems = updatedCartItems)
                 }
-                updateTotal()//todo check this
+                updateTotal()
             } else {
                 onIncreaseCartItem(existingCartItem)
             }
         }
     }
 
-    fun onIncreaseCartItem(cartItem: CartItem) {
-        //todo update the quantity of the cart item in DB
+    fun onIncreaseCartItem(cartItem: CartItem) {//TODO NO ANDA
         viewModelScope.launch() {
             val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity + 1)
             if (cartItem.quantity < _cartUiState.value.MAX_CART_ITEM_QUANTITY) {
-
+                _cartUiState.update {
+                    it
+                }
+            } else {
+                withContext(Dispatchers.IO) { //update en DB
+                    updateCartItemUseCase.invoke(cartItemUpdated)
+                }
+                getCartItems()
             }
-            withContext(Dispatchers.IO) { //update en DB
-                updateCartItemUseCase.invoke(cartItemUpdated)
-            }
-            getCartItems()
         }
     }
 
-    fun onDecreaseCartItem(cartItem: CartItem) {
+    fun onDecreaseCartItem(cartItem: CartItem) { //TODO NO ANDA
         viewModelScope.launch() {
             val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity - 1)
-            withContext(Dispatchers.IO) { //update en DB
-                updateCartItemUseCase.invoke(cartItemUpdated)
+            if (cartItem.quantity > _cartUiState.value.MIN_CART_ITEM_QUANTITY) {
+                _cartUiState.update {
+                    it
+                }
+            } else {
+                withContext(Dispatchers.IO) { //update en DB
+                    updateCartItemUseCase.invoke(cartItemUpdated)
+                }
+                getCartItems()
             }
-            getCartItems()
         }
     }
 
@@ -115,7 +124,7 @@ class CartViewModel @Inject constructor(
         _cartUiState.update { state ->
             val subTotal = state.cartItems.sumOf { it.product.price * it.quantity }
             val deliveryFee = Math.round(subTotal * state.FEE_PERCENTAGE * 100) / 100.0
-            val totalAmount = subTotal + state.deliveryFee
+            val totalAmount = subTotal + state.deliveryFee //TODO SOLO GUARDAR TOTAL CON 2 DECIMALES
             state.copy(
                 subTotal = subTotal,
                 deliveryFee = deliveryFee,
@@ -132,5 +141,6 @@ data class CartUiState(
     val cartItems: List<CartItem> = emptyList(),
     val subTotal: Double = 0.0,
     val deliveryFee: Double = 0.0,
-    val totalAmount: Double = 0.0
+    val totalAmount: Double = 0.0,
+    var isOrderProcessing: Boolean = false
 )

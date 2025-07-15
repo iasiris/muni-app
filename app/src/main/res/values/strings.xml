@@ -43,6 +43,7 @@
     <string name="confirm">Aceptar</string>
     <string name="order_success_title">¡Felicidades!</string>
     <string name="order_success_message">Tu compra se ha realizado con éxito</string>
+    <string name="empty_order_history_message">No tienes compras realizadas</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>
@@ -67,6 +68,7 @@
     <string name="user_icon">Icono usuario</string>
     <string name="edit_image_icon">Icono editar imagen</string>
     <string name="add_to_cart_icon">Agregar</string>
+    <string name="empty_order_history_icon">Icono Sin Historial de Pedidos</string>
 
 
 

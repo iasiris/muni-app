@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.view.ui.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +37,11 @@ import com.iasiris.muniapp.view.ui.components.EmptyCartScreen
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.RowWithBodyTextAndAmount
 import com.iasiris.muniapp.view.ui.components.RowWithSubheadTextAndAmount
+import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.viewmodel.CartViewModel
 import com.iasiris.muniapp.view.viewmodel.OrderHistoryViewModel
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun CartScreen(
     navController: NavController,
@@ -46,9 +50,18 @@ fun CartScreen(
 ) {
     val cartUiState by cartViewModel.cartUiState.collectAsStateWithLifecycle()
     var showDialog by remember { mutableStateOf(false) }
+    val isOrderAdded = orderHistoryViewModel.orderHistoryUiState.collectAsStateWithLifecycle().value.isOrderAdded
 
     LaunchedEffect(Unit) {
         cartViewModel.init()
+    }
+
+    LaunchedEffect(isOrderAdded) {
+        if (isOrderAdded) {
+            showDialog = true
+            cartViewModel.clearCart()
+            orderHistoryViewModel.resetOrderAdded()
+        }
     }
 
     if (cartUiState.cartItems.isEmpty() && !showDialog) {
@@ -62,10 +75,9 @@ fun CartScreen(
             BackButtonWithTitle(
                 title = stringResource(id = R.string.cart_title),
                 onBackButtonClick = { navController.popBackStack() }
-
             )
 
-            LazyColumn( //TODO fix scrollable content que se corta con el bloque de abajo
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = paddingMedium)
@@ -119,13 +131,15 @@ fun CartScreen(
                 PrimaryButton(
                     label = stringResource(id = R.string.checkout),
                     onClick = {
-                        showDialog = orderHistoryViewModel.addOrder(cartUiState.cartItems)
+                        cartUiState.isOrderProcessing = true
+                        orderHistoryViewModel.addOrder(cartUiState.cartItems)
                     }
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                if (showDialog) {
+                if (showDialog) {//TODO NO ESTA MOSTRANDO EL DIALOGO
+                    cartUiState.isOrderProcessing = false
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
                         confirmButton = {
@@ -144,6 +158,12 @@ fun CartScreen(
             }
         }
     }
+
+    if (cartUiState.isOrderProcessing) {
+        SimpleCircularProgressIndicator()
+    }
 }
+
+
 
 

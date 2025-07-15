@@ -1,8 +1,10 @@
 package com.iasiris.muniapp.data.repository
 
+import android.util.Log
 import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSource
 import com.iasiris.muniapp.data.local.entity.OrderEntity
 import com.iasiris.muniapp.data.local.entity.OrderItemEntity
+import com.iasiris.muniapp.data.local.entity.OrderItemWithProductEntity
 import com.iasiris.muniapp.data.remote.datasource.OrderHistoryRemoteDataSource
 import com.iasiris.muniapp.domain.mapper.orderDtoToDomain
 import com.iasiris.muniapp.domain.mapper.orderDtoToEntity
@@ -21,7 +23,7 @@ class OrderHistoryRepositoryImpl @Inject constructor(
     private val local: OrderHistoryLocalDataSource
 ) : OrderHistoryRepository {
 
-    override suspend fun getOrderHistoryByUserId(
+    override suspend fun getOrderHistoryByUserId( //TODO check logic in this function
         userId: String,
         refreshData: Boolean
     ): List<Order> {
@@ -35,7 +37,8 @@ class OrderHistoryRepositoryImpl @Inject constructor(
                     it.products.map { orderItemDto ->
                         orderItemDto.orderItemDtoToEntity(orderEntity.id.toString())
                     }
-                local.insertOrder(orderEntity, orderItemEntityList)
+                val orderEntityWithId = local.insertOrder(orderEntity)
+                local.insertOrderItems(orderEntityWithId.id, orderItemEntityList)
             }
 
             remoteOrderHistory.map { //genera List<Order>
@@ -63,7 +66,8 @@ class OrderHistoryRepositoryImpl @Inject constructor(
                         it.products.map { orderItemDto ->
                             orderItemDto.orderItemDtoToEntity(orderEntity.id.toString())
                         }
-                    local.insertOrder(orderEntity, orderItemEntityList)
+                    val orderEntityWithId = local.insertOrder(orderEntity)
+                    local.insertOrderItems(orderEntityWithId.id, orderItemEntityList)
                 }
 
                 remoteOrderHistory.map { //genera List<Order>
@@ -73,11 +77,11 @@ class OrderHistoryRepositoryImpl @Inject constructor(
         }
     }
 
-
     override suspend fun insertOrder(cartItems: List<CartItem>): Order {
-        //TODO validar que la guarden se guardo en local y remote, si no se guardo en romote borrar en local
+        val subTotal = cartItems.sumOf { it.product.price * it.quantity }
+        val deliveryFee = 0.03
         val orderEntity = OrderEntity(
-            totalAmount = cartItems.sumOf { it.product.price * it.quantity },
+            totalAmount = cartItems.sumOf { subTotal + (subTotal * deliveryFee) },
             orderDate = returnDate()
         )
         val orderItemsEntity = cartItems.map { cartItem ->
@@ -88,15 +92,25 @@ class OrderHistoryRepositoryImpl @Inject constructor(
             )
         }
 
-        val orderItemsWithProductEntity = local.insertOrder(orderEntity, orderItemsEntity)
+        val orderEntityWithId = local.insertOrder(orderEntity)
+        val orderItemsWithProductEntity = local.insertOrderItems(orderEntityWithId.id, orderItemsEntity)
+        Log.d("OrderHistoryRepositoryImpl","orderItemsWithProductEntity: $orderItemsWithProductEntity")
 
-        val order = orderEntity.orderEntityToDomain(
+
+        val order = orderEntityWithId.orderEntityToDomain(
             orderItemsWithProductEntity.map { it.orderItemWithProductEntityToDomain() }
         )
-
-        remote.insertOrder(order.orderToOrderDto()) //TODO investigar porque rompe aca
-
-        return order
+        Log.d("OrderHistoryRepositoryImpl", "order: $order")
+        // Insert order into remote service
+        val orderDto = order.orderToOrderDto()
+        Log.d("OrderHistoryRepositoryImpl", "order: $orderDto")
+        val isSuccessful = remote.insertOrder(order.orderToOrderDto())
+        if (isSuccessful) {
+            return order
+        } else {
+            local.clearOrderByOrderId(orderEntity.id)
+            throw Exception("Failed to insert order in remote service")
+        }
     }
 
 }

@@ -14,8 +14,8 @@ class ProductRepositoryImpl @Inject constructor(
     private val local: ProductLocalDataSource
 ) : ProductRepository {
     override suspend fun getProducts(refreshData: Boolean): List<Product> {
-        //TODO cargar info de la base de datos local, cargar de remoto si hay cambios en la base de datos, usar workmanager
-        return if (refreshData) {
+
+        return if (refreshData) { //TODO refresh con WorkManager
             val remoteProducts = remote.getProducts()
             local.clearProducts()
             local.insertProducts(remoteProducts.map { it.productDtoToEntity() })
@@ -45,7 +45,6 @@ class ProductRepositoryImpl @Inject constructor(
             remoteProduct.productDtoToDomain()
         }
     }
-
 }
 
 
