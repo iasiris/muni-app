@@ -5,12 +5,15 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.network.HttpException
 import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
 import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
 import com.iasiris.muniapp.domain.model.User
+import com.iasiris.muniapp.domain.usecase.user.GetUserByIdUserCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
+import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -19,12 +22,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     myApplication: Application,
     private val cloudinary: Cloudinary,
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val getUserByIdUserCase: GetUserByIdUserCase
 ) : AndroidViewModel(myApplication) {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -133,17 +137,31 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun getUser() {
+    private fun getUser() {//TODO seguir con este metodo!!!!!!!!!!!
         viewModelScope.launch { //let para ejecutar el bloque solo si el usuario no es nulo
-            val user = withContext(Dispatchers.IO) {
-                userRemoteDataSource.getCurrentUser()
-            }
-            user?.let {
+            _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
+            try {
+                val user = withContext(Dispatchers.IO) {
+                    getUserByIdUserCase.invoke("1234") //TODO get user id from SharedPreferences or similar
+                }
+                if (user == null) {
+                    throw IllegalArgumentException("Usuario no encontrado")
+                }
                 _profileUiState.update { state ->
                     state.copy(
                         user = user
                     )
                 }
+
+            } catch (e: IOException) {
+                _profileUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
+                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
+            } catch (e: HttpException) {
+                _profileUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
+                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
+            } catch (e: Exception) {
+                _profileUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
+                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
             }
         }
     }
@@ -182,6 +200,7 @@ class ProfileViewModel @Inject constructor(
 }
 
 data class ProfileUiState(
+    val screenState: ScreenState<Boolean> = ScreenState.Loading,
     val user: User = User("", "", "", "", ""),
     val newPassword: String = "",
     val isSaveEnabled: Boolean = false,

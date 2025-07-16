@@ -3,11 +3,14 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.iasiris.muniapp.data.remote.datasource.UserRemoteDataSource
+import coil3.network.HttpException
 import com.iasiris.muniapp.domain.model.User
+import com.iasiris.muniapp.domain.usecase.user.AddUserUseCase
+import com.iasiris.muniapp.domain.usecase.user.GetUserIdByEmailUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isFullNameValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -16,11 +19,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val addUserUseCase: AddUserUseCase,
+    private val getUserIdByEmailUserCase: GetUserIdByEmailUseCase
 ) : ViewModel() {
 
     private val _registerUiState = MutableStateFlow(RegisterUiState())
@@ -84,7 +89,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun onRegister(onResult: (Boolean) -> Unit) {
+    fun onRegister() {
         val canRegister = _registerUiState.value.isRegisterEnabled
         if (canRegister) {
             val newUser = User(
@@ -94,19 +99,32 @@ class RegisterViewModel @Inject constructor(
                 password = _registerUiState.value.password
             )
             viewModelScope.launch {
-                withContext(Dispatchers.IO) {
-                    userRemoteDataSource.saveUser(newUser)
+                _registerUiState.update { it.copy(screenState = ScreenState.Loading) }
+                try {
+                    val isUserSaved = withContext(Dispatchers.IO) {
+                        addUserUseCase.invoke(newUser)
+                    }
+                    if (isUserSaved) {
+                        clearRegistrationForm(newUser)
+                        val userId = getUserIdByEmailUserCase.invoke(newUser.email)
+                        _registerUiState.update { it.copy(screenState = ScreenState.Success(newUser)) }
+                        //TODO add userId to Shared preferences
+                    }
+                } catch (e: IOException) {
+                    _registerUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
+                    Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
+                } catch (e: HttpException) {
+                    _registerUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
+                    Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
+                } catch (e: Exception) {
+                    _registerUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
+                    Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
                 }
-                clearRegistrationForm()
-                onResult(true)
             }
-        } else {
-            Log.d("RegisterViewModel", "Registration not enabled: $canRegister")
-            onResult(false)
         }
     }
 
-    private fun clearRegistrationForm() {
+    private fun clearRegistrationForm(user: User) {
         _registerUiState.update { state ->
             state.copy(
                 email = "",
@@ -114,7 +132,8 @@ class RegisterViewModel @Inject constructor(
                 fullName = "",
                 confirmPassword = "",
                 isRegisterEnabled = false,
-                isSheetVisible = false
+                isSheetVisible = false,
+                screenState = ScreenState.Success(user),
             )
         }
     }
@@ -133,6 +152,7 @@ class RegisterViewModel @Inject constructor(
 }
 
 data class RegisterUiState(
+    val screenState: ScreenState<User> = ScreenState.Loading,
     val email: String = "",
     val password: String = "",
     val fullName: String = "",

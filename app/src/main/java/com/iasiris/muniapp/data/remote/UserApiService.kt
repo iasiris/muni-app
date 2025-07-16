@@ -1,7 +1,15 @@
 package com.iasiris.muniapp.data.remote
 
+import com.iasiris.muniapp.data.remote.dto.UserDto
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+
 interface UserApiService {
-    //para endpoints https://muni-peya-delivery-api.onrender.com/api-docs/
     //TODO implement the methods for user operations
-    //Use for post and puts Response<Unit> to check the state of the response
+    @POST("users/login")
+    suspend fun loginUser(@Body email: String, @Body password: String): UserDto
+
+    @GET("users/{id}")//todo check if this is correct
+    suspend fun getUserById(userId:String): UserDto
 }

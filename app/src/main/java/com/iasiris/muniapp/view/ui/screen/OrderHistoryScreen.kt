@@ -26,7 +26,6 @@ import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CardWithDateAndTotal
-import com.iasiris.muniapp.view.ui.components.EmptyCartScreen
 import com.iasiris.muniapp.view.ui.components.EmptyOrderHistoryScreen
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
@@ -45,7 +44,7 @@ fun OrderHistoryScreen(
     LaunchedEffect(Unit) {
         orderHistoryViewModel.loadOrderHistory(true)
     }
-    //TODO mostrar pantalla de no hay historial cuando no haya ordenes, agregar un mensaje de "No hay historial de ordenes" en la pantalla
+
     if (orderHistoryUiState.orderHistory.isEmpty() && state !is ScreenState.Loading) {
         EmptyOrderHistoryScreen(navController)
     } else {

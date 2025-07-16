@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentPasteOff
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,7 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.utils.paddingSmall
+import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 
 @Composable
 fun EmptyCartScreen(
@@ -46,7 +51,7 @@ fun EmptyCartScreen(
                     .align(Alignment.CenterHorizontally),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.width(paddingSmall))
+            Spacer(modifier = Modifier.height(paddingMedium))
             SubheadText(
                 text = stringResource(id = R.string.empty_cart_message),
                 fontWeight = FontWeight.Normal
@@ -54,8 +59,6 @@ fun EmptyCartScreen(
         }
     }
 }
-
-//TODO hacer emptyOrderHistoryScreen similar to EmptyCartScreen
 
 @Composable
 fun EmptyOrderHistoryScreen(
@@ -67,7 +70,7 @@ fun EmptyOrderHistoryScreen(
     ) {
         BackButtonWithTitle(
             title = stringResource(id = R.string.order_history_title),
-            onBackButtonClick = { navController.popBackStack() }
+            onBackButtonClick = { navController.navigate(PRODUCT_CATALOG) }
         )
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -75,14 +78,14 @@ fun EmptyOrderHistoryScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Default.ShoppingCart,
+                imageVector = Icons.Default.ViewTimeline,
                 contentDescription = stringResource(id = R.string.empty_order_history_icon),
                 modifier = Modifier
                     .size(64.dp)
                     .align(Alignment.CenterHorizontally),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.width(paddingSmall))
+            Spacer(modifier = Modifier.height(paddingMedium))
             SubheadText(
                 text = stringResource(id = R.string.empty_order_history_message),
                 fontWeight = FontWeight.Normal
@@ -95,5 +98,6 @@ fun EmptyOrderHistoryScreen(
 @Preview(showBackground = true)
 @Composable
 fun EmptyOrderHistoryScreenPreview() {
-    EmptyOrderHistoryScreen(navController = NavController(context = androidx.compose.ui.platform.LocalContext.current))
+    //EmptyCartScreen(navController = NavController(context = androidx.compose.ui.platform.LocalContext.current))
+    //EmptyOrderHistoryScreen(navController = NavController(context = androidx.compose.ui.platform.LocalContext.current))
 }
