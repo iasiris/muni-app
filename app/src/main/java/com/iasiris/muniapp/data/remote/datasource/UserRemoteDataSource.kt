@@ -1,11 +1,12 @@
 package com.iasiris.muniapp.data.remote.datasource
 
 import com.iasiris.muniapp.data.remote.dto.UserDto
-import com.iasiris.muniapp.domain.model.User
 
 interface UserRemoteDataSource {
     suspend fun loginUser(email: String, password: String): String?
+    suspend fun insertUser(user: UserDto)
     suspend fun getUserById(email: String): UserDto?
-    suspend fun saveUser(user: User): Boolean
-    suspend fun updateUser(user: User): Boolean
+    suspend fun getUserIdByEmail(email: String): Int
+    suspend fun updateUser(user: UserDto)
+    suspend fun isEmailAvailable(email: String): Boolean
 }

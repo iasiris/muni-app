@@ -113,6 +113,8 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     //cloudinary
     implementation(libs.cloudinary)
+    //dataStore
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

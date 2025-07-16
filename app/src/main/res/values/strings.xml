@@ -7,6 +7,7 @@
     <string name="email">Email</string>
     <string name="password">Contraseña</string>
     <string name="invalid_login">Email o contraseña incorrectos</string>
+    <string name="invalid_email">El email ya se encuentra registrado</string>
     <string name="confirm_password">Confirmar Contraseña</string>
     <string name="full_name">Nombre Completo</string>
     <string name="do_not_have_account">No tienes una cuenta?</string>
@@ -44,6 +45,7 @@
     <string name="order_success_title">¡Felicidades!</string>
     <string name="order_success_message">Tu compra se ha realizado con éxito</string>
     <string name="empty_order_history_message">No tienes compras realizadas</string>
+    <string name="logout">Cerrar sesión</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

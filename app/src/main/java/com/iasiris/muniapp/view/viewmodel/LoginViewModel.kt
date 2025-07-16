@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.network.HttpException
+import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.usecase.user.LoginUserUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
@@ -20,7 +21,8 @@ import java.io.IOException
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUserUseCase: LoginUserUseCase
+    private val loginUserUseCase: LoginUserUseCase,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _loginUiState = MutableStateFlow(LoginUiState())
@@ -66,19 +68,20 @@ class LoginViewModel @Inject constructor(
                 if (userId.isNullOrEmpty()) {
                     throw IllegalArgumentException("Email o contraseña incorrectos")
                 } else {
+                    userPreferences.setUserId(userId)
                     _loginUiState.update { state ->
                         state.copy(
                             screenState = ScreenState.Success(userId)
                         )
                     }
-                    //TODO guardar el userId en SharedPreferences o similar
                 }
             } catch (e: IllegalArgumentException) {//Email o contraseña incorrectos
                 _loginUiState.update {
                     it.copy(
                         screenState = ScreenState.Error(e.message ?: "Error de autenticación"),
                         isValidLogin = false
-                    ) }
+                    )
+                }
                 Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
             } catch (e: IOException) {
                 _loginUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }

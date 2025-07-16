@@ -3,10 +3,10 @@ package com.iasiris.muniapp.domain.usecase.user
 import com.iasiris.muniapp.domain.repository.UserRepository
 import javax.inject.Inject
 
-class GetUserIdByEmailUseCase @Inject constructor(
+class IsEmailAvailableUseCase @Inject constructor(
     private val userRepository: UserRepository
 ){
-    suspend operator fun invoke(email: String): String {
-        return userRepository.getUserIdByEmail(email)
+    suspend operator fun invoke(email: String): Boolean {
+        return userRepository.isEmailAvailable(email)
     }
 }

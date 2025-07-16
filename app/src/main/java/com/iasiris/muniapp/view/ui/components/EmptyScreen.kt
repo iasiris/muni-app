@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentPasteOff
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.Icon
@@ -23,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iasiris.muniapp.R
 import com.iasiris.muniapp.utils.paddingMedium
-import com.iasiris.muniapp.utils.paddingSmall
 import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 
 @Composable

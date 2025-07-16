@@ -47,6 +47,7 @@ fun ProductCatalogScreen(
     LaunchedEffect(Unit) {
         prodCatViewModel.loadProducts()
     }
+
     when (state) {
         is ScreenState.Loading -> {
             SimpleCircularProgressIndicator()

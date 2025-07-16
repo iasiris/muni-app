@@ -28,7 +28,7 @@ class OrderHistoryRepositoryImpl @Inject constructor(
         refreshData: Boolean
     ): List<Order> {
         return if (refreshData) {
-            val remoteOrderHistory = remote.getOrderHistoryByUserId(userId) //get de Api
+            val remoteOrderHistory = remote.getOrderHistoryByUserId(userId)
 
             local.clearOrderHistory()
             remoteOrderHistory.map { //insert all the orders with their respective items //guarda en ROOM
@@ -49,13 +49,11 @@ class OrderHistoryRepositoryImpl @Inject constructor(
             if (localOrderHistory.isNotEmpty()) {
                 localOrderHistory.map { //Mapeo de List<OrderEntity> a List<Order>
                     val orderItemsWithProductEntityList =
-                        local.getOrderItemsWithProductsByOrderId(it.id.toInt())
-                    val products =//TODO chequear problema con mappeo de products
-                        //[{"_id":"68759ceb64ddc514cb1bca28","id":0,"userId":"123","products":[{"product":{"id":"string","name":"string","description":"string","imageUrl":"string","price":0,"hasDrink":true,"category":"string","_id":"68759ceb64ddc514cb1bca2a"},"quantity":0,"_id":"68759ceb64ddc514cb1bca29"}],"totalAmount":0,"orderDate":"string","createdAt":"2025-07-15T00:12:27.544Z","updatedAt":"2025-07-15T00:12:27.544Z","__v":0}]
-                        orderItemsWithProductEntityList.map { orderItemWithProductEntity ->
+                        local.getOrderItemsWithProductsByOrderId(it.id)
+                    val products = orderItemsWithProductEntityList.map { orderItemWithProductEntity ->
                             orderItemWithProductEntity.orderItemWithProductEntityToDomain()
                         }
-                    it.orderEntityToDomain(products)
+                    it.orderEntityToDomain(userId,products)
                 }
             } else { //Pide a la API
                 val remoteOrderHistory = remote.getOrderHistoryByUserId(userId)
@@ -77,7 +75,7 @@ class OrderHistoryRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun insertOrder(cartItems: List<CartItem>): Order {
+    override suspend fun insertOrder(userId: String, cartItems: List<CartItem>): Order {
         val subTotal = cartItems.sumOf { it.product.price * it.quantity }
         val deliveryFee = 0.03
         val orderEntity = OrderEntity(
@@ -98,6 +96,7 @@ class OrderHistoryRepositoryImpl @Inject constructor(
 
 
         val order = orderEntityWithId.orderEntityToDomain(
+            userId,
             orderItemsWithProductEntity.map { it.orderItemWithProductEntityToDomain() }
         )
         Log.d("OrderHistoryRepositoryImpl", "order: $order")

@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import coil3.network.HttpException
+import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.domain.usecase.user.AddUserUseCase
 import com.iasiris.muniapp.domain.usecase.user.GetUserIdByEmailUseCase
+import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isFullNameValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
@@ -24,17 +26,21 @@ import java.io.IOException
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
+    private val isEmailAvailableUseCase: IsEmailAvailableUseCase,
     private val addUserUseCase: AddUserUseCase,
-    private val getUserIdByEmailUserCase: GetUserIdByEmailUseCase
+    private val getUserIdByEmailUserCase: GetUserIdByEmailUseCase,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _registerUiState = MutableStateFlow(RegisterUiState())
     val registerUiState: StateFlow<RegisterUiState> = _registerUiState
 
     fun onEmailChange(email: String) {
-        //TODO checkear si el email ya existe, hacer con repository
         _registerUiState.update { state ->
-            state.copy(email = email)
+            state.copy(
+                email = email,
+                isEmailValid = true//todo CHEQUEAR ESTA LOGICA, NO SE SI ESTÁ BIEN
+            )
         }
         verifyRegister()
     }
@@ -101,15 +107,28 @@ class RegisterViewModel @Inject constructor(
             viewModelScope.launch {
                 _registerUiState.update { it.copy(screenState = ScreenState.Loading) }
                 try {
-                    val isUserSaved = withContext(Dispatchers.IO) {
+                    val isEmailAvailable = withContext(Dispatchers.IO) {
+                        isEmailAvailableUseCase.invoke(newUser.email)
+                    }
+                    if (!isEmailAvailable) {
+                        throw IllegalArgumentException("El email ya está en uso")
+                    }
+                    withContext(Dispatchers.IO) {
                         addUserUseCase.invoke(newUser)
                     }
-                    if (isUserSaved) {
-                        clearRegistrationForm(newUser)
-                        val userId = getUserIdByEmailUserCase.invoke(newUser.email)
-                        _registerUiState.update { it.copy(screenState = ScreenState.Success(newUser)) }
-                        //TODO add userId to Shared preferences
+                    clearRegistrationForm(newUser)
+                    val userId = getUserIdByEmailUserCase.invoke(newUser.email)
+                    userPreferences.setUserId(userId)
+                    _registerUiState.update { it.copy(screenState = ScreenState.Success(newUser)) }
+
+                } catch (e: IllegalArgumentException) {
+                    _registerUiState.update {
+                        it.copy(
+                            isEmailValid = false,
+                            screenState = ScreenState.Error(e.message ?: "Email ya está en uso")
+                        )
                     }
+                    Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
                 } catch (e: IOException) {
                     _registerUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
                     Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
@@ -132,7 +151,6 @@ class RegisterViewModel @Inject constructor(
                 fullName = "",
                 confirmPassword = "",
                 isRegisterEnabled = false,
-                isSheetVisible = false,
                 screenState = ScreenState.Success(user),
             )
         }
@@ -158,9 +176,9 @@ data class RegisterUiState(
     val fullName: String = "",
     val confirmPassword: String = "",
     val isRegisterEnabled: Boolean = false,
-    val isSheetVisible: Boolean = false,
     val passwordHidden: Boolean = true,
     val passwordConfirmHidden: Boolean = true,
+    val isEmailValid: Boolean = true,
     val emailError: String? = null,
     val passwordError: String? = null,
     val passwordConfirmError: String? = null

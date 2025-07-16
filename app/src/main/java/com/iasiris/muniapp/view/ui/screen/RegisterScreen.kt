@@ -12,9 +12,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,9 +47,17 @@ fun RegisterScreen(
 
     val registerUiState by registerViewModel.registerUiState.collectAsStateWithLifecycle()
     val state = registerUiState.screenState
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
+    val invalidEmail = stringResource(id = R.string.invalid_email)
 
     LaunchedEffect(registerUiState.screenState is ScreenState.Success) {
         navController.navigate(PRODUCT_CATALOG)
+    }
+    LaunchedEffect(registerUiState.isEmailValid) {
+        if (!registerUiState.isEmailValid) {
+            snackbarHostState.showSnackbar(invalidEmail)
+        }
     }
 
     Scaffold(
@@ -147,6 +158,12 @@ fun RegisterScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        //TODO deberia ir en dos lados?
+                        LaunchedEffect(registerUiState.isEmailValid) {
+                            if (!registerUiState.isEmailValid) {
+                                snackbarHostState.showSnackbar(invalidEmail)
+                            }
+                        }
                         SubheadText(
                             text = state.message,
                             textAlign = TextAlign.Center,

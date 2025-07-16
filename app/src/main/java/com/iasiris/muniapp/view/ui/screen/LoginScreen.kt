@@ -45,7 +45,6 @@ import com.iasiris.muniapp.view.ui.components.SubheadText
 import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.viewmodel.LoginViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -55,13 +54,15 @@ fun LoginScreen(
     val loginUiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
     val state = loginUiState.screenState
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception
+    val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
     val invalidLogin = stringResource(id = R.string.invalid_login)//TODO Mover a catch exception
 
     LaunchedEffect(loginUiState.screenState is ScreenState.Success) {
-        navController.navigate(PRODUCT_CATALOG)
+        navController.navigate(PRODUCT_CATALOG) {
+            popUpTo(0) { inclusive = true }//TODO check this
+        }
     }
-
+    //TODO deberia ir en dos lados?
     LaunchedEffect(loginUiState.isValidLogin) {
         if (!loginUiState.isValidLogin) {
             snackbarHostState.showSnackbar(invalidLogin)

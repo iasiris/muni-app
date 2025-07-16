@@ -5,9 +5,9 @@ import com.iasiris.muniapp.data.remote.dto.OrderDto
 import com.iasiris.muniapp.domain.model.Order
 import com.iasiris.muniapp.domain.model.OrderItem
 
-fun OrderEntity.orderEntityToDomain(orderItems: List<OrderItem>) = Order(
+fun OrderEntity.orderEntityToDomain(userId: String, orderItems: List<OrderItem>) = Order(
     id = id.toString(),
-    userId = "12356", // TODO traer de sharedPreferences
+    userId = userId,
     products = orderItems,
     totalAmount = totalAmount,
     orderDate = orderDate

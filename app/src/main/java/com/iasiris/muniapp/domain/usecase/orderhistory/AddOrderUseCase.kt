@@ -8,6 +8,6 @@ import javax.inject.Inject
 class AddOrderUseCase @Inject constructor(
     private val orderHistoryRepository: OrderHistoryRepository
 ) {
-    suspend operator fun invoke(cartItems: List<CartItem>): Order =
-        orderHistoryRepository.insertOrder(cartItems)
+    suspend operator fun invoke(userId: String, cartItems: List<CartItem>): Order =
+        orderHistoryRepository.insertOrder(userId, cartItems)
 }
