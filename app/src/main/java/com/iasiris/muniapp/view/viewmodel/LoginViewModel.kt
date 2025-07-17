@@ -3,11 +3,13 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import coil3.network.HttpException
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.usecase.user.LoginUserUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -58,41 +60,39 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onLogin() {
+    fun onLogin(navController: NavController) {
         viewModelScope.launch {
             _loginUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
                 val userId = withContext(Dispatchers.IO) {
                     loginUserUseCase.invoke(_loginUiState.value.email, _loginUiState.value.password)
-                }
-                if (userId.isNullOrEmpty()) {
-                    throw IllegalArgumentException("Email o contraseña incorrectos")
-                }
+                } ?: throw IllegalArgumentException("Email o contraseña incorrectos")
 
                 userPreferences.setUserId(userId)
-                Log.d("com.iasiris.muniapp", "Usuario logueado con ID: $userId")
                 _loginUiState.update { state ->
                     state.copy(
                         screenState = ScreenState.Success(userId)
                     )
                 }
-            } catch (e: IllegalArgumentException) {//Email o contraseña incorrectos
+                navController.navigate(PRODUCT_CATALOG) {
+                    popUpTo(PRODUCT_CATALOG) { inclusive = true }
+                }
+            } catch (e: IllegalArgumentException) {
                 _loginUiState.update {
                     it.copy(
-                        screenState = ScreenState.Error(e.message ?: "Error de autenticación"),
+                        screenState = ScreenState.Success(
+                            e.message ?: "Error de autenticación"
+                        ), //reseteo del estado para que usuario modfique los datos de login
                         isValidLogin = false
                     )
                 }
                 Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
             } catch (e: IOException) {
                 _loginUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
             } catch (e: HttpException) {
                 _loginUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
             } catch (e: Exception) {
                 _loginUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
             }
         }
     }

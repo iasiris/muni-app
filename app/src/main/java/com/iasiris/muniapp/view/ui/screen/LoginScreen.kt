@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +41,6 @@ import com.iasiris.muniapp.view.ui.components.CustomTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.components.SubheadText
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.viewmodel.LoginViewModel
 
@@ -54,14 +52,8 @@ fun LoginScreen(
     val loginUiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
     val state = loginUiState.screenState
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
-    val invalidLogin = stringResource(id = R.string.invalid_login)//TODO Mover a catch exception
+    val invalidLogin = stringResource(id = R.string.invalid_login)
 
-    /*LaunchedEffect(loginUiState.screenState is ScreenState.Success) { //TODO esto genera que siempre se vaya a PRODUCT_CATALOG al iniciar la app, FIX!!!!!!!!!!
-        navController.navigate(PRODUCT_CATALOG) {
-            popUpTo(0) { inclusive = true }//TODO check this
-        }
-    }*/
     LaunchedEffect(loginUiState.isValidLogin) {
         if (!loginUiState.isValidLogin) {
             snackbarHostState.showSnackbar(invalidLogin)
@@ -89,9 +81,7 @@ fun LoginScreen(
                     Card(
                         modifier = Modifier
                             .padding(horizontal = paddingLarge, vertical = paddingLarge),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color.White
-                        )
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
                         Column(
                             modifier = Modifier
@@ -121,7 +111,7 @@ fun LoginScreen(
                                 value = loginUiState.password,
                                 onValueChange = loginViewModel::onPasswordChange,
                                 passwordHidden = loginUiState.passwordHidden,
-                                onVisibilityToggle = { loginViewModel.onPasswordIconClick() },
+                                onVisibilityToggle = loginViewModel::onPasswordIconClick,
                                 errorMessage = loginUiState.passwordError
                             )
 
@@ -131,9 +121,7 @@ fun LoginScreen(
 
                             PrimaryButton(
                                 label = stringResource(id = R.string.login),
-                                onClick = {
-                                    loginViewModel.onLogin()
-                                },
+                                onClick = { loginViewModel.onLogin(navController) },
                                 enabled = loginUiState.isLoginEnabled
                             )
                         }
@@ -171,11 +159,6 @@ fun LoginScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        LaunchedEffect(loginUiState.isValidLogin) {//Esto deberia aparecer sobre el screen normal
-                            if (!loginUiState.isValidLogin) {
-                                snackbarHostState.showSnackbar(invalidLogin)
-                            }
-                        }
                         if (loginUiState.isValidLogin) {//si error de red o servidor
                             SubheadText(
                                 text = state.message,
@@ -183,7 +166,7 @@ fun LoginScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             PrimaryButton(
-                                onClick = { loginViewModel.onLogin() },
+                                onClick = { loginViewModel.onLogin(navController) },
                                 label = "${stringResource(id = R.string.retry)}",
                             )
                         }
