@@ -15,31 +15,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.view.ui.components.BottomNavBar
 import com.iasiris.muniapp.view.ui.navigation.NavGraph
 import com.iasiris.muniapp.view.ui.navigation.Routes
 import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MuniAppTheme {
-                MuniApp()
+                MuniApp(userPreferences)
             }
         }
     }
 }
 
 @Composable
-fun MuniApp() {
+fun MuniApp(userPreferences: UserPreferences) {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
-    Log.d("Current Route", "Current route: $currentRoute")
     Scaffold(
         bottomBar = {
             if (currentRoute != Routes.LOGIN && currentRoute != Routes.REGISTER) {
@@ -53,7 +55,7 @@ fun MuniApp() {
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            NavGraph(navController = navController)
+            NavGraph(navController = navController, userPreferences = userPreferences)
         }
     }
 }

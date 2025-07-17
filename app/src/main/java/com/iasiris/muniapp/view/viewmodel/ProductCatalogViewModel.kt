@@ -21,7 +21,6 @@ import java.io.IOException
 class ProductCatalogViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
 ) : ViewModel() {
-
     private val _prodCatUiState = MutableStateFlow(ProductCatalogUiState())
     val prodCatUiState: StateFlow<ProductCatalogUiState> = _prodCatUiState
 
@@ -60,11 +59,11 @@ class ProductCatalogViewModel @Inject constructor(
     }
 
     fun loadProducts(refreshData: Boolean = false) {
-        //TODO!!!!! se borra cartItems cuando: catalog(agrega prod) -> cart(esta el prod) -> catalog -> cart(desaparece el prod)
         viewModelScope.launch {
             _prodCatUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val products = withContext(Dispatchers.IO) { getProductsUseCase.invoke(refreshData) }
+                val products =
+                    withContext(Dispatchers.IO) { getProductsUseCase.invoke(refreshData) }
                 val categories = products.map { it.category }
                     .distinct()
                     .sorted()
@@ -80,6 +79,15 @@ class ProductCatalogViewModel @Inject constructor(
                         screenState = ScreenState.Success(products),
                     )
                 }
+            } catch (e: IllegalArgumentException) {
+                _prodCatUiState.update {
+                    it.copy(
+                        screenState = ScreenState.Error(
+                            e.message ?: "Error al cargar productos"
+                        )
+                    )
+                }
+                Log.e("com.iasiris.muniapp", "Error de carga de lista: ${e.message}")
             } catch (e: IOException) {
                 _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
                 Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")

@@ -45,7 +45,9 @@ fun ProductCatalogScreen(
     val state = prodCatUiState.screenState
 
     LaunchedEffect(Unit) {
-        prodCatViewModel.loadProducts()
+        if (prodCatUiState.products.isEmpty()) {
+            prodCatViewModel.loadProducts()
+        }
     }
 
     when (state) {

@@ -1,10 +1,13 @@
 package com.iasiris.muniapp.view.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.iasiris.muniapp.data.local.UserPreferences
+import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.navigation.Routes.CART
 import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
@@ -35,8 +38,13 @@ object Routes {
 
 @Composable
 fun NavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    userPreferences: UserPreferences
 ) {
+    val userIdFlow = userPreferences.userIdFlow.collectAsState(initial = null)
+    val userId = userIdFlow.value
+    val isLoggedIn = userIdFlow.value != null
+
     val cartViewModel: CartViewModel = hiltViewModel()
     val loginViewModel: LoginViewModel = hiltViewModel()
     val orderHistoryViewModel: OrderHistoryViewModel = hiltViewModel()
@@ -44,27 +52,31 @@ fun NavGraph(
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
 
-    NavHost(
-        navController = navController,
-        startDestination = LOGIN
-    ) { //TODO agregar if para chequear si usuario esta loggeado, si esta loggeado llevar directamente a home
-        composable(LOGIN) {
-            LoginScreen(navController, loginViewModel)
-        }
-        composable(REGISTER) {
-            RegisterScreen(navController, registerViewModel)
-        }
-        composable(PRODUCT_CATALOG) {
-            ProductCatalogScreen(prodCatViewModel, cartViewModel)
-        }
-        composable(PROFILE) {
-            ProfileScreen(navController, profileViewModel)
-        }
-        composable(CART) {
-            CartScreen(navController, cartViewModel, orderHistoryViewModel)
-        }
-        composable(ORDER_HISTORY) {
-            OrderHistoryScreen(navController, orderHistoryViewModel)
+    if (userId == null) {
+        SimpleCircularProgressIndicator()
+    } else {
+        NavHost(
+            navController = navController,
+            startDestination = if (isLoggedIn) PRODUCT_CATALOG else LOGIN
+        ) {
+            composable(LOGIN) {
+                LoginScreen(navController, loginViewModel)
+            }
+            composable(REGISTER) {
+                RegisterScreen(navController, registerViewModel)
+            }
+            composable(PRODUCT_CATALOG) {
+                ProductCatalogScreen( prodCatViewModel, cartViewModel)//
+            }
+            composable(PROFILE) {
+                ProfileScreen(navController, profileViewModel)
+            }
+            composable(CART) {
+                CartScreen(navController, cartViewModel, orderHistoryViewModel)
+            }
+            composable(ORDER_HISTORY) {
+                OrderHistoryScreen(navController, orderHistoryViewModel)
+            }
         }
     }
 }
