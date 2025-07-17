@@ -5,10 +5,10 @@ import com.iasiris.muniapp.data.local.entity.CartItemWithProductEntity
 
 interface CartItemLocalDataSource {
     fun getCartItems(): List<CartItemEntity>
-    fun getCartItemsWithProducts(): List<CartItemWithProductEntity>
-    suspend fun getCartItemByProductId(productId: String): CartItemWithProductEntity?
-    suspend fun insertCartItem(cartItem: CartItemEntity) : CartItemWithProductEntity
+    fun getCartItemsWithProducts(): List<CartItemWithProductEntity>?
+    fun getCartItemByProductId(productId: String): CartItemWithProductEntity?
+    suspend fun insertCartItem(cartItem: CartItemEntity): CartItemWithProductEntity
     suspend fun updateCartItem(cartItem: CartItemEntity)
-    suspend fun deleteCartItem(cartItemId: Int)
+    suspend fun deleteCartItem(cartItemId: String)
     suspend fun deleteCartItems()
 }

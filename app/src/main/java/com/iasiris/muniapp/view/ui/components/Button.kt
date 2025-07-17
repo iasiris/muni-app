@@ -130,7 +130,8 @@ fun AddToButton(
             .size(40.dp)
             .graphicsLayer(
                 scaleX = scale,
-                scaleY = scale)
+                scaleY = scale
+            )
             .then(
                 if (clicked) Modifier else Modifier
             ),
@@ -155,7 +156,7 @@ fun AddToButton(
 }
 
 @Composable
-fun QuantityButtons(//TODO change names of variables onAdd, onRemove
+fun QuantityButtons(
     quantity: Int,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
@@ -191,12 +192,13 @@ fun QuantityButtons(//TODO change names of variables onAdd, onRemove
 
         IconButton(
             onClick = onIncrease,
+            enabled = quantity < 10,
             modifier = Modifier.weight(1f)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(id = R.string.increase_icon),
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = if (quantity < 10) MaterialTheme.colorScheme.onSurface else Color.Gray,
                 modifier = Modifier.size(sizeMedium)
             )
         }

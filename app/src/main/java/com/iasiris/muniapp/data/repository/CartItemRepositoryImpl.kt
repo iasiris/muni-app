@@ -15,23 +15,23 @@ class CartItemRepositoryImpl @Inject constructor(
     private val cartItemLocalDataSource: CartItemLocalDataSource
 ) : CartItemRepository {
 
-    override fun getCartItems(): List<CartItem> {//TODO chequear real uso de esto
+    override fun getCartItems(): List<CartItem> {
         val localCarItems = cartItemLocalDataSource.getCartItems()
         return localCarItems.map { it.cartItemEntityToDomain() }
     }
 
-    override fun getCartItemsWithProducts(): List<CartItem> {
+    override fun getCartItemsWithProducts(): List<CartItem>? {
         val localCartItems = cartItemLocalDataSource.getCartItemsWithProducts()
-        return localCartItems.map { it.cartItemWithProductEntityToDomain() }
+        return localCartItems?.map { it.cartItemWithProductEntityToDomain() }
     }
 
-    override suspend fun getCartItemByProductId(productId: String): CartItem? { //siempre va a retonar un CartItemWithProductEntity
+    override fun getCartItemByProductId(productId: String): CartItem? {
         val cartItemEntity = cartItemLocalDataSource.getCartItemByProductId(productId)
         return cartItemEntity?.cartItemWithProductEntityToDomain()
     }
 
-    override suspend fun insertCartItem(product: Product): CartItem {
-        val cartItemWithProductEntity = cartItemLocalDataSource.insertCartItem(CartItemEntity(productId = product.id))
+    override suspend fun insertCartItem(productId: String): CartItem {
+        val cartItemWithProductEntity = cartItemLocalDataSource.insertCartItem(CartItemEntity(productId = productId))
         return cartItemWithProductEntity.cartItemWithProductEntityToDomain()
     }
 
@@ -40,7 +40,7 @@ class CartItemRepositoryImpl @Inject constructor(
         cartItemLocalDataSource.updateCartItem(cartItemEntity)
     }
 
-    override suspend fun deleteCartItem(cartItemId: Int) {
+    override suspend fun deleteCartItem(cartItemId: String) {
         cartItemLocalDataSource.deleteCartItem(cartItemId)
     }
 

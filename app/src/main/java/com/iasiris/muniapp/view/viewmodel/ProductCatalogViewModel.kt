@@ -79,24 +79,16 @@ class ProductCatalogViewModel @Inject constructor(
                         screenState = ScreenState.Success(products),
                     )
                 }
-            } catch (e: IllegalArgumentException) {
-                _prodCatUiState.update {
-                    it.copy(
-                        screenState = ScreenState.Error(
-                            e.message ?: "Error al cargar productos"
-                        )
-                    )
-                }
-                Log.e("com.iasiris.muniapp", "Error de carga de lista: ${e.message}")
-            } catch (e: IOException) {
-                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
-            } catch (e: HttpException) {
-                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
             } catch (e: Exception) {
-                _prodCatUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
+                val errorMessage = when (e) {
+                    is IllegalArgumentException -> "Error al cargar productos"
+                    is NoSuchElementException -> "No se encontre productos"
+                    is IOException -> "Sin conexión a internet"
+                    is HttpException -> "Error de servidor"
+                    else -> "Ocurrió un error inesperado"
+                }
+                _prodCatUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             }
         }
     }

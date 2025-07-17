@@ -17,9 +17,8 @@ interface CartItemDao {
     @Update
     suspend fun updateCartItem(cartItem: CartItemEntity)
 
-    //TODO check if this is needed since the user will be de same all the time
     @Query("DELETE FROM cart_items WHERE id = :cartItemId")
-    suspend fun deleteCartItem(cartItemId: Int)
+    suspend fun deleteCartItem(cartItemId: String)
 
     @Query("DELETE FROM cart_items")
     suspend fun deleteCartItems()
@@ -32,5 +31,5 @@ interface CartItemDao {
     fun getCartItemsWithProducts(): List<CartItemWithProductEntity>
 
     @Query("SELECT * FROM cart_items WHERE productId = :productId")
-    suspend fun getCartItemByProductId(productId: String): CartItemWithProductEntity? //todo check this return type
+    fun getCartItemByProductId(productId: String): CartItemWithProductEntity?
 }

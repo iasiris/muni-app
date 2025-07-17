@@ -46,6 +46,7 @@
     <string name="order_success_message">Tu compra se ha realizado con éxito</string>
     <string name="empty_order_history_message">No tienes compras realizadas</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="max_cart_items">Máximo número de items para un producto</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

@@ -43,7 +43,7 @@ class ProductRepositoryImpl @Inject constructor(
             val remoteProduct = remote.getProductById(productId)
             local.insertProduct(
                 remoteProduct?.productDtoToEntity()
-                    ?: throw IllegalArgumentException("Product not found")
+                    ?: throw NoSuchElementException("Product not found")
             )
             remoteProduct.productDtoToDomain()
         }

@@ -255,7 +255,7 @@ fun RowWithNameAndDeleteIcon(
 }
 
 @Composable
-fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onDelete
+fun RowWithPriceAndButtons(
     price: Double = 0.0,
     quantity: Int,
     onIncrease: () -> Unit = {},
@@ -275,7 +275,7 @@ fun RowWithPriceAndButtons(//TODO change names of variables onAdd, onRemove, onD
             textAlign = TextAlign.Start
         )
 
-        QuantityButtons(//TODO change names of variables onAdd, onRemove, onDelete
+        QuantityButtons(
             quantity = quantity,
             onIncrease = onIncrease,
             onDecrease = onDecrease,
@@ -356,7 +356,7 @@ fun CartWithImageOnTheTop(
 }
 
 @Composable
-fun CardWithImageInTheLeftWithButtons( //TODO change names of variables onAdd, onRemove, onDelete
+fun CardWithImageInTheLeftWithButtons(
     cartItem: CartItem,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,

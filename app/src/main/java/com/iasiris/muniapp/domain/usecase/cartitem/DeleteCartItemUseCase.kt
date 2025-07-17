@@ -1,11 +1,10 @@
 package com.iasiris.muniapp.domain.usecase.cartitem
 
-import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.repository.CartItemRepository
 import javax.inject.Inject
 
-class GetCartItemsUseCase @Inject constructor(
+class DeleteCartItemUseCase @Inject constructor(
     private val cartItemRepository: CartItemRepository
 ) {
-    operator fun invoke(): List<CartItem>? = cartItemRepository.getCartItemsWithProducts()
+    suspend operator fun invoke(cartItemId: String) = cartItemRepository.deleteCartItem(cartItemId)
 }

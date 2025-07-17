@@ -8,31 +8,29 @@ import jakarta.inject.Inject
 class CartItemLocalDataSourceImpl @Inject constructor(
     private val cartItemDao: CartItemDao
 ) : CartItemLocalDataSource {
-    // CartItemEntity -> para operaciones CRUD simples sobre el carrito.
-    // CartItemWithProductEntity ->para los datos completos del producto relacionado a cada ítem del carrito.
-
     override fun getCartItems(): List<CartItemEntity> {
         return cartItemDao.getCartItems()
     }
 
-    override fun getCartItemsWithProducts(): List<CartItemWithProductEntity> {
+    override fun getCartItemsWithProducts(): List<CartItemWithProductEntity>? {
         return cartItemDao.getCartItemsWithProducts()
     }
 
-    override suspend fun getCartItemByProductId(productId: String): CartItemWithProductEntity? {
+    override fun getCartItemByProductId(productId: String): CartItemWithProductEntity? {
         return cartItemDao.getCartItemByProductId(productId)
     }
 
-    override suspend fun insertCartItem(cartItem: CartItemEntity) : CartItemWithProductEntity {
+    override suspend fun insertCartItem(cartItem: CartItemEntity): CartItemWithProductEntity {
         cartItemDao.insertCartItem(cartItem)
-        return cartItemDao.getCartItemByProductId(cartItem.productId) ?: throw Exception("Cart item not found after insertion")
+        return cartItemDao.getCartItemByProductId(cartItem.productId)
+            ?: throw NoSuchElementException("CartItem no se pudo encontrar despues de insert")
     }
 
     override suspend fun updateCartItem(cartItem: CartItemEntity) {
         cartItemDao.updateCartItem(cartItem)
     }
 
-    override suspend fun deleteCartItem(cartItemId: Int) {
+    override suspend fun deleteCartItem(cartItemId: String) {
         cartItemDao.deleteCartItem(cartItemId)
     }
 

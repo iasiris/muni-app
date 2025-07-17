@@ -1,10 +1,13 @@
 package com.iasiris.muniapp.view.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil3.network.HttpException
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.domain.usecase.cartitem.AddCartItemUseCase
+import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemsUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemByProductIdUseCase
 import com.iasiris.muniapp.domain.usecase.cartitem.GetCartItemsUseCase
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -25,6 +29,7 @@ class CartViewModel @Inject constructor(
     private val getCartItemByProductIdUseCase: GetCartItemByProductIdUseCase,
     private val addCartItemUseCase: AddCartItemUseCase,
     private val updateCartItemUseCase: UpdateCartItemUseCase,
+    private val deleteCartItem: DeleteCartItemUseCase,
     private val deleteCartItemsUseCase: DeleteCartItemsUseCase
 ) : ViewModel() {
     private val _cartUiState = MutableStateFlow(CartUiState())
@@ -36,73 +41,112 @@ class CartViewModel @Inject constructor(
 
     fun addToCart(product: Product) {
         viewModelScope.launch {
-            val existingCartItem = withContext(Dispatchers.IO) {
-                getCartItemByProductIdUseCase.invoke(product.id)
-            }
-            if (existingCartItem == null) {
-                val newCartItem = withContext(Dispatchers.IO) {
-                    addCartItemUseCase.invoke(product)
+            _cartUiState.update { it.copy(screenState = ScreenState.Loading) }
+            try {
+                val existingCartItem = withContext(Dispatchers.IO) {
+                    getCartItemByProductIdUseCase.invoke(product.id)
                 }
-                _cartUiState.update { state ->
-                    val updatedCartItems = state.cartItems + newCartItem
-                    state.copy(cartItems = updatedCartItems)
+                if (existingCartItem == null) {
+                    val newCartItem = withContext(Dispatchers.IO) {
+                        addCartItemUseCase.invoke(product.id)
+                    }
+                    _cartUiState.update { state ->
+                        val updatedCartItems = state.cartItems + newCartItem
+                        state.copy(
+                            cartItems = updatedCartItems,
+                            screenState = ScreenState.Success(""),
+                        )
+                    }
+                    updateTotal()
+                } else {
+                    onIncreaseCartItem(existingCartItem)
                 }
-                updateTotal()
-            } else {
-                onIncreaseCartItem(existingCartItem)
-            }
-        }
-    }
-
-    fun onIncreaseCartItem(cartItem: CartItem) {//TODO NO ANDA
-        viewModelScope.launch() {
-            val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity + 1)
-            if (cartItem.quantity < _cartUiState.value.MAX_CART_ITEM_QUANTITY) {
-                _cartUiState.update {
-                    it
-                }
-            } else {
-                withContext(Dispatchers.IO) { //update en DB
-                    updateCartItemUseCase.invoke(cartItemUpdated)
-                }
-                getCartItems()
+            } catch (e: Exception) {
+                handleException(e)
             }
         }
     }
 
-    fun onDecreaseCartItem(cartItem: CartItem) { //TODO NO ANDA
+    fun onIncreaseCartItem(cartItem: CartItem) {
         viewModelScope.launch() {
-            val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity - 1)
-            if (cartItem.quantity > _cartUiState.value.MIN_CART_ITEM_QUANTITY) {
-                _cartUiState.update {
-                    it
-                }
-            } else {
-                withContext(Dispatchers.IO) { //update en DB
+            try {
+                val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity + 1)
+                withContext(Dispatchers.IO) {
                     updateCartItemUseCase.invoke(cartItemUpdated)
                 }
+                _cartUiState.update {
+                    it.copy(
+                        cartItems = it.cartItems.map { item ->
+                            item.takeIf { it.product.id != cartItem.product.id } ?: item.copy(
+                                quantity = cartItemUpdated.quantity
+                            )
+                        },
+                    )
+                }
                 getCartItems()
+            } catch (e: Exception) {
+                handleException(e)
+            }
+        }
+    }
+
+    fun onDecreaseCartItem(cartItem: CartItem) {
+        viewModelScope.launch() {
+            try {
+                val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity - 1)
+                withContext(Dispatchers.IO) {
+                    updateCartItemUseCase.invoke(cartItemUpdated)
+                }
+                _cartUiState.update {
+                    it.copy(
+                        cartItems = it.cartItems.map { item ->
+                            item.takeIf { it.product.id != cartItem.product.id } ?: item.copy(
+                                quantity = cartItemUpdated.quantity
+                            )
+                        },
+                    )
+                }
+                getCartItems()
+            } catch (e: Exception) {
+                handleException(e)
             }
         }
     }
 
     fun onRemoveCartItem(cartItem: CartItem) {
-        _cartUiState.update { state ->
-            val updatedCartItems = state.cartItems.filterNot {
-                it.product.id == cartItem.product.id
+        viewModelScope.launch() {
+            try {
+                withContext(Dispatchers.IO) {
+                    deleteCartItem.invoke(cartItem.id)
+                }
+                _cartUiState.update { state ->
+                    val updatedCartItems = state.cartItems.filterNot {
+                        it.product.id == cartItem.product.id
+                    }
+                    state.copy(cartItems = updatedCartItems)
+                }
+                getCartItems()
+            } catch (e: Exception) {
+                handleException(e)
             }
-            state.copy(cartItems = updatedCartItems)
         }
-        updateTotal()
     }
 
     private fun getCartItems() {
         viewModelScope.launch {
-            val allCartItems = withContext(Dispatchers.IO) { getCartItemsUseCase.invoke() }
-            _cartUiState.update { state ->
-                state.copy(cartItems = allCartItems)
+            try {
+                val allCartItems = withContext(Dispatchers.IO) { getCartItemsUseCase.invoke() }
+                    ?: throw (throw NoSuchElementException("No se encontraron items en el carrito"))
+                _cartUiState.update { state ->
+                    state.copy(
+                        cartItems = allCartItems,
+                        screenState = ScreenState.Success("")
+                    )
+                }
+                updateTotal()
+            } catch (e: Exception) {
+                handleException(e)
             }
-            updateTotal()
         }
     }
 
@@ -124,7 +168,7 @@ class CartViewModel @Inject constructor(
         _cartUiState.update { state ->
             val subTotal = state.cartItems.sumOf { it.product.price * it.quantity }
             val deliveryFee = Math.round(subTotal * state.FEE_PERCENTAGE * 100) / 100.0
-            val totalAmount = subTotal + state.deliveryFee //TODO SOLO GUARDAR TOTAL CON 2 DECIMALES
+            val totalAmount = subTotal + state.deliveryFee
             state.copy(
                 subTotal = subTotal,
                 deliveryFee = deliveryFee,
@@ -132,15 +176,25 @@ class CartViewModel @Inject constructor(
             )
         }
     }
+
+    private fun handleException(e: Exception) {
+        val errorMessage = when (e) {
+            is NoSuchElementException -> e.message ?: "Error de carga"
+            is IOException -> "Sin conexión a internet"
+            is HttpException -> "Error de servidor"
+            else -> "Ocurrió un error inesperado"
+        }
+        _cartUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+        Log.e("com.iasiris.muniapp", "Error: ${e.message}")
+    }
 }
 
 data class CartUiState(
-    val MAX_CART_ITEM_QUANTITY: Int = 10,
-    val MIN_CART_ITEM_QUANTITY: Int = 1,
+    val screenState: ScreenState<String> = ScreenState.Loading,
     val FEE_PERCENTAGE: Double = 0.03,
     val cartItems: List<CartItem> = emptyList(),
     val subTotal: Double = 0.0,
     val deliveryFee: Double = 0.0,
     val totalAmount: Double = 0.0,
-    var isOrderProcessing: Boolean = false
+    val isMaxItems: Boolean = false,
 )

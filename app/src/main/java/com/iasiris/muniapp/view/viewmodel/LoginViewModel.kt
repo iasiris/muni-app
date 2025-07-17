@@ -77,6 +77,14 @@ class LoginViewModel @Inject constructor(
                 navController.navigate(PRODUCT_CATALOG) {
                     popUpTo(PRODUCT_CATALOG) { inclusive = true }
                 }
+            } catch (e: Exception) {
+                val errorMessage = when (e) {
+                    is IOException -> "Sin conexión a internet"
+                    is HttpException -> "Error de servidor"
+                    else -> "Ocurrió un error inesperado"
+                }
+                _loginUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             } catch (e: IllegalArgumentException) {
                 _loginUiState.update {
                     it.copy(
@@ -87,15 +95,6 @@ class LoginViewModel @Inject constructor(
                     )
                 }
                 Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
-            } catch (e: IOException) {
-                _loginUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
-            } catch (e: HttpException) {
-                _loginUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
-            } catch (e: Exception) {
-                _loginUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
             }
         }
     }
