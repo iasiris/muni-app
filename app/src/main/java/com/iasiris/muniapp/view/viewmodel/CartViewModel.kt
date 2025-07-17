@@ -180,8 +180,6 @@ class CartViewModel @Inject constructor(
     private fun handleException(e: Exception) {
         val errorMessage = when (e) {
             is NoSuchElementException -> e.message ?: "Error de carga"
-            is IOException -> "Sin conexión a internet"
-            is HttpException -> "Error de servidor"
             else -> "Ocurrió un error inesperado"
         }
         _cartUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
