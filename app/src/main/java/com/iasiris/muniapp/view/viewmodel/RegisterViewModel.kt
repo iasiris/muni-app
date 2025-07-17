@@ -1,18 +1,17 @@
 package com.iasiris.muniapp.view.viewmodel
 
-import android.R
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import coil3.network.HttpException
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.domain.usecase.user.AddUserUseCase
-import com.iasiris.muniapp.domain.usecase.user.GetUserIdByEmailUseCase
 import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isFullNameValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -29,7 +28,6 @@ import java.io.IOException
 class RegisterViewModel @Inject constructor(
     private val isEmailAvailableUseCase: IsEmailAvailableUseCase,
     private val addUserUseCase: AddUserUseCase,
-    private val getUserIdByEmailUserCase: GetUserIdByEmailUseCase,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -39,8 +37,7 @@ class RegisterViewModel @Inject constructor(
     fun onEmailChange(email: String) {
         _registerUiState.update { state ->
             state.copy(
-                email = email,
-                isEmailValid = true//todo CHEQUEAR ESTA LOGICA, NO SE SI ESTÁ BIEN
+                email = email
             )
         }
         verifyRegister()
@@ -77,10 +74,7 @@ class RegisterViewModel @Inject constructor(
         val doPasswordsMatch = password == passwordConfirm
 
         val isRegisterEnabled =
-            isEmailValid && isPasswordValid && isPasswordConfirmValid && doPasswordsMatch && isFullNameValid(
-                _registerUiState.value.fullName
-            )
-
+            isEmailValid && isPasswordValid && isPasswordConfirmValid && doPasswordsMatch
         _registerUiState.update { state ->
             state.copy(
                 emailError = if (!isEmailValid && email.isNotEmpty()) "Email inválido" else null,
@@ -96,7 +90,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun onRegister() {//todo check this logic
+    fun onRegister(navController: NavController) {
         val canRegister = _registerUiState.value.isRegisterEnabled
         if (canRegister) {
             val newUser = User(
@@ -111,27 +105,26 @@ class RegisterViewModel @Inject constructor(
                     val isEmailAvailable = withContext(Dispatchers.IO) {
                         isEmailAvailableUseCase.invoke(newUser.email)
                     }
-                    if (!isEmailAvailable) {
-                        throw IllegalArgumentException("El email ya está en uso")
-                    }
+
+                    if (!isEmailAvailable) throw IllegalArgumentException("El email ya está en uso")
 
                     val userId = withContext(Dispatchers.IO) {
                         addUserUseCase.invoke(newUser)
-                    }
-                    Log.d("com.iasiris.muniapp", "Usuario registrado con ID: $userId")
-                    if (userId.isNullOrEmpty()) {
-                        throw IllegalArgumentException("Error al registrar el usuario")
-                    }
+                    } ?: throw IllegalArgumentException("Error al registrar el usuario")
 
                     clearRegistrationForm()
                     userPreferences.setUserId(userId)
+                    navController.navigate(PRODUCT_CATALOG) {
+                        popUpTo(PRODUCT_CATALOG) { inclusive = true }
+                    }
                     _registerUiState.update { it.copy(screenState = ScreenState.Success("")) }
-
                 } catch (e: IllegalArgumentException) {
                     _registerUiState.update {
                         it.copy(
-                            isEmailValid = false,
-                            screenState = ScreenState.Error(e.message ?: "Error de autenticación"),
+                            screenState = ScreenState.Success(
+                                e.message ?: "Error de autenticación"
+                            ),//reseteo del estado para que usuario modfique los datos de register
+                            isEmailValid = false
                         )
                     }
                     Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")

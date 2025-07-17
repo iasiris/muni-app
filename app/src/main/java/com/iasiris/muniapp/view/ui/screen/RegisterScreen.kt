@@ -12,12 +12,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,24 +37,18 @@ import com.iasiris.muniapp.view.ui.components.CustomTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.components.SubheadText
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
-    navController: NavController,
-    registerViewModel: RegisterViewModel
+    navController: NavController, registerViewModel: RegisterViewModel
 ) {
 
     val registerUiState by registerViewModel.registerUiState.collectAsStateWithLifecycle()
     val state = registerUiState.screenState
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
     val invalidEmail = stringResource(id = R.string.invalid_email)
 
-    /*LaunchedEffect(registerUiState.screenState is ScreenState.Success) {//TODO esto genera que siempre se vaya a PRODUCT_CATALOG al iniciar la app, FIX!!!!!!!!!!
-        navController.navigate(PRODUCT_CATALOG)
-    }*/
     LaunchedEffect(registerUiState.isEmailValid) {
         if (!registerUiState.isEmailValid) {
             snackbarHostState.showSnackbar(invalidEmail)
@@ -62,7 +56,8 @@ fun RegisterScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         when (state) {
             is ScreenState.Loading -> {
@@ -83,13 +78,13 @@ fun RegisterScreen(
                     )
 
                     Card(
-                        modifier = Modifier
-                            .padding(horizontal = paddingLarge, vertical = paddingLarge),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                        modifier = Modifier.padding(
+                            horizontal = paddingLarge,
+                            vertical = paddingLarge
+                        ), colors = CardDefaults.cardColors(containerColor = Color.White)
                     ) {
                         Column(
-                            modifier = Modifier
-                                .padding(paddingLarge),
+                            modifier = Modifier.padding(paddingLarge),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -118,7 +113,7 @@ fun RegisterScreen(
                                 onValueChange = registerViewModel::onPasswordChange,
                                 label = stringResource(id = R.string.password),
                                 passwordHidden = registerUiState.passwordHidden,
-                                onVisibilityToggle = { registerViewModel.onPasswordIconClick() },
+                                onVisibilityToggle = registerViewModel::onPasswordIconClick,
                                 errorMessage = registerUiState.passwordError
                             )
 
@@ -129,17 +124,15 @@ fun RegisterScreen(
                                 onValueChange = registerViewModel::onConfirmPasswordChange,
                                 label = stringResource(id = R.string.confirm_password),
                                 passwordHidden = registerUiState.passwordConfirmHidden,
-                                onVisibilityToggle = { registerViewModel.onConfirmPasswordIconClick() },
+                                onVisibilityToggle = registerViewModel::onConfirmPasswordIconClick,
                                 errorMessage = registerUiState.passwordConfirmError
                             )
 
                             Spacer(modifier = Modifier.height(paddingMedium))
 
-                            PrimaryButton(//TODO no se esta activando el boton de registro a pesar de que se cumplan las condiciones
+                            PrimaryButton(
                                 label = stringResource(id = R.string.sing_in),
-                                onClick = {
-                                    registerViewModel.onRegister()
-                                },
+                                onClick = { registerViewModel.onRegister(navController) },
                                 enabled = registerUiState.isRegisterEnabled
                             )
                         }
@@ -150,25 +143,18 @@ fun RegisterScreen(
 
             is ScreenState.Error -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        //TODO deberia ir en dos lados?
-                        LaunchedEffect(registerUiState.isEmailValid) {
-                            if (!registerUiState.isEmailValid) {
-                                snackbarHostState.showSnackbar(invalidEmail)
-                            }
-                        }
                         SubheadText(
                             text = state.message,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold
                         )
                         PrimaryButton(
-                            onClick = { registerViewModel.onRegister() },
+                            onClick = { registerViewModel.onRegister(navController) },
                             label = "${stringResource(id = R.string.retry)}",
                         )
                     }

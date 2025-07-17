@@ -77,7 +77,6 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-
                     Card(
                         modifier = Modifier
                             .padding(horizontal = paddingLarge, vertical = paddingLarge),

@@ -12,19 +12,20 @@ class UserRemoteDataSourceImpl @Inject constructor(
         userApiService.loginUser(LoginRequest(email, password)).id
 
     override suspend fun insertUser(user: UserDto): String? =
-        userApiService.registerUser(user).id
+        userApiService.registerUser(RegisterRequest(user.email, user.fullName, user.password)).id
 
     override suspend fun getUserById(userId: String): UserDto? = userApiService.getUserById(userId)
 
     override suspend fun getUserIdByEmail(email: String): String? =
         userApiService.getUserIdByEmail(email).id
 
-    override suspend fun updateUser(userDto: UserDto) =
-        userApiService.updateUser(userDto)
+    override suspend fun updateUser(userDto: UserDto) = userApiService.updateUser(userDto)
 
 
     override suspend fun isEmailAvailable(email: String): Boolean =
-        userApiService.getEmail(email).email.isNullOrEmpty()
+        userApiService.getEmail(email).email.isNullOrEmpty() //si retorna null entonces el email esta disponible
 }
 
 data class LoginRequest(val email: String, val password: String)
+
+data class RegisterRequest(val email: String, val fullName: String, val password: String)
