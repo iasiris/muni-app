@@ -57,12 +57,11 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
     val invalidLogin = stringResource(id = R.string.invalid_login)//TODO Mover a catch exception
 
-    LaunchedEffect(loginUiState.screenState is ScreenState.Success) {
+    /*LaunchedEffect(loginUiState.screenState is ScreenState.Success) { //TODO esto genera que siempre se vaya a PRODUCT_CATALOG al iniciar la app, FIX!!!!!!!!!!
         navController.navigate(PRODUCT_CATALOG) {
             popUpTo(0) { inclusive = true }//TODO check this
         }
-    }
-    //TODO deberia ir en dos lados?
+    }*/
     LaunchedEffect(loginUiState.isValidLogin) {
         if (!loginUiState.isValidLogin) {
             snackbarHostState.showSnackbar(invalidLogin)
@@ -172,7 +171,7 @@ fun LoginScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        LaunchedEffect(loginUiState.isValidLogin) {//si usuario o contraseña incorrectos
+                        LaunchedEffect(loginUiState.isValidLogin) {//Esto deberia aparecer sobre el screen normal
                             if (!loginUiState.isValidLogin) {
                                 snackbarHostState.showSnackbar(invalidLogin)
                             }

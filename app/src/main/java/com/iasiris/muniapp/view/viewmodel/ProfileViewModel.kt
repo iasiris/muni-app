@@ -155,6 +155,7 @@ class ProfileViewModel @Inject constructor(
     fun onLogout(){
         viewModelScope.launch {
             userPreferences.clearUserId()
+            Log.d("com.iasiris.muniapp", "Usuario borrado de preferencias")
             _profileUiState.update { it.copy(screenState = ScreenState.Success(true)) }
         }
     }

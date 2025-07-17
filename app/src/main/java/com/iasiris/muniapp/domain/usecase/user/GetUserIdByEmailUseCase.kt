@@ -5,8 +5,7 @@ import javax.inject.Inject
 
 class GetUserIdByEmailUseCase @Inject constructor(
     private val userRepository: UserRepository
-){
-    suspend operator fun invoke(email: String): String {
-        return userRepository.getUserIdByEmail(email)
-    }
+) {
+    suspend operator fun invoke(email: String): String? =
+        userRepository.getUserIdByEmail(email)
 }

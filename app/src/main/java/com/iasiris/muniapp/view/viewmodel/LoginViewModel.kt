@@ -67,13 +67,14 @@ class LoginViewModel @Inject constructor(
                 }
                 if (userId.isNullOrEmpty()) {
                     throw IllegalArgumentException("Email o contraseña incorrectos")
-                } else {
-                    userPreferences.setUserId(userId)
-                    _loginUiState.update { state ->
-                        state.copy(
-                            screenState = ScreenState.Success(userId)
-                        )
-                    }
+                }
+
+                userPreferences.setUserId(userId)
+                Log.d("com.iasiris.muniapp", "Usuario logueado con ID: $userId")
+                _loginUiState.update { state ->
+                    state.copy(
+                        screenState = ScreenState.Success(userId)
+                    )
                 }
             } catch (e: IllegalArgumentException) {//Email o contraseña incorrectos
                 _loginUiState.update {
@@ -104,7 +105,7 @@ class LoginViewModel @Inject constructor(
 }
 
 data class LoginUiState(
-    val screenState: ScreenState<String> = ScreenState.Loading,
+    val screenState: ScreenState<String> = ScreenState.Success(""),
     val email: String = "",
     val password: String = "",
     val isLoginEnabled: Boolean = false,

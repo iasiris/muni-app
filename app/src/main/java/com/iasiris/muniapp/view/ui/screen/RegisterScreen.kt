@@ -31,6 +31,7 @@ import com.iasiris.muniapp.R
 import com.iasiris.muniapp.utils.paddingLarge
 import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.utils.paddingSmall
+import com.iasiris.muniapp.view.ui.components.BackButtonWithTitle
 import com.iasiris.muniapp.view.ui.components.CustomTextField
 import com.iasiris.muniapp.view.ui.components.CustomTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
@@ -51,9 +52,9 @@ fun RegisterScreen(
     val coroutineScope = rememberCoroutineScope()//TODO Mover a catch exception??
     val invalidEmail = stringResource(id = R.string.invalid_email)
 
-    LaunchedEffect(registerUiState.screenState is ScreenState.Success) {
+    /*LaunchedEffect(registerUiState.screenState is ScreenState.Success) {//TODO esto genera que siempre se vaya a PRODUCT_CATALOG al iniciar la app, FIX!!!!!!!!!!
         navController.navigate(PRODUCT_CATALOG)
-    }
+    }*/
     LaunchedEffect(registerUiState.isEmailValid) {
         if (!registerUiState.isEmailValid) {
             snackbarHostState.showSnackbar(invalidEmail)
@@ -76,12 +77,9 @@ fun RegisterScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    SubheadText(
-                        text = stringResource(R.string.create_account),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(top = paddingSmall),
-                        fontWeight = FontWeight.Bold
+                    BackButtonWithTitle(
+                        title = stringResource(id = R.string.create_account),
+                        onBackButtonClick = { navController.popBackStack() }
                     )
 
                     Card(
@@ -137,7 +135,7 @@ fun RegisterScreen(
 
                             Spacer(modifier = Modifier.height(paddingMedium))
 
-                            PrimaryButton(
+                            PrimaryButton(//TODO no se esta activando el boton de registro a pesar de que se cumplan las condiciones
                                 label = stringResource(id = R.string.sing_in),
                                 onClick = {
                                     registerViewModel.onRegister()

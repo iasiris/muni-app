@@ -1,6 +1,7 @@
 package com.iasiris.muniapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -38,6 +39,7 @@ fun MuniApp() {
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
     val currentRoute = navBackStackEntry?.destination?.route
+    Log.d("Current Route", "Current route: $currentRoute")
     Scaffold(
         bottomBar = {
             if (currentRoute != Routes.LOGIN && currentRoute != Routes.REGISTER) {

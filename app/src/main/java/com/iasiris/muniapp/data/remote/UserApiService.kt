@@ -10,21 +10,24 @@ import retrofit2.http.Path
 
 interface UserApiService {
     @POST("users/login")
-    suspend fun loginUser(@Body loginRequest: LoginRequest): UserDto
+    suspend fun loginUser(@Body loginRequest: LoginRequest): IdResponse
 
     @POST("users/register")
-    suspend fun registerUser(@Body userDto: UserDto)
+    suspend fun registerUser(@Body userDto: UserDto): IdResponse
 
-    @GET("users/{id}")//todo check if this is correct
+    @GET("users/{id}")
     suspend fun getUserById(@Path("id") userId: String): UserDto
 
     @GET("users/id/{email}")
-    suspend fun getUserIdBtEmail(email: String): Int
+    suspend fun getUserIdByEmail(email: String): IdResponse
 
     @PUT("users/{id}")//todo check if this is correct
     suspend fun updateUser(@Body userDto: UserDto)
 
     @GET("users/email/{email}")
-    suspend fun getEmail(email: String): String?
+    suspend fun getEmail(email: String): EmailResponse
 }
 
+data class IdResponse(val id: String)
+
+data class EmailResponse(val email: String)

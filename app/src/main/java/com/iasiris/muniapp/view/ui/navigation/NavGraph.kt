@@ -28,7 +28,6 @@ object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val PRODUCT_CATALOG = "product_catalog"
-    const val PRODUCT_DETAIL = "product_detail/{id}"
     const val CART = "cart"
     const val PROFILE = "profile"
     const val ORDER_HISTORY = "order_history"
@@ -47,7 +46,7 @@ fun NavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = PRODUCT_CATALOG //LOGIN
+        startDestination = LOGIN
     ) { //TODO agregar if para chequear si usuario esta loggeado, si esta loggeado llevar directamente a home
         composable(LOGIN) {
             LoginScreen(navController, loginViewModel)

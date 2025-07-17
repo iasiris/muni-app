@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.view.viewmodel
 
+import android.R
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -95,7 +96,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun onRegister() {
+    fun onRegister() {//todo check this logic
         val canRegister = _registerUiState.value.isRegisterEnabled
         if (canRegister) {
             val newUser = User(
@@ -113,19 +114,24 @@ class RegisterViewModel @Inject constructor(
                     if (!isEmailAvailable) {
                         throw IllegalArgumentException("El email ya está en uso")
                     }
-                    withContext(Dispatchers.IO) {
+
+                    val userId = withContext(Dispatchers.IO) {
                         addUserUseCase.invoke(newUser)
                     }
-                    clearRegistrationForm(newUser)
-                    val userId = getUserIdByEmailUserCase.invoke(newUser.email)
+                    Log.d("com.iasiris.muniapp", "Usuario registrado con ID: $userId")
+                    if (userId.isNullOrEmpty()) {
+                        throw IllegalArgumentException("Error al registrar el usuario")
+                    }
+
+                    clearRegistrationForm()
                     userPreferences.setUserId(userId)
-                    _registerUiState.update { it.copy(screenState = ScreenState.Success(newUser)) }
+                    _registerUiState.update { it.copy(screenState = ScreenState.Success("")) }
 
                 } catch (e: IllegalArgumentException) {
                     _registerUiState.update {
                         it.copy(
                             isEmailValid = false,
-                            screenState = ScreenState.Error(e.message ?: "Email ya está en uso")
+                            screenState = ScreenState.Error(e.message ?: "Error de autenticación"),
                         )
                     }
                     Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
@@ -143,7 +149,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun clearRegistrationForm(user: User) {
+    private fun clearRegistrationForm() {
         _registerUiState.update { state ->
             state.copy(
                 email = "",
@@ -151,7 +157,7 @@ class RegisterViewModel @Inject constructor(
                 fullName = "",
                 confirmPassword = "",
                 isRegisterEnabled = false,
-                screenState = ScreenState.Success(user),
+                screenState = ScreenState.Success("user"),
             )
         }
     }
@@ -170,7 +176,7 @@ class RegisterViewModel @Inject constructor(
 }
 
 data class RegisterUiState(
-    val screenState: ScreenState<User> = ScreenState.Loading,
+    val screenState: ScreenState<String> = ScreenState.Success(""),
     val email: String = "",
     val password: String = "",
     val fullName: String = "",
