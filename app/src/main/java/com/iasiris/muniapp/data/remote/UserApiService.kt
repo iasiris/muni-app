@@ -1,7 +1,5 @@
 package com.iasiris.muniapp.data.remote
 
-import com.iasiris.muniapp.data.remote.datasource.LoginRequest
-import com.iasiris.muniapp.data.remote.datasource.RegisterRequest
 import com.iasiris.muniapp.data.remote.dto.UserDto
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -22,13 +20,10 @@ interface UserApiService {
     @GET("users/id/{email}")
     suspend fun getUserIdByEmail(@Path("email") email: String): IdResponse
 
-    @PUT("users/{id}")//todo check if this is correct
-    suspend fun updateUser(@Body userDto: UserDto)
+    @PUT("users/{id}")
+    suspend fun updateUser(@Path("id") userId: String, @Body userDto: UserDto)
 
     @GET("users/email/{email}")
     suspend fun getEmail(@Path("email") email: String): EmailResponse
 }
 
-data class IdResponse(val id: String)
-
-data class EmailResponse(val email: String)

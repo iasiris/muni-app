@@ -35,47 +35,64 @@ class OrderHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _orderHistoryUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val orders = withContext(Dispatchers.IO) {
+                val userId = userPreferences.userIdFlow.first()
+                    ?: throw NoSuchElementException("El usuario no esta loggeado")
+                val orderHistory = withContext(Dispatchers.IO) {
                     getOrdersByUserIdUseCase.invoke(
-                        userPreferences.userIdFlow.first()!!,
+                        userId,
                         refreshData
                     )
                 }
                 _orderHistoryUiState.update { state ->
                     state.copy(
-                        orderHistory = orders,
-                        screenState = ScreenState.Success(orders)
+                        orderHistory = orderHistory,
+                        screenState = ScreenState.Success("")
                     )
                 }
-            } catch (e: IOException) {
-                _orderHistoryUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
-            } catch (e: HttpException) {
-                _orderHistoryUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
             } catch (e: Exception) {
-                _orderHistoryUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
+                val errorMessage = when (e) {
+                    is NoSuchElementException -> e.message ?: "No se encontraron ordenes de compra"
+                    is IOException -> "Sin conexión a internet"
+                    is HttpException -> "Error de servidor"
+                    else -> "Ocurrió un error inesperado"
+                }
+                _orderHistoryUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             }
         }
     }
 
     fun addOrder(cartItems: List<CartItem>) {
         viewModelScope.launch {
-            //_orderHistoryUiState.update { it.copy(screenState = ScreenState.Loading) }
-            val order = withContext(Dispatchers.IO) {
-                addOrderUseCase.invoke(
-                    userPreferences.userIdFlow.first()!!,
-                    cartItems)
-            }
-            if (order != null) {
-                _orderHistoryUiState.update { state ->
-                    state.copy(
-                        orderHistory = state.orderHistory + order,
-                        isOrderAdded = true
+            _orderHistoryUiState.update { it.copy(screenState = ScreenState.Loading) }
+            try {
+                val userId = userPreferences.userIdFlow.first()
+                    ?: throw NoSuchElementException("El usuario no esta loggeado")
+                val order = withContext(Dispatchers.IO) {
+                    addOrderUseCase.invoke(
+                        userId,
+                        cartItems
                     )
                 }
-                loadOrderHistory()
+                if (!order.id.isNullOrEmpty()) {
+                    _orderHistoryUiState.update { state ->
+                        state.copy(
+                            orderHistory = state.orderHistory + order,
+                            isOrderAdded = true,
+                            screenState = ScreenState.Success("")
+                        )
+                    }
+                    loadOrderHistory()
+                }
+            } catch (e: Exception) {
+                val errorMessage = when (e) {
+                    is NoSuchElementException -> e.message ?: "Error de carga"
+                    is IOException -> "Sin conexión a internet"
+                    is HttpException -> "Error de servidor"
+                    else -> "Ocurrió un error inesperado"
+                }
+                _orderHistoryUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             }
         }
     }
@@ -86,7 +103,7 @@ class OrderHistoryViewModel @Inject constructor(
 }
 
 data class OrderHistoryUiState(
-    val screenState: ScreenState<List<Order>> = ScreenState.Loading,
+    val screenState: ScreenState<String> = ScreenState.Loading,
     val orderHistory: List<Order> = emptyList(),
     val isOrderAdded: Boolean = false
 )

@@ -1,6 +1,5 @@
 package com.iasiris.muniapp.data.remote.datasource
 
-import android.util.Log
 import com.iasiris.muniapp.data.remote.OrderHistoryApiService
 import com.iasiris.muniapp.data.remote.dto.OrderDto
 import jakarta.inject.Inject
@@ -11,10 +10,8 @@ class OrderHistoryRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getOrderHistoryByUserId(
         userId: String
-    ): List<OrderDto> = orderHistoryApiService.getOrderHistory(userId)
+    ): List<OrderDto>? = orderHistoryApiService.getOrderHistory(userId)
 
-    override suspend fun insertOrder(orderDto: OrderDto): Boolean {
-        val response = orderHistoryApiService.postOrder(orderDto)
-        return response.isSuccessful
-    }
+    override suspend fun insertOrder(orderDto: OrderDto): String? =
+        orderHistoryApiService.postOrder(orderDto).id
 }

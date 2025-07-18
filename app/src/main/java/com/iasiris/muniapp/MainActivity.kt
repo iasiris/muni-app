@@ -1,7 +1,6 @@
 package com.iasiris.muniapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,14 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.view.ui.components.BottomNavBar
 import com.iasiris.muniapp.view.ui.navigation.NavGraph
-import com.iasiris.muniapp.view.ui.navigation.Routes
+import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
+import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject lateinit var userPreferences: UserPreferences
+    @Inject
+    lateinit var userPreferences: UserPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,7 +45,7 @@ fun MuniApp(userPreferences: UserPreferences) {
     val currentRoute = navBackStackEntry?.destination?.route
     Scaffold(
         bottomBar = {
-            if (currentRoute != Routes.LOGIN && currentRoute != Routes.REGISTER) {
+            if (currentRoute != LOGIN && currentRoute != REGISTER) {
                 BottomNavBar(navController = navController)
             }
 
@@ -55,7 +56,10 @@ fun MuniApp(userPreferences: UserPreferences) {
                 .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            NavGraph(navController = navController, userPreferences = userPreferences)
+            NavGraph(
+                navController = navController,
+                userPreferences = userPreferences
+            )
         }
     }
 }

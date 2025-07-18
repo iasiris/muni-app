@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.view.ui.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,9 +26,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.iasiris.muniapp.R
+import com.iasiris.muniapp.utils.paddingExtraLarge
+import com.iasiris.muniapp.utils.paddingMedium
 import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
 import com.iasiris.muniapp.view.ui.theme.Shapes
-import com.iasiris.muniapp.utils.*
 
 @Composable
 fun CustomTextField(
@@ -122,16 +124,19 @@ fun CustomOutlinedTextField(
     label: String,
     text: String,
     onValueChange: (String) -> Unit,
-    leadingIcon: ImageVector
+    leadingIcon: ImageVector,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    errorMessage: String? = null
 ) {
     OutlinedTextField(
         value = text,
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = paddingExtraLarge, vertical = paddingSmall),
+            .padding(horizontal = paddingExtraLarge),
         label = { CaptionText(text = label) },
         singleLine = true,
+        maxLines = 1,
         shape = Shapes.large,
         leadingIcon = {
             Icon(imageVector = leadingIcon, contentDescription = "")
@@ -141,6 +146,13 @@ fun CustomOutlinedTextField(
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
             focusedBorderColor = MaterialTheme.colorScheme.primary
         ),
+        keyboardOptions = keyboardOptions,
+        isError = errorMessage != null,
+        supportingText = {
+            errorMessage?.let {
+                BodyText(text = it, color = Color.Red)
+            }
+        }
     )
 }
 
@@ -159,9 +171,11 @@ fun CustomOutlinedTextFieldPassword(
         onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = paddingExtraLarge, vertical = paddingSmall),
+            .padding(horizontal = paddingExtraLarge),
         label = { CaptionText(text = label) },
         singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         shape = Shapes.large,
         leadingIcon = {
             Icon(imageVector = leadingIcon, contentDescription = "")
@@ -236,11 +250,40 @@ fun CustomSearchBar(
 @Composable
 fun PreviewCustomTextField() {
     MuniAppTheme {
-        CustomOutlinedTextField(
-            label = "Email",
-            text = "user@user.com",
-            onValueChange = { },
-            leadingIcon = Icons.Default.Email
-        )
+        Column {
+            CustomTextField(
+                value = "",
+                onValueChange = { },
+                label = stringResource(id = R.string.full_name),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+            )
+            CustomTextFieldPassword(
+                value = "",
+                onValueChange = { },
+                label = stringResource(id = R.string.password),
+                passwordHidden = true,
+                onVisibilityToggle = { },
+                errorMessage = ""
+            )
+            CustomSearchBar(
+                searchText = "",
+                onSearchTextChange = { }
+            )
+            CustomOutlinedTextField(
+                label = "Email",
+                text = "user@user.com",
+                onValueChange = { },
+                leadingIcon = Icons.Default.Email
+            )
+            CustomOutlinedTextFieldPassword(
+                label = "Password",
+                text = "password",
+                onValueChange = { },
+                leadingIcon = Icons.Default.Visibility,
+                passwordHidden = true,
+                onVisibilityToggle = { },
+                errorMessage = "Error message"
+            )
+        }
     }
 }

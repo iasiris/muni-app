@@ -24,17 +24,17 @@ class OrderHistoryLocalDataSourceImpl @Inject constructor(
         return orderHistoryDao.getOrderItemsWithProductsByOrderId(orderId)
     }
 
-    override suspend fun clearOrderByOrderId(orderId: Int) {
+    override suspend fun deleteOrderByOrderId(orderId: Int) {
         orderHistoryDao.deleteOrderItemsByOrderId(orderId.toString())
         orderHistoryDao.deleteOrderById(orderId)
     }
 
-    override suspend fun clearOrderHistory() {
+    override suspend fun deleteOrderHistory() {
         orderHistoryDao.deleteOrderHistory()
         orderHistoryDao.deleteOrderItems()
     }
 
-    override fun getOrderHistory(): List<OrderEntity> {
+    override fun getOrderHistory(): List<OrderEntity>? {
         return orderHistoryDao.getOrderHistory()
     }
 

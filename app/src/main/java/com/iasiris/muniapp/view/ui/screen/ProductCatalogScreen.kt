@@ -46,7 +46,7 @@ fun ProductCatalogScreen(
 
     LaunchedEffect(Unit) {
         if (prodCatUiState.products.isEmpty()) {
-            prodCatViewModel.loadProducts()
+            prodCatViewModel.loadProducts(true)
         }
     }
 

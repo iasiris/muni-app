@@ -1,5 +1,7 @@
 package com.iasiris.muniapp.data.remote.datasource
 
+import com.iasiris.muniapp.data.remote.LoginRequest
+import com.iasiris.muniapp.data.remote.RegisterRequest
 import com.iasiris.muniapp.data.remote.UserApiService
 import com.iasiris.muniapp.data.remote.dto.UserDto
 import jakarta.inject.Inject
@@ -19,13 +21,10 @@ class UserRemoteDataSourceImpl @Inject constructor(
     override suspend fun getUserIdByEmail(email: String): String? =
         userApiService.getUserIdByEmail(email).id
 
-    override suspend fun updateUser(userDto: UserDto) = userApiService.updateUser(userDto)
-
+    override suspend fun updateUser(userDto: UserDto) =
+        userApiService.updateUser(userDto.id, userDto)
 
     override suspend fun isEmailAvailable(email: String): Boolean =
         userApiService.getEmail(email).email.isNullOrEmpty() //si retorna null entonces el email esta disponible
 }
 
-data class LoginRequest(val email: String, val password: String)
-
-data class RegisterRequest(val email: String, val fullName: String, val password: String)
