@@ -214,6 +214,11 @@ fun PreviewButtons() {
                 label = "Enviar",
                 onClick = {}
             )
+            PrimaryButton(
+                label = "Not Enabled",
+                onClick = {},
+                enabled = false
+            )
 
             SecondaryButton(
                 label = "Enviar",

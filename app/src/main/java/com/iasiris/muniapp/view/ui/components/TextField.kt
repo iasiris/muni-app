@@ -142,7 +142,6 @@ fun CustomOutlinedTextField(
             Icon(imageVector = leadingIcon, contentDescription = "")
         },
         colors = OutlinedTextFieldDefaults.colors(
-            //unfocusedContainerColor = Color.White,
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
             focusedBorderColor = MaterialTheme.colorScheme.primary
         ),
@@ -181,7 +180,6 @@ fun CustomOutlinedTextFieldPassword(
             Icon(imageVector = leadingIcon, contentDescription = "")
         },
         colors = OutlinedTextFieldDefaults.colors(
-            //unfocusedContainerColor = Color.White,
             unfocusedBorderColor = MaterialTheme.colorScheme.surfaceDim,
             focusedBorderColor = MaterialTheme.colorScheme.primary
         ),
