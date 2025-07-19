@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.hilt.android)
     id("org.jetbrains.kotlin.kapt")
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
+
 }
 
 val localProperties = Properties()
@@ -18,6 +21,20 @@ if (localPropertiesFile.exists()) {
 android {
     namespace = "com.iasiris.muniapp"
     compileSdk = 35
+
+    ktlint {
+        version.set(libs.versions.ktlint.get())
+        android.set(true)
+        outputColorName.set("RED")
+    }
+
+    detekt {
+        toolVersion = libs.versions.detekt.get()
+        config = files("$rootDir/config/detekt/detekt.yml")
+        buildUponDefaultConfig = true
+        allRules = false
+        ignoreFailures = false
+    }
 
     defaultConfig {
         applicationId = "com.iasiris.muniapp"
@@ -132,4 +149,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+tasks.named("check") {
+    dependsOn("ktlintCheck", "detekt")
 }
