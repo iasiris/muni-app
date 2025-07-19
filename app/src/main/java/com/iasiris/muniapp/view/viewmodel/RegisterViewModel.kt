@@ -3,7 +3,6 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import coil3.network.HttpException
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
@@ -11,7 +10,6 @@ import com.iasiris.muniapp.domain.usecase.user.AddUserUseCase
 import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -90,7 +88,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun onRegister(navController: NavController) {
+    fun onRegister() {
         val canRegister = _registerUiState.value.isRegisterEnabled
         if (canRegister) {
             val newUser = User(
@@ -106,7 +104,11 @@ class RegisterViewModel @Inject constructor(
                         isEmailAvailableUseCase.invoke(newUser.email)
                     }
 
-                    if (!isEmailAvailable) throw IllegalArgumentException("El email ya está en uso")
+                    if (!isEmailAvailable) {
+                        throw IllegalArgumentException("El email ya está en uso")
+                        _registerUiState.update { it.copy(isEmailAvailable = false) }
+                    }
+
 
                     val userId = withContext(Dispatchers.IO) {
                         addUserUseCase.invoke(newUser)
@@ -114,10 +116,23 @@ class RegisterViewModel @Inject constructor(
 
                     clearRegistrationForm()
                     userPreferences.setUserId(userId)
-                    navController.navigate(PRODUCT_CATALOG) {
-                        popUpTo(PRODUCT_CATALOG) { inclusive = true }
+                    _registerUiState.update {
+                        it.copy(
+                            screenState = ScreenState.Success(""),
+                            shouldNavigateToCatalog = true
+                        )
                     }
-                    _registerUiState.update { it.copy(screenState = ScreenState.Success("")) }
+                    Log.d("uistate", "uistate: ${_registerUiState.value}")
+                } catch (e: IllegalArgumentException) {
+                    _registerUiState.update {
+                        it.copy(
+                            screenState = ScreenState.Success(
+                                e.message ?: "Error de autenticación"
+                            ),
+                            isEmailValid = false
+                        )
+                    }
+                    Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
                 } catch (e: Exception) {
                     val errorMessage = when (e) {
                         is IOException -> "Sin conexión a internet"
@@ -126,31 +141,8 @@ class RegisterViewModel @Inject constructor(
                     }
                     _registerUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
                     Log.e("com.iasiris.muniapp", "Error: ${e.message}")
-                } catch (e: IllegalArgumentException) {
-                    _registerUiState.update {
-                        it.copy(
-                            screenState = ScreenState.Success(
-                                e.message ?: "Error de autenticación"
-                            ),//reseteo del estado para que usuario modfique los datos de register
-                            isEmailValid = false
-                        )
-                    }
-                    Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
                 }
             }
-        }
-    }
-
-    private fun clearRegistrationForm() {
-        _registerUiState.update { state ->
-            state.copy(
-                email = "",
-                password = "",
-                fullName = "",
-                confirmPassword = "",
-                isRegisterEnabled = false,
-                screenState = ScreenState.Success("user"),
-            )
         }
     }
 
@@ -165,6 +157,26 @@ class RegisterViewModel @Inject constructor(
             state.copy(passwordConfirmHidden = !state.passwordConfirmHidden)
         }
     }
+
+    fun clearFlag(update: (RegisterUiState) -> RegisterUiState) {
+        _registerUiState.update { update(it) }
+    }
+
+    private fun clearRegistrationForm() {
+        _registerUiState.update { state ->
+            state.copy(
+                email = "",
+                password = "",
+                fullName = "",
+                confirmPassword = "",
+                isRegisterEnabled = false,
+                isEmailAvailable = true,
+                screenState = ScreenState.Success("user"),
+            )
+        }
+    }
+
+
 }
 
 data class RegisterUiState(
@@ -179,5 +191,7 @@ data class RegisterUiState(
     val isEmailValid: Boolean = true,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val passwordConfirmError: String? = null
+    val passwordConfirmError: String? = null,
+    val shouldNavigateToCatalog: Boolean = false,
+    val isEmailAvailable: Boolean = true,
 )

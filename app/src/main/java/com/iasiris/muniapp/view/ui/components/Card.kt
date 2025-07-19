@@ -348,7 +348,7 @@ fun CartWithImageOnTheTop(
                 horizontalArrangement = Arrangement.End
             ) {
                 AddToButton(
-                    onClick = { onClick(product.id) } //TODO change this to add to cart
+                    onClick = { onClick(product.id) }
                 )
             }
         }
@@ -374,7 +374,6 @@ fun CardWithImageInTheLeftWithButtons(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            //TODO agregar imagen por default mientras cargan las imagenes reales
             AsyncImage(
                 model = cartItem.product.imageUrl,
                 contentDescription = stringResource(id = R.string.product_image),

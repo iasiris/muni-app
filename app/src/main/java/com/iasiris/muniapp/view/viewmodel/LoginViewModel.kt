@@ -3,13 +3,11 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import coil3.network.HttpException
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.usecase.user.LoginUserUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -60,7 +58,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onLogin(navController: NavController) {
+    fun onLogin() {
         viewModelScope.launch {
             _loginUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
@@ -69,13 +67,18 @@ class LoginViewModel @Inject constructor(
                 } ?: throw IllegalArgumentException("Email o contraseña incorrectos")
 
                 userPreferences.setUserId(userId)
-                _loginUiState.update { state ->
-                    state.copy(
-                        screenState = ScreenState.Success(userId)
+                _loginUiState.update {
+                    it.copy(
+                        email = "",
+                        password = "",
+                        isLoginEnabled = false,
+                        passwordHidden = true,
+                        emailError = null,
+                        passwordError = null,
+                        isValidLogin = true,
+                        screenState = ScreenState.Success(userId),
+                        shouldNavigateToCatalog = true
                     )
-                }
-                navController.navigate(PRODUCT_CATALOG) {
-                    popUpTo(PRODUCT_CATALOG) { inclusive = true }
                 }
             } catch (e: Exception) {
                 val errorMessage = when (e) {
@@ -104,6 +107,12 @@ class LoginViewModel @Inject constructor(
             state.copy(passwordHidden = !state.passwordHidden)
         }
     }
+
+    fun resetNavigationFlag() {
+        _loginUiState.update { state ->
+            state.copy(shouldNavigateToCatalog = false)
+        }
+    }
 }
 
 data class LoginUiState(
@@ -114,5 +123,6 @@ data class LoginUiState(
     val passwordHidden: Boolean = true,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val isValidLogin: Boolean = true
+    val isValidLogin: Boolean = true,
+    val shouldNavigateToCatalog: Boolean = false
 )

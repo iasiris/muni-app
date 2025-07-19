@@ -10,17 +10,20 @@ import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
+import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemsUseCase
+import com.iasiris.muniapp.domain.usecase.orderhistory.DeleteOrderHistoryUseCase
 import com.iasiris.muniapp.domain.usecase.user.GetUserByIdUseCase
 import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
 import com.iasiris.muniapp.domain.usecase.user.UpdateUserUseCase
 import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isNewPasswordValid
+import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,7 +36,9 @@ class ProfileViewModel @Inject constructor(
     private val getUserByIdUseCase: GetUserByIdUseCase,
     private val isEmailAvailableUseCase: IsEmailAvailableUseCase,
     private val updateUserUseCase: UpdateUserUseCase,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val deleteCartItemsUseCase: DeleteCartItemsUseCase,
+    private val deleteOrderHistoryUseCase: DeleteOrderHistoryUseCase
 ) : AndroidViewModel(myApplication) {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -43,23 +48,20 @@ class ProfileViewModel @Inject constructor(
         getUser()
     }
 
-    fun enableSave() {//TODO this can be improved
-        _profileUiState.update { state ->
-            state.copy(
-                isSaveEnabled = true
-            )
-        }
+    fun enableSave() {
+        _profileUiState.update { it.copy(isSaveEnabled = true) }
     }
 
     fun onFieldChange(field: ProfileField, value: String) {
-        _profileUiState.update { state ->
+        _profileUiState.update {
             when (field) {
-                ProfileField.FullName -> state.copy(
-                    user = state.user.copy(fullName = value), isSaveEnabled = true
+                ProfileField.FullName -> it.copy(
+                    user = it.user.copy(fullName = value),
+                    isSaveEnabled = true
                 )
 
-                ProfileField.Nationality -> state.copy(
-                    user = state.user.copy(
+                ProfileField.Nationality -> it.copy(
+                    user = it.user.copy(
                         nationality = value
                     ), isSaveEnabled = true
                 )
@@ -67,131 +69,144 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun onEmailChange(email: String) {
-        _profileUiState.update { state ->
-            state.copy(
-                user = state.user.copy(
-                    email = email,
-                    //isEmailValid = true TODO check this
-                )
+    fun onEmailChange(newEmail: String) {
+        _profileUiState.update {
+            it.copy(
+                user = it.user.copy(email = newEmail),
             )
         }
         verifyFieldChange("email")
     }
 
     fun onPasswordChange(newPassword: String) {
-        _profileUiState.update { state ->
-            state.copy(
-                user = state.user.copy(password = newPassword), newPassword = newPassword
+        _profileUiState.update {
+            it.copy(
+                user = it.user.copy(password = newPassword)
             )
         }
         verifyFieldChange("password")
     }
 
     fun onPasswordIconClick() {
-        _profileUiState.update { state ->
-            state.copy(passwordHidden = !state.passwordHidden)
-        }
+        _profileUiState.update { it.copy(passwordHidden = !it.passwordHidden) }
     }
 
-    private suspend fun uploadImage(uri: Uri) {
-        withContext(Dispatchers.IO) {
-            try {
-                val inputSteam = getApplication<Application>().contentResolver.openInputStream(uri)
-                val uploadResult = cloudinary.uploader().upload(
-                    inputSteam, mapOf("upload_preset" to BuildConfig.CLOUDINARY_UPLOAD_PRESET)
-                )
-                val imageUrl = uploadResult["secure_url"] as String
-                _profileUiState.update { state ->
-                    state.copy(
-                        user = state.user.copy(userImageUrl = imageUrl), isSaveEnabled = true
+    fun uploadImage(uri: Uri) {
+        viewModelScope.launch {
+            _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
+            withContext(Dispatchers.IO) {
+                try {
+                    val inputSteam =
+                        getApplication<Application>().contentResolver.openInputStream(uri)
+                    val uploadResult = cloudinary.uploader().upload(
+                        inputSteam, mapOf("upload_preset" to BuildConfig.CLOUDINARY_UPLOAD_PRESET)
                     )
+                    val imageUrl = uploadResult["secure_url"] as String
+                    _profileUiState.update { state ->
+                        state.copy(
+                            user = state.user.copy(userImageUrl = imageUrl),
+                            isSaveEnabled = true,
+                            screenState = ScreenState.Success("")
+                        )
+                    }
+                } catch (e: Exception) {
+                    handleException(e)
                 }
-            } catch (e: Exception) {
-                Log.e("Cloudinary", "Error uploading image: ${e.message}")
             }
         }
     }
 
-    fun onSaveChanges(imageUri: Uri?) {
+    fun onSaveChanges() {
         viewModelScope.launch() {
             _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                //todo CHECK IF EMAIL HAS CHANGED AND THEN CHECK IF IT IS AVAILABLE
-                /*val isEmailAvailable = withContext(Dispatchers.IO) {
-                    isEmailAvailableUseCase.invoke(newUser.email)
+                val isNewEmail =
+                    _profileUiState.value.user.email != _profileUiState.value.originalEmail
+                if (isNewEmail) {
+                    val isEmailAvailable = withContext(Dispatchers.IO) {
+                        isEmailAvailableUseCase.invoke(_profileUiState.value.user.email)
+                    }
+                    if (!isEmailAvailable) {
+                        throw IllegalArgumentException("El email ya está en uso")
+                    }
+                    _profileUiState.update {
+                        it.copy(
+                            user = it.user.copy(email = it.user.email),
+                            isSaveEnabled = true,
+                            isEmailAvailable = true,
+                            originalEmail = "${it.user.email}"
+                        )
+                    }
                 }
-                if (!isEmailAvailable) {
-                    throw IllegalArgumentException("El email ya está en uso")
-                }*/
-
-                imageUri?.let { uploadImage(imageUri) }
-
                 withContext(Dispatchers.IO) {
                     updateUserUseCase.invoke(_profileUiState.value.user)
                 }
-
-                _profileUiState.update { state ->
-                    state.copy(
-                        user = _profileUiState.value.user,
+                _profileUiState.update {
+                    it.copy(
+                        user = it.user,
                         newPassword = "",
                         isSaveEnabled = false,
-                        screenState = ScreenState.Success(true) //TODO check this kind of data
+                        screenState = ScreenState.Success(""),
+                        showSuccessSnackbar = true,
                     )
                 }
-            } catch (e: IOException) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
-            } catch (e: HttpException) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
+            } catch (e: IllegalArgumentException) {
+                _profileUiState.update {
+                    it.copy(
+                        screenState = ScreenState.Success(
+                            e.message ?: "Error de guardado de cambios"
+                        ),
+                        isEmailAvailable = false
+                    )
+                }
+                Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
             } catch (e: Exception) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
+                handleException(e)
             }
         }
     }
 
-    fun onLogout(){
-        viewModelScope.launch {
-            userPreferences.clearUserId()
-            Log.d("com.iasiris.muniapp", "Usuario borrado de preferencias")
-            _profileUiState.update { it.copy(screenState = ScreenState.Success(true)) }
+    fun onLogout() {
+        viewModelScope.launch() {
+            _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
+            try {
+                withContext(Dispatchers.IO) {
+                    deleteCartItemsUseCase
+                    deleteOrderHistoryUseCase
+                }
+                _profileUiState.update { state ->
+                    state.copy(
+                        screenState = ScreenState.Success(""),
+                        shouldNavigateToLogin = true
+                    )
+                }
+            } catch (e: Exception) {
+                handleException(e)
+            }
         }
     }
 
     private fun getUser() {
-        viewModelScope.launch { //let para ejecutar el bloque solo si el usuario no es nulo
+        viewModelScope.launch {
             _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val user = withContext(Dispatchers.IO) {
-                    getUserByIdUseCase.invoke("6877c6aa588db6407f587ac6")//userPreferences.userIdFlow.first()!!)
-                }
-                if (user == null) {
-                    throw IllegalArgumentException("Usuario no encontrado")
-                }
-                _profileUiState.update { state ->
-                    state.copy(
-                        user = user, screenState = ScreenState.Success(true)
-                    )
-                }
+                val userId = userPreferences.userIdFlow.first()
+                    ?: throw NoSuchElementException("El usuario no esta loggeado")
 
-            } catch (e: IllegalArgumentException) {//Usuario no encontrado en DB
+                val user = withContext(Dispatchers.IO) {
+                    getUserByIdUseCase.invoke(userId)
+                } ?: throw NoSuchElementException("Usuario no encontrado")
+
                 _profileUiState.update {
                     it.copy(
-                        screenState = ScreenState.Error(e.message ?: "Usuario no encontrado")
+                        user = user,
+                        originalEmail = user.email,
+                        originalPassword = user.password,
+                        screenState = ScreenState.Success("")
                     )
                 }
-                Log.e("com.iasiris.muniapp", "Usuario no encontrado: ${e.message}")
-            } catch (e: IOException) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Sin conexión a internet")) }
-                Log.e("com.iasiris.muniapp", "Error de red: ${e.message}")
-            } catch (e: HttpException) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Error de servidor")) }
-                Log.e("com.iasiris.muniapp", "Error HTTP: ${e.message}")
             } catch (e: Exception) {
-                _profileUiState.update { it.copy(screenState = ScreenState.Error("Ocurrió un error inesperado")) }
-                Log.e("com.iasiris.muniapp", "Error inesperado: ${e.message}")
+                handleException(e)
             }
         }
     }
@@ -206,37 +221,58 @@ class ProfileViewModel @Inject constructor(
                     emailError = if (!isEmailValid && email.isNotEmpty()) "Email inválido" else null
                 )
             }
+        } else if (field == "password") {
+            val password = _profileUiState.value.user.password
+            val originalPassword = _profileUiState.value.originalPassword
+            val isPasswordValid = isPasswordValid(password)
+            val isPasswordChanged = password != originalPassword
 
-        } else if (field == "newPassword") {
-            val newPassword = _profileUiState.value.newPassword
-            val isNewPasswordValid =
-                isNewPasswordValid(_profileUiState.value.user.password, newPassword)
-            _profileUiState.update { state ->
-                if (isNewPasswordValid) {
-                    state.copy(
-                        user = state.user.copy(password = newPassword), isSaveEnabled = true
-                    )
-                } else {
-                    state.copy(
-                        isSaveEnabled = false,
-                        passwordError = if (newPassword.isNotEmpty()) "Contraseña tiene que tener al menos 8 caracteres" else null
-                    )
-                }
+            val isSaveEnabled = isPasswordValid && isPasswordChanged
+
+            val passwordError = when {
+                !isPasswordValid && isPasswordChanged -> "Contraseña tiene que tener al menos 8 caracteres"
+                else -> null
+            }
+
+            _profileUiState.update {
+                it.copy(
+                    isSaveEnabled = isSaveEnabled,
+                    passwordError = passwordError
+                )
             }
         }
+    }
+
+    fun clearFlag(update: (ProfileUiState) -> ProfileUiState) {
+        _profileUiState.update { update(it) }
+    }
+
+    private fun handleException(e: Exception) {
+        val errorMessage = when (e) {
+            is NoSuchElementException -> e.message ?: "Error de carga"
+            is IOException -> "Sin conexión a internet"
+            is HttpException -> "Error de servidor"
+            else -> "Ocurrió un error inesperado"
+        }
+        _profileUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+        Log.e("com.iasiris.muniapp", "Error: ${e.message}")
     }
 }
 
 data class ProfileUiState(
-    val screenState: ScreenState<Boolean> = ScreenState.Loading,
+    val screenState: ScreenState<String> = ScreenState.Loading,
     val user: User = User("", "", "", "", ""),
+    val originalEmail: String = "",
+    val originalPassword: String = "",
     val newPassword: String = "",
     val isSaveEnabled: Boolean = false,
     val passwordHidden: Boolean = true,
     val isEmailValid: Boolean = true,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val isValidLogin: Boolean = true
+    val isEmailAvailable: Boolean = true,
+    val showSuccessSnackbar: Boolean = false,
+    val shouldNavigateToLogin: Boolean = false
 )
 
 enum class ProfileField {

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,9 +60,7 @@ import com.iasiris.muniapp.view.ui.components.CustomOutlinedTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.components.SubheadText
-import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
-import com.iasiris.muniapp.view.ui.navigation.Routes.PRODUCT_CATALOG
 import com.iasiris.muniapp.view.viewmodel.ProfileField
 import com.iasiris.muniapp.view.viewmodel.ProfileViewModel
 
@@ -67,8 +69,6 @@ fun ProfileScreen(
     navController: NavController,
     profileViewModel: ProfileViewModel
 ) {
-    //TODO agregar pre visualuzacion antes de guardar los cambios
-    //TODO agregar Logout button
     LaunchedEffect(Unit) {
         profileViewModel.init()
     }
@@ -82,10 +82,32 @@ fun ProfileScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         imageUri = uri
+        uri?.let {
+            profileViewModel.uploadImage(it)
+        }
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val invalidEmail = stringResource(id = R.string.invalid_email)
+    val userSaved = stringResource(id = R.string.user_saved_successfully)
+
+    LaunchedEffect(profileUiState.isEmailAvailable) {
+        if (!profileUiState.isEmailAvailable) {
+            snackbarHostState.showSnackbar(invalidEmail)
+            profileViewModel.clearFlag { it.copy(isEmailAvailable = true) }
+        }
+    }
+
+    LaunchedEffect(profileUiState.showSuccessSnackbar) {
+        if (profileUiState.showSuccessSnackbar) {
+            snackbarHostState.showSnackbar(userSaved)
+            profileViewModel.clearFlag { it.copy(showSuccessSnackbar = false) }
+        }
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) {
         when (state) {
             is ScreenState.Loading -> {
@@ -172,6 +194,8 @@ fun ProfileScreen(
                         text = profileUiState.user.email,
                         onValueChange = profileViewModel::onEmailChange,
                         leadingIcon = Icons.Default.Email,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        errorMessage = profileUiState.emailError
                     )
 
                     CustomOutlinedTextFieldPassword(
@@ -181,6 +205,7 @@ fun ProfileScreen(
                         leadingIcon = Icons.Default.Password,
                         passwordHidden = profileUiState.passwordHidden,
                         onVisibilityToggle = { profileViewModel.onPasswordIconClick() },
+                        errorMessage = profileUiState.passwordError
                     )
 
                     CustomOutlinedTextField(
@@ -218,7 +243,7 @@ fun ProfileScreen(
                     ) {
                         PrimaryButton(
                             label = stringResource(id = R.string.save_changes),
-                            onClick = { profileViewModel.onSaveChanges(imageUri) },
+                            onClick = profileViewModel::onSaveChanges,
                             enabled = profileUiState.isSaveEnabled
                         )
 
@@ -230,10 +255,7 @@ fun ProfileScreen(
                             label = stringResource(id = R.string.logout),
                             onClick = {
                                 profileViewModel.onLogout()
-                                navController.popBackStack() // Navigate back to login screen
-                                navController.navigate(PRODUCT_CATALOG) {
-                                    popUpTo(0) { inclusive = true } // TODO CHECK THIS  -> Limpia todo el back stack
-                                }
+
                             }
                         )
                     }
@@ -244,8 +266,7 @@ fun ProfileScreen(
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {//TODO A SNACKBAR PARA EMAIL NOT VALID
-                    //TODO diferenciar entre error de getUser y error de updateUser
+                ) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {

@@ -25,7 +25,7 @@ class OrderHistoryRepositoryImpl @Inject constructor(
         userId: String,
         refreshData: Boolean
     ): List<Order> {
-        return if (refreshData) {//TODO workmanager para refrescar datos
+        return if (refreshData) {
             getAndSaveInRemoteAndLocal(userId)
         } else {
             val localOrderHistory = local.getOrderHistory()
@@ -63,7 +63,6 @@ class OrderHistoryRepositoryImpl @Inject constructor(
         return remoteOrderHistory.map { it.orderDtoToDomain() }
     }
 
-    //TODO el calculo del monto total no es correcto
     override suspend fun insertOrder(
         userId: String,
         cartItems: List<CartItem>

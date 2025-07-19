@@ -137,7 +137,7 @@ fun CartScreen(
 
                         Spacer(modifier = Modifier.height(paddingMedium))
 
-                        PrimaryButton(//TODO CHECK THIS PATH
+                        PrimaryButton(
                             label = stringResource(id = R.string.checkout),
                             onClick = { orderHistoryViewModel.addOrder(cartUiState.cartItems) }
                         )

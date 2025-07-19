@@ -3,7 +3,6 @@ package com.iasiris.muniapp.view.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import coil3.network.HttpException
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Product
 import com.iasiris.muniapp.domain.usecase.cartitem.AddCartItemUseCase
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -132,7 +130,7 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun getCartItems() {
+    private fun getCartItems() {//TODO check que haya persistencia de los items en el carrito al cerrar y abrir la app de nuevo
         viewModelScope.launch {
             try {
                 val allCartItems = withContext(Dispatchers.IO) { getCartItemsUseCase.invoke() }

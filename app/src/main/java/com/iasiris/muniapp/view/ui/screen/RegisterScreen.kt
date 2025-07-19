@@ -43,7 +43,6 @@ import com.iasiris.muniapp.view.viewmodel.RegisterViewModel
 fun RegisterScreen(
     navController: NavController, registerViewModel: RegisterViewModel
 ) {
-
     val registerUiState by registerViewModel.registerUiState.collectAsStateWithLifecycle()
     val state = registerUiState.screenState
     val snackbarHostState = remember { SnackbarHostState() }
@@ -53,6 +52,7 @@ fun RegisterScreen(
         if (!registerUiState.isEmailValid) {
             snackbarHostState.showSnackbar(invalidEmail)
         }
+        registerViewModel.clearFlag { it.copy(isEmailAvailable = true) }
     }
 
     Scaffold(
@@ -132,7 +132,7 @@ fun RegisterScreen(
 
                             PrimaryButton(
                                 label = stringResource(id = R.string.sing_in),
-                                onClick = { registerViewModel.onRegister(navController) },
+                                onClick = { registerViewModel.onRegister() },
                                 enabled = registerUiState.isRegisterEnabled
                             )
                         }
@@ -154,7 +154,7 @@ fun RegisterScreen(
                             fontWeight = FontWeight.Bold
                         )
                         PrimaryButton(
-                            onClick = { registerViewModel.onRegister(navController) },
+                            onClick = { registerViewModel.onRegister() },
                             label = "${stringResource(id = R.string.retry)}",
                         )
                     }

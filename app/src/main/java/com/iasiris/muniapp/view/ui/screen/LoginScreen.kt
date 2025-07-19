@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -100,7 +101,8 @@ fun LoginScreen(
                                 value = loginUiState.email,
                                 onValueChange = loginViewModel::onEmailChange,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                                errorMessage = loginUiState.emailError
+                                errorMessage = loginUiState.emailError,
+                                modifier = Modifier.testTag("emailField")
                             )
 
                             Spacer(modifier = Modifier.height(paddingMedium))
@@ -111,7 +113,8 @@ fun LoginScreen(
                                 onValueChange = loginViewModel::onPasswordChange,
                                 passwordHidden = loginUiState.passwordHidden,
                                 onVisibilityToggle = loginViewModel::onPasswordIconClick,
-                                errorMessage = loginUiState.passwordError
+                                errorMessage = loginUiState.passwordError,
+                                modifier = Modifier.testTag("passwordField")
                             )
 
                             Spacer(modifier = Modifier.height(paddingMedium))
@@ -120,8 +123,9 @@ fun LoginScreen(
 
                             PrimaryButton(
                                 label = stringResource(id = R.string.login),
-                                onClick = { loginViewModel.onLogin(navController) },
-                                enabled = loginUiState.isLoginEnabled
+                                onClick = { loginViewModel.onLogin() },
+                                enabled = loginUiState.isLoginEnabled,
+                                modifier = Modifier.testTag("loginButton")
                             )
                         }
                     }
@@ -139,7 +143,9 @@ fun LoginScreen(
 
                         TextButton(
                             onClick = { navController.navigate(REGISTER) },
-                            modifier = Modifier.wrapContentSize()
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .testTag("signUpButton")
                         ) {
                             CaptionText(
                                 text = stringResource(id = R.string.sing_up_here),
@@ -165,7 +171,7 @@ fun LoginScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             PrimaryButton(
-                                onClick = { loginViewModel.onLogin(navController) },
+                                onClick = { loginViewModel.onLogin() },
                                 label = "${stringResource(id = R.string.retry)}",
                             )
                         }
