@@ -14,14 +14,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +38,7 @@ import com.iasiris.muniapp.view.ui.components.CustomTextFieldPassword
 import com.iasiris.muniapp.view.ui.components.PrimaryButton
 import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.components.SubheadText
+import com.iasiris.muniapp.view.ui.components.rememberToastController
 import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.viewmodel.LoginViewModel
 
@@ -52,132 +49,127 @@ fun LoginScreen(
 ) {
     val loginUiState by loginViewModel.loginUiState.collectAsStateWithLifecycle()
     val state = loginUiState.screenState
-    val snackbarHostState = remember { SnackbarHostState() }
-    val invalidLogin = stringResource(id = R.string.invalid_login)
 
+    val toast = rememberToastController()
     LaunchedEffect(loginUiState.isValidLogin) {
         if (!loginUiState.isValidLogin) {
-            snackbarHostState.showSnackbar(invalidLogin)
+            toast.show(
+                messageRes = R.string.invalid_login
+            )
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) {
-        when (state) {
-            is ScreenState.Loading -> {
-                SimpleCircularProgressIndicator()
-            }
+    when (state) {
+        is ScreenState.Loading -> {
+            SimpleCircularProgressIndicator()
+        }
 
-            is ScreenState.Success -> {
-                Column(
+        is ScreenState.Success -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Card(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(horizontal = paddingLarge, vertical = paddingLarge),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(paddingLarge),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.muni_icon),
-                                contentDescription = stringResource(id = R.string.shopping_bag),
-                            )
-
-                            Spacer(modifier = Modifier.height(paddingMedium))
-
-                            CustomTextField(
-                                label = stringResource(id = R.string.email),
-                                value = loginUiState.email,
-                                onValueChange = loginViewModel::onEmailChange,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                                errorMessage = loginUiState.emailError,
-                                modifier = Modifier.testTag("emailField")
-                            )
-
-                            Spacer(modifier = Modifier.height(paddingMedium))
-
-                            CustomTextFieldPassword(
-                                label = stringResource(id = R.string.password),
-                                value = loginUiState.password,
-                                onValueChange = loginViewModel::onPasswordChange,
-                                passwordHidden = loginUiState.passwordHidden,
-                                onVisibilityToggle = loginViewModel::onPasswordIconClick,
-                                errorMessage = loginUiState.passwordError,
-                                modifier = Modifier.testTag("passwordField")
-                            )
-
-                            Spacer(modifier = Modifier.height(paddingMedium))
-
-                            Spacer(modifier = Modifier.height(paddingLarge))
-
-                            PrimaryButton(
-                                label = stringResource(id = R.string.login),
-                                onClick = { loginViewModel.onLogin() },
-                                enabled = loginUiState.isLoginEnabled,
-                                modifier = Modifier.testTag("loginButton")
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(paddingLarge))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CaptionText(
-                            text = stringResource(id = R.string.do_not_have_account)
-                        )
-
-                        TextButton(
-                            onClick = { navController.navigate(REGISTER) },
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .testTag("signUpButton")
-                        ) {
-                            CaptionText(
-                                text = stringResource(id = R.string.sing_up_here),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-
-            is ScreenState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                        .padding(horizontal = paddingLarge, vertical = paddingLarge),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier
+                            .padding(paddingLarge),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        if (loginUiState.isValidLogin) {//si error de red o servidor
-                            SubheadText(
-                                text = state.message,
-                                textAlign = TextAlign.Center,
-                                fontWeight = FontWeight.Bold
-                            )
-                            PrimaryButton(
-                                onClick = { loginViewModel.onLogin() },
-                                label = "${stringResource(id = R.string.retry)}",
-                            )
-                        }
+                        Image(
+                            painter = painterResource(id = R.drawable.muni_icon),
+                            contentDescription = stringResource(id = R.string.shopping_bag),
+                        )
+
+                        Spacer(modifier = Modifier.height(paddingMedium))
+
+                        CustomTextField(
+                            label = stringResource(id = R.string.email),
+                            value = loginUiState.email,
+                            onValueChange = loginViewModel::onEmailChange,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            errorMessage = loginUiState.emailError,
+                            modifier = Modifier.testTag("emailField")
+                        )
+
+                        Spacer(modifier = Modifier.height(paddingMedium))
+
+                        CustomTextFieldPassword(
+                            label = stringResource(id = R.string.password),
+                            value = loginUiState.password,
+                            onValueChange = loginViewModel::onPasswordChange,
+                            passwordHidden = loginUiState.passwordHidden,
+                            onVisibilityToggle = loginViewModel::onPasswordIconClick,
+                            errorMessage = loginUiState.passwordError,
+                            modifier = Modifier.testTag("passwordField")
+                        )
+
+                        Spacer(modifier = Modifier.height(paddingMedium))
+
+                        Spacer(modifier = Modifier.height(paddingLarge))
+
+                        PrimaryButton(
+                            label = stringResource(id = R.string.login),
+                            onClick = { loginViewModel.onLogin() },
+                            enabled = loginUiState.isLoginEnabled,
+                            modifier = Modifier.testTag("loginButton")
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(paddingLarge))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CaptionText(
+                        text = stringResource(id = R.string.do_not_have_account)
+                    )
+
+                    TextButton(
+                        onClick = { navController.navigate(REGISTER) },
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .testTag("signUpButton")
+                    ) {
+                        CaptionText(
+                            text = stringResource(id = R.string.sing_up_here),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        is ScreenState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (loginUiState.isValidLogin) {//si error de red o servidor
+                        SubheadText(
+                            text = state.message,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                        PrimaryButton(
+                            onClick = { loginViewModel.onLogin() },
+                            label = "${stringResource(id = R.string.retry)}",
+                        )
                     }
                 }
             }
         }
     }
+
 }

@@ -48,6 +48,11 @@
     <string name="logout">Cerrar sesión</string>
     <string name="max_cart_items">Máximo número de items para un producto</string>
     <string name="user_saved_successfully">"Usuario guardado con exito"</string>
+    <string name="gallery">Galeria</string>
+    <string name="camera">Camara</string>
+    <string name="select_image">Seleccionar imagen</string>
+    <string name="camera_error">No se pudo generar la imagen</string>
+    <string name="permission_required">Permisos son requeridos</string>
 
     <!-- Descripcion de Imagenes y Contenido-->
     <string name="shopping_bag">Bolsas de compra</string>

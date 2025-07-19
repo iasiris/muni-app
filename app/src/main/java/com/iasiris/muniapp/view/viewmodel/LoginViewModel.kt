@@ -80,14 +80,6 @@ class LoginViewModel @Inject constructor(
                         shouldNavigateToCatalog = true
                     )
                 }
-            } catch (e: Exception) {
-                val errorMessage = when (e) {
-                    is IOException -> "Sin conexión a internet"
-                    is HttpException -> "Error de servidor"
-                    else -> "Ocurrió un error inesperado"
-                }
-                _loginUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
-                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             } catch (e: IllegalArgumentException) {
                 _loginUiState.update {
                     it.copy(
@@ -98,6 +90,14 @@ class LoginViewModel @Inject constructor(
                     )
                 }
                 Log.e("com.iasiris.muniapp", "Error de autenticación: ${e.message}")
+            } catch (e: Exception) {
+                val errorMessage = when (e) {
+                    is IOException -> "Sin conexión a internet"
+                    is HttpException -> "Error de servidor"
+                    else -> "Ocurrió un error inesperado"
+                }
+                _loginUiState.update { it.copy(screenState = ScreenState.Error(errorMessage)) }
+                Log.e("com.iasiris.muniapp", "Error: ${e.message}")
             }
         }
     }

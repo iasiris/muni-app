@@ -147,7 +147,7 @@ class ProfileViewModel @Inject constructor(
                         newPassword = "",
                         isSaveEnabled = false,
                         screenState = ScreenState.Success(""),
-                        showSuccessSnackbar = true,
+                        showSuccessToast = true,
                     )
                 }
             } catch (e: IllegalArgumentException) {
@@ -271,7 +271,7 @@ data class ProfileUiState(
     val emailError: String? = null,
     val passwordError: String? = null,
     val isEmailAvailable: Boolean = true,
-    val showSuccessSnackbar: Boolean = false,
+    val showSuccessToast: Boolean = false,
     val shouldNavigateToLogin: Boolean = false
 )
 
