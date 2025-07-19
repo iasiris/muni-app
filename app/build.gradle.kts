@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.androidx.navigation.testing.android)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.room.external.antlr)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     //navigation component
@@ -146,7 +147,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.junit)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

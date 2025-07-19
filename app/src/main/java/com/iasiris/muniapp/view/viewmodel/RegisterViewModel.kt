@@ -122,7 +122,6 @@ class RegisterViewModel @Inject constructor(
                             shouldNavigateToCatalog = true
                         )
                     }
-                    Log.d("uistate", "uistate: ${_registerUiState.value}")
                 } catch (e: IllegalArgumentException) {
                     _registerUiState.update {
                         it.copy(

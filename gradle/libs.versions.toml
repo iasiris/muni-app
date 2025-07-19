@@ -3,6 +3,7 @@ agp = "8.10.1"
 
 cloudinary = "2.5.0"
 datastorePreferences = "1.1.7"
+junit = "4.13.2"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junitVersion = "1.2.1"
@@ -38,9 +39,9 @@ junitJupiter = "5.8.1"
 
 hiltWork = "1.2.0"
 workRuntimeKtx = "2.10.2"
-
 ktlint = "13.0.0"
 detekt = "1.23.8"
+roomExternalAntlr = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,7 +56,6 @@ androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended"}
@@ -63,6 +63,7 @@ androidx-compose-material-icons-extended = { module = "androidx.compose.material
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 cloudinary = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinary" }
 
+junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
@@ -92,6 +93,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-navigation-testing-android = { group = "androidx.navigation", name = "navigation-testing-android", version.ref = "navigationTestingAndroid" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 androidx-hilt-work = { group = "androidx.hilt", name = "hilt-work", version.ref = "hiltWork" }
+androidx-room-external-antlr = { group = "androidx.room", name = "room-external-antlr", version.ref = "roomExternalAntlr" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
