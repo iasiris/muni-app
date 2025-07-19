@@ -1,5 +1,6 @@
 package com.iasiris.muniapp.data.repository
 
+import android.util.Log
 import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSource
 import com.iasiris.muniapp.data.local.entity.OrderEntity
 import com.iasiris.muniapp.data.local.entity.OrderItemEntity
@@ -47,11 +48,11 @@ class OrderHistoryRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getAndSaveInRemoteAndLocal(userId: String): List<Order> {
-        val remoteOrderHistory = remote.getOrderHistoryByUserId(userId)
-            ?: throw NoSuchElementException("No se encontraron ordenes de compra")
+        val remoteOrderHistory = remote.getOrderHistoryByUserId(userId).orEmpty()
+
+        if (remoteOrderHistory.isEmpty()) return emptyList()
 
         local.deleteOrderHistory()
-
         remoteOrderHistory.forEach {
             val orderEntity = it.orderDtoToEntity()
             val orderItemEntityList = it.products.map { orderItemDto ->

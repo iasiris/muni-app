@@ -17,7 +17,7 @@ import com.iasiris.muniapp.data.local.entity.ProductEntity
         OrderEntity::class,
         OrderItemEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

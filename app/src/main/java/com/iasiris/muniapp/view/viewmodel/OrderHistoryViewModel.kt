@@ -51,7 +51,6 @@ class OrderHistoryViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 val errorMessage = when (e) {
-                    is NoSuchElementException -> e.message ?: "No se encontraron ordenes de compra"
                     is IOException -> "Sin conexión a internet"
                     is HttpException -> "Error de servidor"
                     else -> "Ocurrió un error inesperado"
@@ -74,16 +73,15 @@ class OrderHistoryViewModel @Inject constructor(
                         cartItems
                     )
                 }
-                if (!order.id.isNullOrEmpty()) {
-                    _orderHistoryUiState.update { state ->
-                        state.copy(
-                            orderHistory = state.orderHistory + order,
-                            isOrderAdded = true,
-                            screenState = ScreenState.Success("")
-                        )
-                    }
-                    loadOrderHistory()
+                _orderHistoryUiState.update { state ->
+                    state.copy(
+                        orderHistory = state.orderHistory + order,
+                        isOrderAdded = true,
+                        screenState = ScreenState.Success("")
+                    )
                 }
+                loadOrderHistory()
+
             } catch (e: Exception) {
                 val errorMessage = when (e) {
                     is NoSuchElementException -> e.message ?: "Error de carga"

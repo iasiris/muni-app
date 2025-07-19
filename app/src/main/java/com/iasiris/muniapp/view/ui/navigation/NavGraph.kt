@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.iasiris.muniapp.data.local.UserPreferences
-import com.iasiris.muniapp.view.ui.components.SimpleCircularProgressIndicator
 import com.iasiris.muniapp.view.ui.navigation.Routes.CART
 import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.view.ui.navigation.Routes.ORDER_HISTORY
@@ -42,7 +41,6 @@ fun NavGraph(
     userPreferences: UserPreferences
 ) {
     val userIdFlow = userPreferences.userIdFlow.collectAsState(initial = null)
-    val userId = userIdFlow.value
     val isLoggedIn = userIdFlow.value != null
 
     val cartViewModel: CartViewModel = hiltViewModel()
@@ -52,37 +50,54 @@ fun NavGraph(
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val registerViewModel: RegisterViewModel = hiltViewModel()
 
-    if (userId == null) {
-        SimpleCircularProgressIndicator()
-    } else {
-        NavHost(
-            navController = navController,
-            startDestination = if (isLoggedIn) PRODUCT_CATALOG else LOGIN
-        ) {
-            composable(LOGIN) {
-                LoginScreen(navController, loginViewModel)
+
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) PRODUCT_CATALOG else LOGIN
+    ) {
+        composable(LOGIN) {
+            val uiState = loginViewModel.loginUiState.collectAsState()
+            LoginScreen(navController, loginViewModel)
+            if (uiState.value.shouldNavigateToCatalog) {
+                navController.navigate(PRODUCT_CATALOG) {
+                    popUpTo(0) { inclusive = true }
+                }
+                loginViewModel.resetNavigationFlag()
             }
-            composable(REGISTER) {
-                RegisterScreen(navController, registerViewModel)
+        }
+
+        composable(REGISTER) {
+            val uiState = registerViewModel.registerUiState.collectAsState()
+            RegisterScreen(navController, registerViewModel)
+            if (uiState.value.shouldNavigateToCatalog) {
+                navController.navigate(PRODUCT_CATALOG) {
+                    popUpTo(0) { inclusive = true }
+                }
+                registerViewModel.clearFlag { it.copy(shouldNavigateToCatalog = false) }
             }
-            composable(PRODUCT_CATALOG) {
-                ProductCatalogScreen(prodCatViewModel, cartViewModel)
+        }
+
+        composable(PRODUCT_CATALOG) {
+            ProductCatalogScreen(prodCatViewModel, cartViewModel)
+        }
+
+        composable(PROFILE) {
+            val uiState = profileViewModel.profileUiState.collectAsState()
+            ProfileScreen(navController, profileViewModel)
+            if (uiState.value.shouldNavigateToLogin) {
+                navController.navigate(LOGIN) {
+                    popUpTo(0) { inclusive = true }
+                }
+                profileViewModel.clearFlag { it.copy(shouldNavigateToLogin = false) }
             }
-            composable(PROFILE) {
-                ProfileScreen(navController, profileViewModel)
-            }
-            composable(CART) {
-                CartScreen(navController, cartViewModel, orderHistoryViewModel)
-            }
-            composable(ORDER_HISTORY) {
-                OrderHistoryScreen(navController, orderHistoryViewModel)
-            }
+        }
+
+        composable(CART) {
+            CartScreen(navController, cartViewModel, orderHistoryViewModel)
+        }
+
+        composable(ORDER_HISTORY) {
+            OrderHistoryScreen(navController, orderHistoryViewModel)
         }
     }
 }
-
-/*navigateToCatalog = { //EJEMPLO PARA BORRAR STACK DE NAVEGACION
-    navigationController.navigate(ProductCatalog) {
-        popUpTo(ProductCatalog) { inclusive = true}
-    }
-}*/
