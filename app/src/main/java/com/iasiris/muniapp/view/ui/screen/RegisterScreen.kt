@@ -47,7 +47,7 @@ fun RegisterScreen(
     LaunchedEffect(registerUiState.isEmailValid) {
         if (!registerUiState.isEmailValid) {
             toast.show(
-                messageRes = R.string.invalid_login,
+                messageRes = R.string.invalid_email,
                 onDismiss = { registerViewModel.clearFlag { it.copy(isEmailValid = true) } }
             )
         }

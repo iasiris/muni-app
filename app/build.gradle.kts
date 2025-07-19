@@ -99,6 +99,8 @@ dependencies {
     //hilt
     implementation(libs.hilt.core)
     implementation(libs.androidx.navigation.testing.android)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     //navigation component

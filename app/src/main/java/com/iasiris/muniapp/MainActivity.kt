@@ -20,6 +20,7 @@ import com.iasiris.muniapp.view.ui.navigation.NavGraph
 import com.iasiris.muniapp.view.ui.navigation.Routes.LOGIN
 import com.iasiris.muniapp.view.ui.navigation.Routes.REGISTER
 import com.iasiris.muniapp.view.ui.theme.MuniAppTheme
+import com.iasiris.muniapp.workmanager.ProductSyncManager
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 
@@ -27,8 +28,14 @@ import jakarta.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var userPreferences: UserPreferences
+    @Inject
+    lateinit var productSyncManager: ProductSyncManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        productSyncManager.schedulePeriodicSync()
+        productSyncManager.syncNow()
+
         enableEdgeToEdge()
         setContent {
             MuniAppTheme {

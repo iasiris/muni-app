@@ -5,9 +5,11 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Room
 import coil3.network.HttpException
 import com.cloudinary.Cloudinary
 import com.iasiris.muniapp.BuildConfig
+import com.iasiris.muniapp.data.local.AppDatabase
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.domain.usecase.cartitem.DeleteCartItemsUseCase
@@ -171,8 +173,18 @@ class ProfileViewModel @Inject constructor(
             _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
                 withContext(Dispatchers.IO) {
-                    deleteCartItemsUseCase
-                    deleteOrderHistoryUseCase
+                    // Elimina todos los registros de las tablas
+                    getApplication<Application>().let { app ->
+                        val db = Room.databaseBuilder(
+                            app, AppDatabase::class.java, "muniapp_database"
+                        ).build()
+                        db.cartItemDao().deleteCartItems()
+                        db.orderHistoryDao().deleteOrderHistory()
+                        db.orderHistoryDao().deleteOrderItems()
+                        db.close()
+                        app.deleteDatabase("muniapp_database")
+                        app.cacheDir.deleteRecursively()
+                    }
                 }
                 _profileUiState.update { state ->
                     state.copy(
