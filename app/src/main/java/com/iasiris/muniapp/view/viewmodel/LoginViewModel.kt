@@ -11,12 +11,10 @@ import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 @HiltViewModel
@@ -62,9 +60,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _loginUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val userId = withContext(Dispatchers.IO) {
+                val userId =
                     loginUserUseCase.invoke(_loginUiState.value.email, _loginUiState.value.password)
-                } ?: throw IllegalArgumentException("Email o contraseña incorrectos")
+                        ?: throw IllegalArgumentException("Email o contraseña incorrectos")
 
                 userPreferences.setUserId(userId)
                 _loginUiState.update {

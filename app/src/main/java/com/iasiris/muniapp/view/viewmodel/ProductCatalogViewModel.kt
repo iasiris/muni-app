@@ -9,12 +9,10 @@ import com.iasiris.muniapp.domain.usecase.product.GetProductsUseCase
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 @HiltViewModel
@@ -62,8 +60,7 @@ class ProductCatalogViewModel @Inject constructor(
         viewModelScope.launch {
             _prodCatUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val products =
-                    withContext(Dispatchers.IO) { getProductsUseCase.invoke(refreshData) }
+                val products = getProductsUseCase.invoke(refreshData)
                 val categories = products.map { it.category }
                     .distinct()
                     .sorted()

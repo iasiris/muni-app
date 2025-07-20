@@ -92,9 +92,6 @@ android {
         compose = true
         buildConfig = true
     }
-    tasks.withType<Test> {
-        useJUnitPlatform()
-    }
 }
 
 dependencies {
@@ -140,7 +137,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
-    testImplementation(libs.junit.jupiter)
+    //Unit test
+    testImplementation("io.mockk:mockk:1.14.5")
+
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)
