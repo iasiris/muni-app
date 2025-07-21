@@ -1,6 +1,5 @@
 package com.iasiris.muniapp.data.repository
 
-import android.util.Log
 import com.iasiris.muniapp.data.local.datasource.OrderHistoryLocalDataSource
 import com.iasiris.muniapp.data.local.entity.OrderEntity
 import com.iasiris.muniapp.data.local.entity.OrderItemEntity
@@ -14,12 +13,13 @@ import com.iasiris.muniapp.domain.mapper.orderToOrderDto
 import com.iasiris.muniapp.domain.model.CartItem
 import com.iasiris.muniapp.domain.model.Order
 import com.iasiris.muniapp.domain.repository.OrderHistoryRepository
-import com.iasiris.muniapp.utils.CommonUtils.Companion.returnDate
+import com.iasiris.muniapp.utils.CommonUtils
 import javax.inject.Inject
 
 class OrderHistoryRepositoryImpl @Inject constructor(
     private val remote: OrderHistoryRemoteDataSource,
-    private val local: OrderHistoryLocalDataSource
+    private val local: OrderHistoryLocalDataSource,
+    private val commonUtils: CommonUtils
 ) : OrderHistoryRepository {
 
     override suspend fun getOrderHistoryByUserId(
@@ -67,10 +67,11 @@ class OrderHistoryRepositoryImpl @Inject constructor(
     override suspend fun insertOrder(
         userId: String,
         cartItems: List<CartItem>
-    ): Order {//saves remote and local order
+    ): Order {
         val subTotal = cartItems.sumOf { it.product.price * it.quantity }
         val totalAmount = subTotal + (subTotal * 0.03)
-        val orderEntity = OrderEntity(totalAmount = totalAmount, orderDate = returnDate())
+        val orderEntity =
+            OrderEntity(totalAmount = totalAmount, orderDate = commonUtils.returnDate())
         val orderItemsEntity = cartItems.map {
             OrderItemEntity(
                 orderId = orderEntity.id.toString(),
@@ -87,8 +88,8 @@ class OrderHistoryRepositoryImpl @Inject constructor(
             orderItemsWithProductEntity.map { it.orderItemWithProductEntityToDomain() }
         )
 
-        val remoteOrder = remote.insertOrder(order.orderToOrderDto())
-        if (remoteOrder.isNullOrEmpty()) {
+        val remoteOrderId = remote.insertOrder(order.orderToOrderDto())
+        if (remoteOrderId.isNullOrEmpty()) {
             local.deleteOrderByOrderId(orderEntity.id)
             throw NoSuchElementException("No se pudo insertar la orden")
         }

@@ -12,13 +12,11 @@ import com.iasiris.muniapp.domain.usecase.orderhistory.GetOrdersByUserIdUseCase
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 @HiltViewModel
@@ -37,12 +35,11 @@ class OrderHistoryViewModel @Inject constructor(
             try {
                 val userId = userPreferences.userIdFlow.first()
                     ?: throw NoSuchElementException("El usuario no esta loggeado")
-                val orderHistory = withContext(Dispatchers.IO) {
-                    getOrdersByUserIdUseCase.invoke(
-                        userId,
-                        refreshData
-                    )
-                }
+                val orderHistory = getOrdersByUserIdUseCase.invoke(
+                    userId,
+                    refreshData
+                )
+
                 _orderHistoryUiState.update { state ->
                     state.copy(
                         orderHistory = orderHistory,
@@ -67,12 +64,8 @@ class OrderHistoryViewModel @Inject constructor(
             try {
                 val userId = userPreferences.userIdFlow.first()
                     ?: throw NoSuchElementException("El usuario no esta loggeado")
-                val order = withContext(Dispatchers.IO) {
-                    addOrderUseCase.invoke(
-                        userId,
-                        cartItems
-                    )
-                }
+                val order = addOrderUseCase.invoke(userId, cartItems)
+
                 _orderHistoryUiState.update { state ->
                     state.copy(
                         orderHistory = state.orderHistory + order,

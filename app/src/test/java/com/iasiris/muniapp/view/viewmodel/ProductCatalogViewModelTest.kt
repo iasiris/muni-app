@@ -32,7 +32,6 @@ class ProductCatalogViewModelTest {
     fun getProdCatUiState() = runTest {
         coEvery { getProductsUseCase.invoke(any()) } returns emptyList()
 
-        val viewModel = ProductCatalogViewModel(getProductsUseCase)
         viewModel.loadProducts(true)
         advanceUntilIdle()
         val state = viewModel.prodCatUiState.value
@@ -52,7 +51,6 @@ class ProductCatalogViewModelTest {
         )
         coEvery { getProductsUseCase.invoke(any()) } returns products
 
-        val viewModel = ProductCatalogViewModel(getProductsUseCase)
         viewModel.loadProducts(true)
         advanceUntilIdle()
 
@@ -63,7 +61,6 @@ class ProductCatalogViewModelTest {
         assertTrue(state.products.all { it.category == "Electronics" })
     }
 
-
     @Test
     fun onSearchTextChangeFiltersProductsByName() = runTest {
         val products = listOf(
@@ -73,7 +70,6 @@ class ProductCatalogViewModelTest {
         )
         coEvery { getProductsUseCase.invoke(any()) } returns products
 
-        val viewModel = ProductCatalogViewModel(getProductsUseCase)
         viewModel.loadProducts(true)
         advanceUntilIdle()
 
@@ -92,7 +88,7 @@ class ProductCatalogViewModelTest {
         )
         coEvery { getProductsUseCase.invoke(any()) } returns products
 
-        val viewModel = ProductCatalogViewModel(getProductsUseCase)
+
         viewModel.loadProducts(true)
         advanceUntilIdle()
 
@@ -116,7 +112,6 @@ class ProductCatalogViewModelTest {
             mockProduct(id = "prod2")
         )
 
-        val viewModel = ProductCatalogViewModel(getProductsUseCase)
         viewModel.loadProducts(true)
         advanceUntilIdle()
         val state = viewModel.prodCatUiState.value

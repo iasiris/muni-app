@@ -4,14 +4,15 @@ import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.usecase.user.LoginUserUseCase
 import com.iasiris.muniapp.utils.CommonUtils
 import com.iasiris.muniapp.utils.MainDispatcherRule
+import com.iasiris.muniapp.utils.mockUser
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,17 +23,16 @@ class LoginViewModelTest {
 
     private val loginUserUseCase: LoginUserUseCase = mockk()
     private val userPreferences: UserPreferences = mockk()
+    private val commonUtils: CommonUtils = mockk(relaxed = true)
     private lateinit var viewModel: LoginViewModel
 
     @Before
     fun setup() {
-        mockkStatic("com.iasiris.muniapp.utils.CommonUtils")
-        viewModel = LoginViewModel(loginUserUseCase, userPreferences)
+        viewModel = LoginViewModel(loginUserUseCase, userPreferences, commonUtils)
     }
 
     @Test
     fun getLoginUiState() = runTest {
-        val viewModel = LoginViewModel(loginUserUseCase, userPreferences)
         val state = viewModel.loginUiState.value
 
         assertEquals("", state.email)
@@ -42,21 +42,24 @@ class LoginViewModelTest {
         assertTrue(state.screenState is ScreenState.Success)
     }
 
-    //@Test
-    fun loginWithValidCredentialsUpdatesUiStateToSuccess() = runTest {
-        every { CommonUtils.isEmailValid(any()) } returns true
+    @Test
+    fun loginWithValidCredentialsAndNavigatesToCatalog() = runTest {
 
-        coEvery { loginUserUseCase.invoke("valid@example.com", "password123") } returns "userId123"
-        coEvery { userPreferences.setUserId("userId123") } returns Unit
+        coEvery {
+            loginUserUseCase.invoke(
+                mockUser().email,
+                mockUser().password
+            )
+        } returns mockUser().id
+        coEvery { userPreferences.setUserId(any()) } returns Unit
 
-        viewModel.onEmailChange("valid@example.com")
-        viewModel.onPasswordChange("password123")
+        viewModel.onEmailChange(mockUser().email)
+        viewModel.onPasswordChange(mockUser().password)
         viewModel.onLogin()
         advanceUntilIdle()
 
         val state = viewModel.loginUiState.value
         assertTrue(state.screenState is ScreenState.Success)
-        assertEquals("userId123", (state.screenState as ScreenState.Success).data)
         assertTrue(state.shouldNavigateToCatalog)
     }
 

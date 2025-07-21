@@ -6,8 +6,7 @@ import androidx.lifecycle.viewModelScope
 import coil3.network.HttpException
 import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.usecase.user.LoginUserUseCase
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.utils.CommonUtils
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -20,7 +19,8 @@ import java.io.IOException
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val commonUtils: CommonUtils
 ) : ViewModel() {
 
     private val _loginUiState = MutableStateFlow(LoginUiState())
@@ -44,8 +44,8 @@ class LoginViewModel @Inject constructor(
         val email = _loginUiState.value.email
         val password = _loginUiState.value.password
 
-        val isEmailValid = isEmailValid(email)
-        val isPasswordValid = isPasswordValid(password)
+        val isEmailValid = commonUtils.isEmailValid(email)
+        val isPasswordValid = commonUtils.isPasswordValid(password)
 
         _loginUiState.update { state ->
             state.copy(

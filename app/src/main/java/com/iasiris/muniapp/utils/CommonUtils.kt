@@ -6,14 +6,13 @@ import java.util.Date
 import java.util.Locale
 
 class CommonUtils {
-    companion object {
-        fun isEmailValid(email: String) = Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    fun isEmailValid(email: String) = Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-        fun isPasswordValid(password: String) = password.length >= 8
+    fun isPasswordValid(password: String) = password.length >= 8
 
-        fun returnDate(): String = SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss",
-            Locale.getDefault()
-        ).format(Date(System.currentTimeMillis()))
-    }
+    fun returnDate(): String = SimpleDateFormat(
+        "yyyy-MM-dd HH:mm:ss",
+        Locale.getDefault()
+    ).format(Date(System.currentTimeMillis()))
+
 }

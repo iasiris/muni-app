@@ -17,8 +17,7 @@ import com.iasiris.muniapp.domain.usecase.orderhistory.DeleteOrderHistoryUseCase
 import com.iasiris.muniapp.domain.usecase.user.GetUserByIdUseCase
 import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
 import com.iasiris.muniapp.domain.usecase.user.UpdateUserUseCase
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.utils.CommonUtils
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -40,7 +39,8 @@ class ProfileViewModel @Inject constructor(
     private val updateUserUseCase: UpdateUserUseCase,
     private val userPreferences: UserPreferences,
     private val deleteCartItemsUseCase: DeleteCartItemsUseCase,
-    private val deleteOrderHistoryUseCase: DeleteOrderHistoryUseCase
+    private val deleteOrderHistoryUseCase: DeleteOrderHistoryUseCase,
+    private val commonUtils: CommonUtils
 ) : AndroidViewModel(myApplication) {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -125,9 +125,8 @@ class ProfileViewModel @Inject constructor(
                 val isNewEmail =
                     _profileUiState.value.user.email != _profileUiState.value.originalEmail
                 if (isNewEmail) {
-                    val isEmailAvailable = withContext(Dispatchers.IO) {
+                    val isEmailAvailable =
                         isEmailAvailableUseCase.invoke(_profileUiState.value.user.email)
-                    }
                     if (!isEmailAvailable) {
                         throw IllegalArgumentException("El email ya está en uso")
                     }
@@ -140,9 +139,9 @@ class ProfileViewModel @Inject constructor(
                         )
                     }
                 }
-                withContext(Dispatchers.IO) {
-                    updateUserUseCase.invoke(_profileUiState.value.user)
-                }
+
+                updateUserUseCase.invoke(_profileUiState.value.user)
+
                 _profileUiState.update {
                     it.copy(
                         user = it.user,
@@ -172,20 +171,19 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch() {
             _profileUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                withContext(Dispatchers.IO) {
-                    // Elimina todos los registros de las tablas
-                    getApplication<Application>().let { app ->
-                        val db = Room.databaseBuilder(
-                            app, AppDatabase::class.java, "muniapp_database"
-                        ).build()
-                        db.cartItemDao().deleteCartItems()
-                        db.orderHistoryDao().deleteOrderHistory()
-                        db.orderHistoryDao().deleteOrderItems()
-                        db.close()
-                        app.deleteDatabase("muniapp_database")
-                        app.cacheDir.deleteRecursively()
-                    }
+                // Elimina todos los registros de las tablas
+                getApplication<Application>().let { app ->
+                    val db = Room.databaseBuilder(
+                        app, AppDatabase::class.java, "muniapp_database"
+                    ).build()
+                    db.cartItemDao().deleteCartItems()
+                    db.orderHistoryDao().deleteOrderHistory()
+                    db.orderHistoryDao().deleteOrderItems()
+                    db.close()
+                    app.deleteDatabase("muniapp_database")
+                    app.cacheDir.deleteRecursively()
                 }
+
                 _profileUiState.update { state ->
                     state.copy(
                         screenState = ScreenState.Success(""),
@@ -205,9 +203,8 @@ class ProfileViewModel @Inject constructor(
                 val userId = userPreferences.userIdFlow.first()
                     ?: throw NoSuchElementException("El usuario no esta loggeado")
 
-                val user = withContext(Dispatchers.IO) {
-                    getUserByIdUseCase.invoke(userId)
-                } ?: throw NoSuchElementException("Usuario no encontrado")
+                val user = getUserByIdUseCase.invoke(userId)
+                    ?: throw NoSuchElementException("Usuario no encontrado")
 
                 _profileUiState.update {
                     it.copy(
@@ -226,7 +223,7 @@ class ProfileViewModel @Inject constructor(
     private fun verifyFieldChange(field: String) {
         if (field == "email") {
             val email = _profileUiState.value.user.email
-            val isEmailValid = isEmailValid(email)
+            val isEmailValid = commonUtils.isEmailValid(email)
             _profileUiState.update { state ->
                 state.copy(
                     isSaveEnabled = isEmailValid || email.isNotEmpty(),
@@ -236,7 +233,7 @@ class ProfileViewModel @Inject constructor(
         } else if (field == "password") {
             val password = _profileUiState.value.user.password
             val originalPassword = _profileUiState.value.originalPassword
-            val isPasswordValid = isPasswordValid(password)
+            val isPasswordValid = commonUtils.isPasswordValid(password)
             val isPasswordChanged = password != originalPassword
 
             val isSaveEnabled = isPasswordValid && isPasswordChanged

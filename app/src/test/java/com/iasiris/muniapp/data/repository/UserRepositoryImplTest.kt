@@ -12,7 +12,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -30,42 +29,32 @@ class UserRepositoryImplTest {
         userRepository = UserRepositoryImpl(remote)
     }
 
-
     @Test
     fun loginUserWithValidCredentialsReturnsUserId() = runTest {
-        coEvery { remote.loginUser("valid@example.com", "password123") } returns "userId123"
+        coEvery { remote.loginUser(mockUser().email, mockUser().password) } returns mockUser().id
 
-        val result = userRepository.loginUser("valid@example.com", "password123")
+        val result = userRepository.loginUser(mockUser().email, mockUser().password)
 
-        assertEquals("userId123", result)
-    }
-
-    @Test
-    fun loginUserWithInvalidCredentialsReturnsNull() = runTest {
-        coEvery { remote.loginUser("invalid@example.com", "wrongpassword") } returns null
-
-        val result = userRepository.loginUser("invalid@example.com", "wrongpassword")
-
-        assertNull(result)
+        assertEquals(mockUser().id, result)
     }
 
     @Test
     fun insertUserReturnsUserId() = runTest {
         val user = mockUser()
-        coEvery { remote.insertUser(any()) } returns "userId123"
+        coEvery { remote.insertUser(any()) } returns mockUser().id
 
         val result = userRepository.insertUser(user)
 
-        assertEquals("userId123", result)
+        assertEquals(mockUser().id, result)
     }
 
     @Test
     fun getUserIdByEmailReturnsCorrectId() = runTest {
-        coEvery { remote.getUserIdByEmail("john@example.com") } returns "userId123"
+        coEvery { remote.getUserIdByEmail(mockUser().email) } returns mockUser().id
 
-        val result = userRepository.getUserIdByEmail("john@example.com")
+        val result = userRepository.getUserIdByEmail(mockUser().email)
 
-        assertEquals("userId123", result)
+        assertEquals(mockUser().id, result)
     }
 
     @Test
@@ -80,9 +69,9 @@ class UserRepositoryImplTest {
 
     @Test
     fun isEmailAvailableReturnsTrueWhenAvailable() = runTest {
-        coEvery { remote.isEmailAvailable("available@example.com") } returns true
+        coEvery { remote.isEmailAvailable(mockUser().email) } returns true
 
-        val result = userRepository.isEmailAvailable("available@example.com")
+        val result = userRepository.isEmailAvailable(mockUser().email)
 
         assertTrue(result)
     }

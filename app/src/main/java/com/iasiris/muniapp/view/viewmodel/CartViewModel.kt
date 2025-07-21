@@ -14,12 +14,10 @@ import com.iasiris.muniapp.domain.usecase.cartitem.UpdateCartItemUseCase
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -41,13 +39,10 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch {
             _cartUiState.update { it.copy(screenState = ScreenState.Loading) }
             try {
-                val existingCartItem = withContext(Dispatchers.IO) {
-                    getCartItemByProductIdUseCase.invoke(product.id)
-                }
+                val existingCartItem = getCartItemByProductIdUseCase.invoke(product.id)
+
                 if (existingCartItem == null) {
-                    val newCartItem = withContext(Dispatchers.IO) {
-                        addCartItemUseCase.invoke(product.id)
-                    }
+                    val newCartItem = addCartItemUseCase.invoke(product.id)
                     _cartUiState.update { state ->
                         val updatedCartItems = state.cartItems + newCartItem
                         state.copy(
@@ -69,9 +64,9 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch() {
             try {
                 val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity + 1)
-                withContext(Dispatchers.IO) {
-                    updateCartItemUseCase.invoke(cartItemUpdated)
-                }
+
+                updateCartItemUseCase.invoke(cartItemUpdated)
+
                 _cartUiState.update {
                     it.copy(
                         cartItems = it.cartItems.map { item ->
@@ -92,9 +87,9 @@ class CartViewModel @Inject constructor(
         viewModelScope.launch() {
             try {
                 val cartItemUpdated = cartItem.copy(quantity = cartItem.quantity - 1)
-                withContext(Dispatchers.IO) {
-                    updateCartItemUseCase.invoke(cartItemUpdated)
-                }
+
+                updateCartItemUseCase.invoke(cartItemUpdated)
+
                 _cartUiState.update {
                     it.copy(
                         cartItems = it.cartItems.map { item ->
@@ -114,9 +109,8 @@ class CartViewModel @Inject constructor(
     fun onRemoveCartItem(cartItem: CartItem) {
         viewModelScope.launch() {
             try {
-                withContext(Dispatchers.IO) {
-                    deleteCartItem.invoke(cartItem.id)
-                }
+                deleteCartItem.invoke(cartItem.id)
+
                 _cartUiState.update { state ->
                     val updatedCartItems = state.cartItems.filterNot {
                         it.product.id == cartItem.product.id
@@ -130,10 +124,10 @@ class CartViewModel @Inject constructor(
         }
     }
 
-    private fun getCartItems() {//TODO check que haya persistencia de los items en el carrito al cerrar y abrir la app de nuevo
+    private fun getCartItems() {
         viewModelScope.launch {
             try {
-                val allCartItems = withContext(Dispatchers.IO) { getCartItemsUseCase.invoke() }
+                val allCartItems = getCartItemsUseCase.invoke()
                     ?: throw (throw NoSuchElementException("No se encontraron items en el carrito"))
                 _cartUiState.update { state ->
                     state.copy(
@@ -150,7 +144,7 @@ class CartViewModel @Inject constructor(
 
     fun clearCart() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { deleteCartItemsUseCase.invoke() }
+            deleteCartItemsUseCase.invoke()
             _cartUiState.update { state ->
                 state.copy(
                     cartItems = emptyList(),

@@ -14,6 +14,7 @@ import com.iasiris.muniapp.domain.repository.CartItemRepository
 import com.iasiris.muniapp.domain.repository.OrderHistoryRepository
 import com.iasiris.muniapp.domain.repository.ProductRepository
 import com.iasiris.muniapp.domain.repository.UserRepository
+import com.iasiris.muniapp.utils.CommonUtils
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,8 +48,13 @@ object RepositoryModule {
     @Provides
     fun provideOrderRepository(
         orderHistoryRemoteDataSource: OrderHistoryRemoteDataSource,
-        orderHistoryLocalDataSource: OrderHistoryLocalDataSource
+        orderHistoryLocalDataSource: OrderHistoryLocalDataSource,
+        commonUtils: CommonUtils
     ): OrderHistoryRepository {
-        return OrderHistoryRepositoryImpl(orderHistoryRemoteDataSource,orderHistoryLocalDataSource)
+        return OrderHistoryRepositoryImpl(
+            orderHistoryRemoteDataSource,
+            orderHistoryLocalDataSource,
+            commonUtils
+        )
     }
 }

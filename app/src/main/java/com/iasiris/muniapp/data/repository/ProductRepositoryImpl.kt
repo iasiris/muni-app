@@ -15,7 +15,7 @@ class ProductRepositoryImpl @Inject constructor(
 ) : ProductRepository {
 
     override suspend fun getProducts(refreshData: Boolean): List<Product> {
-        return if (refreshData) { //TODO refresh con WorkManager
+        return if (refreshData) {
             val remoteProducts = remote.getProducts()
                 ?: throw NoSuchElementException("La lista no pudo cargar productos")
             local.clearProducts()
@@ -28,7 +28,7 @@ class ProductRepositoryImpl @Inject constructor(
                 val remoteProducts = remote.getProducts()
                     ?: throw NoSuchElementException("La lista no pudo cargar productos")
                 local.insertProducts(remoteProducts.map { it.productDtoToEntity() })
-                remoteProducts.map { it.productDtoToDomain() }
+                return remoteProducts.map { it.productDtoToDomain() }
             }
 
             localProducts.map { it.productEntityToDomain() }

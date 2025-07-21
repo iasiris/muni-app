@@ -8,17 +8,14 @@ import com.iasiris.muniapp.data.local.UserPreferences
 import com.iasiris.muniapp.domain.model.User
 import com.iasiris.muniapp.domain.usecase.user.AddUserUseCase
 import com.iasiris.muniapp.domain.usecase.user.IsEmailAvailableUseCase
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isEmailValid
-import com.iasiris.muniapp.utils.CommonUtils.Companion.isPasswordValid
+import com.iasiris.muniapp.utils.CommonUtils
 import com.iasiris.muniapp.view.ui.screen.ScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 
@@ -26,7 +23,8 @@ import java.io.IOException
 class RegisterViewModel @Inject constructor(
     private val isEmailAvailableUseCase: IsEmailAvailableUseCase,
     private val addUserUseCase: AddUserUseCase,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val commonUtils: CommonUtils
 ) : ViewModel() {
 
     private val _registerUiState = MutableStateFlow(RegisterUiState())
@@ -66,9 +64,10 @@ class RegisterViewModel @Inject constructor(
         val password = _registerUiState.value.password
         val passwordConfirm = _registerUiState.value.confirmPassword
 
-        val isEmailValid = isEmailValid(email)
-        val isPasswordValid = isPasswordValid(password)
-        val isPasswordConfirmValid = isPasswordValid(passwordConfirm)
+        val isEmailValid = commonUtils.isEmailValid(email)
+        val isPasswordValid = commonUtils.isPasswordValid(password)
+        val isPasswordConfirmValid =
+            commonUtils.isPasswordValid(passwordConfirm)
         val doPasswordsMatch = password == passwordConfirm
 
         val isRegisterEnabled =
@@ -100,9 +99,7 @@ class RegisterViewModel @Inject constructor(
             viewModelScope.launch {
                 _registerUiState.update { it.copy(screenState = ScreenState.Loading) }
                 try {
-                    val isEmailAvailable = withContext(Dispatchers.IO) {
-                        isEmailAvailableUseCase.invoke(newUser.email)
-                    }
+                    val isEmailAvailable = isEmailAvailableUseCase.invoke(newUser.email)
 
                     if (!isEmailAvailable) {
                         throw IllegalArgumentException("El email ya está en uso")
@@ -110,9 +107,8 @@ class RegisterViewModel @Inject constructor(
                     }
 
 
-                    val userId = withContext(Dispatchers.IO) {
-                        addUserUseCase.invoke(newUser)
-                    } ?: throw IllegalArgumentException("Error al registrar el usuario")
+                    val userId = addUserUseCase.invoke(newUser)
+                        ?: throw IllegalArgumentException("Error al registrar el usuario")
 
                     clearRegistrationForm()
                     userPreferences.setUserId(userId)
@@ -125,9 +121,7 @@ class RegisterViewModel @Inject constructor(
                 } catch (e: IllegalArgumentException) {
                     _registerUiState.update {
                         it.copy(
-                            screenState = ScreenState.Success(
-                                e.message ?: "Error de autenticación"
-                            ),
+                            screenState = ScreenState.Success(""),
                             isEmailValid = false
                         )
                     }
@@ -174,8 +168,6 @@ class RegisterViewModel @Inject constructor(
             )
         }
     }
-
-
 }
 
 data class RegisterUiState(
