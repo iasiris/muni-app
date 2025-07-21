@@ -107,13 +107,14 @@ Perfil
 
 <img src="screenshots/perfil_con_historial_de_ordenes.png" alt="Perfil" width="300"/>
 
-Seleccion de imagen de perfil
-
-<img src="screenshots/perfil_-_seleccionar_foto.png" alt="Perfil - Selección de imagen" width="300"/>
-
 Permiso para acceder a la cámara y galería
 
 <img src="screenshots/perfil_-_permisos_de_camara_y_galeria.png" alt="Perfil - Permisos" width="300"/>
+
+
+Seleccion de imagen de perfil
+
+<img src="screenshots/perfil_-_seleccionar_foto.png" alt="Perfil - Selección de imagen" width="300"/>
 
 Chequeo de email disponible
 
@@ -132,3 +133,7 @@ Historial de Pedidos con ordenes de compra
 Historial de Pedidos vacío
 
 <img src="screenshots/historial_de_pedidos_vacio.png" alt="Historial" width="300"/>
+
+Soporta Dark Mode:
+
+<img src="screenshots/dark_mode.png" alt="Dark Mode" width="300"/>
