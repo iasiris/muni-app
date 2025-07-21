@@ -10,7 +10,7 @@ Aplicación móvil para Android desarrollada en Kotlin, utilizando Jetpack Compo
 - Persistencia local con Room
 - Consumo de servicios REST con Retrofit y OkHttp
 - Carga de imágenes con Coil
-- Soporte para fuentes personalizadas de Google Fonts
+- Soporte para Dark Mode
 
 ## Requisitos
 
@@ -69,6 +69,10 @@ Verificación de contraseñas
 
 <img src="screenshots/register_-_check_pass.png" alt="Registro - Verificación de contraseñas" width="300"/>
 
+Chequeo de email disponible
+
+<img src="screenshots/register_-_chequeo_de_email_disponible.png" alt="Registro - Chequeo de email" width="300"/>
+
 Catálogo de Productos:
 
 Catálogo de productos
@@ -87,10 +91,6 @@ Filtrado por categoría
 
 <img src="screenshots/product_catalog_-_filtrado_por_categoria.png" alt="Catálogo - Categoría" width="300"/>
 
-Detalle de Producto:
-
-<img src="screenshots/product_detail.png" alt="Detalle" width="300"/>
-
 Carrito:
 
 Carrito con productos
@@ -103,9 +103,21 @@ Carrito vacío
 
 Perfil:
 
-Perfil con historial de órdenes
+Perfil
 
 <img src="screenshots/perfil_con_historial_de_ordenes.png" alt="Perfil" width="300"/>
+
+Seleccion de imagen de perfil
+
+<img src="screenshots/perfil_-_seleccionar_foto.png" alt="Perfil - Selección de imagen" width="300"/>
+
+Permiso para acceder a la cámara y galería
+
+<img src="screenshots/perfil_-_permisos_de_camara_y_galeria.png" alt="Perfil - Permisos" width="300"/>
+
+Chequeo de email disponible
+
+<img src="screenshots/perfil_-_chequeo_de_email_disponible.png" alt="Perfil - Chequeo de email" width="300"/>
 
 Guardado exitoso en perfil
 
@@ -113,4 +125,10 @@ Guardado exitoso en perfil
 
 Historial de Pedidos:
 
+Historial de Pedidos con ordenes de compra
+
 <img src="screenshots/historial_de_pedidos.png" alt="Historial" width="300"/>
+
+Historial de Pedidos vacío
+
+<img src="screenshots/historial_de_pedidos_vacio.png" alt="Historial" width="300"/>
